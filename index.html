@@ -530,26 +530,18 @@ async function openFlipbook(pdfUrl){
 
 function closeFlipbook(){
   
-    const music = document.getElementById("bg-music");
-    music.pause();
-    music.currentTime = 0;
-  
-    if($("#flipbook").data("turn")){
-      $("#flipbook").turn("destroy");
-    }
-  
-    $("#flipbook").html("");
-  
-    document.getElementById("flipbook-container").style.display="none";
-    document.getElementById("zine-loading").style.display="none";
+  const music = document.getElementById("bg-music");
+  music.pause();
+  music.currentTime = 0;
+
+  if($("#flipbook").data("turn")){
+    $("#flipbook").turn("destroy");
   }
 
-  flipbook.html(""); // kosongkan isi
+  $("#flipbook").html("");
 
-  document.getElementById("flipbook-container").style.display = "none";
-
-  // 🔥 pastikan loading mati kalau ada error sebelumnya
-  document.getElementById("zine-loading").style.display = "none";
+  document.getElementById("flipbook-container").style.display="none";
+  document.getElementById("zine-loading").style.display="none";
 }
 function searchZine(){
   const input = document.getElementById("zineSearch").value.toLowerCase();
