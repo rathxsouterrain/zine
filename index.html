@@ -224,19 +224,37 @@ position:fixed;
 inset:0;
 background:black;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
-font-size:18px;
-letter-spacing:8px;
 z-index:9999;
-transition:1s;
+transition:1.2s ease;
+}
+
+#introText{
+font-size:22px;
+letter-spacing:10px;
+opacity:0;
+filter:blur(10px);
+transition:1.2s ease;
+}
+
+#introSub{
+margin-top:20px;
+font-size:11px;
+letter-spacing:4px;
+opacity:0;
+filter:blur(10px);
+transition:1.5s ease;
+opacity:0.5;
 }
 </style>
 </head>
 
 <body>
 <div id="intro">
-  RATH X SOUTERRAIN
+  <h1 id="introText">RATH X SOUTERRAIN</h1>
+  <p id="introSub">digital underground archive</p>
 </div>
 <nav>
 <audio id="bg-music" loop>
@@ -523,15 +541,33 @@ function kirimKritik(){
   document.getElementById("kritikPesan").value = "";
 }
   window.addEventListener("load", ()=>{
+
+  const intro = document.getElementById("intro");
+  const text = document.getElementById("introText");
+  const sub = document.getElementById("introSub");
+
+  // Munculkan teks utama
   setTimeout(()=>{
-    const intro = document.getElementById("intro");
-    if(intro){
-      intro.style.opacity = "0";
-      setTimeout(()=>{
-        intro.style.display = "none";
-      },1000);
-    }
-  },1500);
+    text.style.opacity = "1";
+    text.style.filter = "blur(0px)";
+  }, 500);
+
+  // Munculkan sub text
+  setTimeout(()=>{
+    sub.style.opacity = "0.6";
+    sub.style.filter = "blur(0px)";
+  }, 1200);
+
+  // Fade out semua
+  setTimeout(()=>{
+    intro.style.opacity = "0";
+  }, 3000);
+
+  // Hapus dari layar
+  setTimeout(()=>{
+    intro.style.display = "none";
+  }, 4200);
+
 });
 </script>
 
