@@ -533,10 +533,11 @@ function kirimKritik(){
     return;
   }
 
-  const phoneNumber = "6282313076077"; // GANTI DENGAN NOMOR WA KAMU
-  const url = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(pesan);
+  const email = "ulinnha1140@gmail.com"; // GANTI DENGAN EMAIL KAMU
+  const subject = "Kritik & Saran Website";
+  const body = encodeURIComponent(pesan);
 
-  window.open(url, "_blank");
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
 
   document.getElementById("kritikPesan").value = "";
 }
