@@ -472,6 +472,7 @@ async function openFlipbook(pdfUrl){
   }
 
   $("#flipbook").html("");
+  flipbook.removeData();
 
   document.getElementById("flipbook-container").style.display = "block";
 
@@ -516,7 +517,7 @@ async function openFlipbook(pdfUrl){
     display: isMobile ? "single" : "double",
     duration: 1200
   });
-
+flipbook.turn("page", 1);
   document.getElementById("nextBtn").onclick = () => {
     $("#flipbook").turn("next");
   };
