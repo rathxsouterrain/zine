@@ -464,28 +464,18 @@ async function openFlipbook(pdfUrl){
   const loading = document.getElementById("zine-loading");
   loading.style.display = "flex";
 
-  // Paksa browser render dulu loading
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Reset flipbook dulu
+  if($("#flipbook").data("turn")){
+    $("#flipbook").turn("destroy");
+  }
+
+  $("#flipbook").html("");
+  document.getElementById("flipbook-container").style.display = "block";
 
   try {
 
-    if($("#flipbook").data("turn")){
-      $("#flipbook").turn("destroy");
-      $("#flipbook").html("");
-    }
-
-    const music = document.getElementById("bg-music");
-    music.volume = 0.5;
-    music.play().catch(()=>{});
-
-    document.getElementById("flipbook-container").style.display = "block";
-    const flipbook = document.getElementById("flipbook");
-    flipbook.innerHTML = "";
-
     const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
     const total = pdf.numPages;
-
-    const pages = [];
 
     for(let i = 1; i <= total; i++){
       const page = await pdf.getPage(i);
@@ -506,30 +496,34 @@ async function openFlipbook(pdfUrl){
       div.className = "page";
       div.appendChild(canvas);
 
-      pages.push(div);
+      document.getElementById("flipbook").appendChild(div);
     }
 
-    pages.forEach(p => flipbook.appendChild(p));
+    // 🔥 PENTING: kasih delay kecil sebelum init turn
+    setTimeout(() => {
 
-    let isMobile = window.innerWidth <= 768;
-    let ratio = 1.414;
-    let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
-    let pageHeight = pageWidth * ratio;
+      let isMobile = window.innerWidth <= 768;
+      let ratio = 1.414;
+      let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
+      let pageHeight = pageWidth * ratio;
 
-    $("#flipbook").turn({
-      width: isMobile ? pageWidth : pageWidth * 2,
-      height: pageHeight,
-      autoCenter: true,
-      display: isMobile ? "single" : "double",
-      duration: 1200
-    });
+      $("#flipbook").turn({
+        width: isMobile ? pageWidth : pageWidth * 2,
+        height: pageHeight,
+        autoCenter: true,
+        display: isMobile ? "single" : "double",
+        duration: 1000
+      });
+
+      loading.style.display = "none";
+
+    }, 300);
 
   } catch(err){
     console.error(err);
     alert("Gagal membuka zine.");
+    loading.style.display = "none";
   }
-
-  loading.style.display = "none";
 }
 
 function closeFlipbook(){
