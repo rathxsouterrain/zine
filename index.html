@@ -511,13 +511,15 @@ async function openFlipbook(pdfUrl){
   let pageHeight = pageWidth * ratio;
 
   $("#flipbook").turn({
-    width: isMobile ? pageWidth : pageWidth * 2,
-    height: pageHeight,
-    autoCenter: true,
-    display: isMobile ? "single" : "double",
-    duration: 1200
-  });
-  $("#flipbook").turn("page", 1);
+  width: isMobile ? pageWidth : pageWidth * 2,
+  height: pageHeight,
+  autoCenter: true,
+  display: isMobile ? "single" : "double",
+  duration: 1200
+});
+
+// 🔥 paksa mulai dari halaman pertama
+$("#flipbook").turn("page", 1);
   document.getElementById("nextBtn").onclick = () => {
     $("#flipbook").turn("next");
   };
