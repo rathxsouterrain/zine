@@ -517,9 +517,8 @@ async function openFlipbook(pdfUrl){
     display: isMobile ? "single" : "double",
     duration: 1200
   });
-flipbook.turn("page", 1);
   document.getElementById("nextBtn").onclick = () => {
-    $("#flipbook").turn("next");
+    $("#flipbook").turn("page" 1);
   };
 
   document.getElementById("prevBtn").onclick = () => {
