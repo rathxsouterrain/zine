@@ -469,7 +469,6 @@ async function openFlipbook(pdfUrl){
   // Reset flipbook total
   if($("#flipbook").data("turn")){
   $("#flipbook").turn("destroy");
-  $("#flipbook").removeData();
 }
 
 $("#flipbook").html("");
@@ -518,8 +517,6 @@ $("#flipbook").html("");
   duration: 1200
 });
 
-// 🔥 paksa mulai dari halaman pertama
-$("#flipbook").turn("page", 1);
   document.getElementById("nextBtn").onclick = () => {
     $("#flipbook").turn("next");
   };
