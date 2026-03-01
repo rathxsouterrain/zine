@@ -461,84 +461,107 @@ Rath X souterrain Berasal dari 2 Kata Rath: Istilah Irlandia dalam frasa celtic 
 </div>
 
 <script>
+  let currentSession = 0;
 async function openFlipbook(pdfUrl){
+
+  const session = ++currentSession; // 🔥 buat session baru
 
   const loading = document.getElementById("zine-loading");
   loading.style.display = "flex";
 
-  // Reset flipbook total
-  if($("#flipbook").data("turn")){
-  $("#flipbook").turn("destroy");
-}
+  const container = document.getElementById("flipbook-container");
+  container.style.display = "block";
 
-$("#flipbook").html("");
+  const oldFlipbook = document.getElementById("flipbook");
 
-  document.getElementById("flipbook-container").style.display = "block";
+  if($(oldFlipbook).data("turn")){
+    $(oldFlipbook).turn("destroy");
+  }
+
+  const newFlipbook = document.createElement("div");
+  newFlipbook.id = "flipbook";
+  oldFlipbook.parentNode.replaceChild(newFlipbook, oldFlipbook);
 
   const music = document.getElementById("bg-music");
   music.volume = 0.5;
   music.play().catch(()=>{});
 
-  const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-  const total = pdf.numPages;
+  try{
 
-  for(let i = 1; i <= total; i++){
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 2 });
+    const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
+    // 🔥 kalau sudah bukan session aktif, hentikan
+    if(session !== currentSession) return;
 
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+    const total = pdf.numPages;
 
-    await page.render({
-      canvasContext: context,
-      viewport: viewport
-    }).promise;
+    for(let i = 1; i <= total; i++){
 
-    const div = document.createElement("div");
-    div.className = "page";
-    div.appendChild(canvas);
+      if(session !== currentSession) return; // 🔥 stop kalau sudah close
 
-    document.getElementById("flipbook").appendChild(div);
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 2 });
+
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
+
+      const div = document.createElement("div");
+      div.className = "page";
+      div.appendChild(canvas);
+
+      newFlipbook.appendChild(div);
+    }
+
+    let isMobile = window.innerWidth <= 768;
+    let ratio = 1.414;
+    let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
+    let pageHeight = pageWidth * ratio;
+
+    $(newFlipbook).turn({
+      width: isMobile ? pageWidth : pageWidth * 2,
+      height: pageHeight,
+      autoCenter: true,
+      display: isMobile ? "single" : "double",
+      duration: 1200
+    });
+
+    document.getElementById("nextBtn").onclick = () => {
+      $(newFlipbook).turn("next");
+    };
+
+    document.getElementById("prevBtn").onclick = () => {
+      $(newFlipbook).turn("previous");
+    };
+
+  }catch(err){
+    console.error(err);
   }
 
-  let isMobile = window.innerWidth <= 768;
-  let ratio = 1.414;
-  let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
-  let pageHeight = pageWidth * ratio;
-
-  $("#flipbook").turn({
-  width: isMobile ? pageWidth : pageWidth * 2,
-  height: pageHeight,
-  autoCenter: true,
-  display: isMobile ? "single" : "double",
-  duration: 1200
-});
-
-  document.getElementById("nextBtn").onclick = () => {
-    $("#flipbook").turn("next");
-  };
-
-  document.getElementById("prevBtn").onclick = () => {
-    $("#flipbook").turn("previous");
-  };
-
-  loading.style.display = "none";
+  if(session === currentSession){
+    loading.style.display = "none";
+  }
 }
 
 function closeFlipbook(){
-  
+
+  currentSession++; // 🔥 batalkan semua proses lama
+
   const music = document.getElementById("bg-music");
   music.pause();
   music.currentTime = 0;
 
-  if($("#flipbook").data("turn")){
-    $("#flipbook").turn("destroy");
+  const flip = document.getElementById("flipbook");
+  if($(flip).data("turn")){
+    $(flip).turn("destroy");
   }
-
-  $("#flipbook").html("");
 
   document.getElementById("flipbook-container").style.display="none";
   document.getElementById("zine-loading").style.display="none";
