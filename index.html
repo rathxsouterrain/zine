@@ -468,11 +468,11 @@ async function openFlipbook(pdfUrl){
 
   // Reset flipbook total
   if($("#flipbook").data("turn")){
-    $("#flipbook").turn("destroy");
-  }
+  $("#flipbook").turn("destroy");
+  $("#flipbook").removeData();
+}
 
-  $("#flipbook").html("");
-  $("flipbook").removeData();
+$("#flipbook").html("");
 
   document.getElementById("flipbook-container").style.display = "block";
 
