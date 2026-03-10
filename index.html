@@ -602,19 +602,7 @@ z-index:-1;
 </style>
 </head>
 <body>
-<div class="bg-layer"></div>
-<script>
 
-var images=["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
-var bg=images[Math.floor(Math.random()*images.length)];
-document.querySelector(".bg-layer").style.backgroundImage="url('"+bg+"')";
-
-window.addEventListener("scroll",function(){
-var sc=window.scrollY;
-document.querySelector(".bg-layer").style.transform="scale("+(1+sc*0.0003)+")";
-});
-
-</script>
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
   <p id="introSub">digital underground archive</p>
