@@ -528,41 +528,30 @@ align-items:center;
     font-family: Arial, sans-serif !important;
 }
 /* Semua teks dalam card glass lebih lembut */
+html, body {
+  min-height: 100%;
+  background: #000;
+}
+
 .bg-wrapper {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
   width: 100%;
   height: 100%;
+  height: -webkit-fill-available;
   z-index: -1;
-  /* Force hardware layer */
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .gif-bg {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* Ini kunci untuk mobile */
-  transform: translateZ(0);
-}
-
-/* Fallback untuk iOS yang tidak support fixed attachment */
-@supports (-webkit-touch-callout: none) {
-  .gif-bg {
-    position: absolute;
-    height: 100vh;
-    background-attachment: scroll;
-  }
+  background-repeat: no-repeat;
 }
 
 .gif-bg::after {
@@ -1372,19 +1361,6 @@ function setVH() {
 
 setVH();
 window.addEventListener('resize', setVH);
-
-// Prevent background jump saat scroll (khusus mobile)
-let ticking = false;
-window.addEventListener('scroll', () => {
-  if (!ticking) {
-    window.requestAnimationFrame(() => {
-      const wrapper = document.querySelector('.bg-wrapper');
-      wrapper.style.transform = 'translate3d(0, ' + window.scrollY + 'px, 0)';
-      ticking = false;
-    });
-    ticking = true;
-  }
-}, { passive: true });
 </script>
 
 </body>
