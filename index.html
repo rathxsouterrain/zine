@@ -528,47 +528,38 @@ align-items:center;
     font-family: Arial, sans-serif !important;
 }
 /* Semua teks dalam card glass lebih lembut */
+/* Wrapper untuk background */
+.bg-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  height: -webkit-fill-available;
+  z-index: -1;
+  pointer-events: none;
+}
+
 .gif-bg{
-position:fixed;
-top:0;
-left:0;
-width:100vw;
-height:100vh;
-height:-webkit-fill-available;
-min-height:100vh;
-min-height:-webkit-fill-available;
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-background-attachment:fixed;
-transform:translateZ(0);
--webkit-transform:translateZ(0);
-will-change:transform;
-z-index:-1;
+  position: absolute; /* absolute di dalam fixed wrapper */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translateZ(0);
 }
 
 .gif-bg::after{
-content:"";
-position:fixed;  /* ← BENAR: fixed bukan absolute */
-top:0;
-left:0;
-width:100vw;
-height:100vh;
-height:-webkit-fill-available;
-min-height:100vh;
-min-height:-webkit-fill-available;
-background:rgba(0,0,0,0.60);
-z-index:-1;
-}
-.gif-bg::after{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-
-background:rgba(0,0,0,0.60);
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.60);
 }
 /* MENU CONTAINER */
 .menu{
@@ -626,8 +617,10 @@ transform:scale(0.95);
 </style>
 </head>
 <body>
-<div class="gif-bg"></div>
-<div class="gif-bg" id="bgContainer"></div>
+<!-- Ganti div gif-bg lama dengan ini -->
+<div class="bg-wrapper">
+  <div class="gif-bg" id="bgContainer"></div>
+</div>
 <script>
 var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
 var bg = images[Math.floor(Math.random()*images.length)];
@@ -1354,7 +1347,25 @@ window.addEventListener("load", () => {
   });
 });
 
+var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
+var bg = images[Math.floor(Math.random()*images.length)];
+document.getElementById("bgContainer").style.backgroundImage = "url('"+bg+"')";
 
+// Kunci viewport untuk mobile browser
+function lockViewport() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+window.addEventListener('resize', lockViewport);
+window.addEventListener('scroll', () => {
+  // Force reflow untuk mengunci posisi
+  document.body.style.display = 'none';
+  document.body.offsetHeight; 
+  document.body.style.display = '';
+}, { passive: true });
+
+lockViewport();
 </script>
 
 </body>
