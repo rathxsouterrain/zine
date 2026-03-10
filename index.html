@@ -622,9 +622,7 @@ transform:scale(0.95);
 </head>
 <body>
 
-<div class="gif-bg">
-<img id="bgimg">
-</div>
+<div class="gif-bg" id="bg"></div>
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
   <p id="introSub">digital underground archive</p>
@@ -1357,9 +1355,7 @@ const backgrounds = [
 
 const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
 
-document.getElementById("bgimg").src = randomBg;
-
-});
+document.getElementById("bg").style.backgroundImage = "url('" + randomBg + "')";
 </script>
 
 </body>
