@@ -621,9 +621,38 @@ border:none;
 transform:scale(0.95);
 
 }
+.bg-layer{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+
+z-index:-1;
+
+transition:transform 0.4s ease-out;
+will-change:transform;
+}
 </style>
 </head>
 <body>
+<div class="bg-layer"></div>
+<script>
+
+var images=["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
+var bg=images[Math.floor(Math.random()*images.length)];
+document.querySelector(".bg-layer").style.backgroundImage="url('"+bg+"')";
+
+window.addEventListener("scroll",function(){
+var sc=window.scrollY;
+document.querySelector(".bg-layer").style.transform="scale("+(1+sc*0.0003)+")";
+});
+
+</script>
 <div class="gif-bg"></div>
 <script>
 var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
