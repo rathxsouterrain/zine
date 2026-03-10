@@ -24,14 +24,9 @@ html{ scroll-behavior:smooth; }
 
 body{
 margin:0;
+background:#000;
 color:white;
 font-family:Arial, sans-serif;
-
-background-image:url("back1.jpg");
-background-size:cover;
-background-position:center 0px;
-background-repeat:no-repeat;
-background-attachment:scroll;
 }
 
 /* NAVBAR */
@@ -532,7 +527,47 @@ align-items:center;
 #zineSearch{
     font-family: Arial, sans-serif !important;
 }
+/* Semua teks dalam card glass lebih lembut */
+.gif-bg{
+position:fixed;
+top:0;
+left:0;
 
+width:100vw;
+height:100vh;
+
+background-image:url("back1.jpg");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+
+z-index:-1;
+}
+
+#bgimg{
+position:fixed;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+object-position:center;
+
+z-index:-1;
+pointer-events:none;
+}
+.gif-bg::after{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.60);
+}
 /* MENU CONTAINER */
 .menu{
 display:flex;
@@ -586,32 +621,14 @@ border:none;
 transform:scale(0.95);
 
 }
-.bg-layer{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-
-z-index:-1;
-}
 </style>
 </head>
 <body>
+<div class="gif-bg"></div>
 <script>
-
-window.addEventListener("scroll",function(){
-
-let scroll = window.scrollY;
-
-document.body.style.backgroundPosition = "center " + (scroll * 0.3) + "px";
-
-});
-
+var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
+var bg = images[Math.floor(Math.random()*images.length)];
+document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </script>
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
@@ -1334,7 +1351,20 @@ window.addEventListener("load", () => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", function(){
+
+const backgrounds = [
+"back1.jpg",
+"back2.jpg",
+"back3.jpg",
+"back4.jpg",
+"back5.jpg"
+];
+
+const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
+
+document.getElementById("bgimg").src = randomBg;
+
+});
 
 </script>
-
-</body>
