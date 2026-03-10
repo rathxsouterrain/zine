@@ -1345,7 +1345,8 @@ window.addEventListener("load", () => {
     });
   });
 });
-document.addEventListener("DOMContentLoaded", function(){
+
+(function(){
 
 const backgrounds = [
 "back1.jpg",
@@ -1355,15 +1356,15 @@ const backgrounds = [
 "back5.jpg"
 ];
 
-const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
-
 const bg = document.getElementById("bg");
 
-if(bg){
-bg.style.backgroundImage = "url('" + randomBg + "')";
-}
+if(!bg) return;
 
-});
+const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
+
+bg.style.backgroundImage = "url('" + randomBg + "')";
+
+})();
 </script>
 
 </body>
