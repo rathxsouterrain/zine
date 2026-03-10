@@ -602,7 +602,17 @@ z-index:-1;
 </style>
 </head>
 <body>
+<script>
 
+window.addEventListener("scroll",function(){
+
+let scroll = window.scrollY;
+
+document.body.style.backgroundPosition = "center " + (scroll * 0.3) + "px";
+
+});
+
+</script>
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
   <p id="introSub">digital underground archive</p>
