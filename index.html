@@ -1350,6 +1350,13 @@ const backgrounds = [
 
 const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
 
+const bg = document.getElementById("bg");
+
+if(bg){
+bg.style.backgroundImage = "url('" + randomBg + "')";
+}
+
+});
 </script>
 
 </body>
