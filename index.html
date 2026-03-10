@@ -545,15 +545,24 @@ align-items:center;
 }
 
 .gif-bg {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  will-change: transform;
+  background-attachment: fixed; /* Ini kunci untuk mobile */
+  transform: translateZ(0);
+}
+
+/* Fallback untuk iOS yang tidak support fixed attachment */
+@supports (-webkit-touch-callout: none) {
+  .gif-bg {
+    position: absolute;
+    height: 100vh;
+    background-attachment: scroll;
+  }
 }
 
 .gif-bg::after {
