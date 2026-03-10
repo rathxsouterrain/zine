@@ -535,13 +535,14 @@ top:0;
 left:0;
 width:100vw;
 height:100vh;
-
-background-position:center;
-background-size:contain;
-background-repeat:no-repeat;
-background-attachment:fixed;
-
 z-index:-1;
+overflow:hidden;
+}
+
+#bgimg{
+width:100%;
+height:100%;
+object-fit:contain;
 }
 .gif-bg::after{
 content:"";
@@ -610,7 +611,9 @@ transform:scale(0.95);
 </head>
 <body>
 
-<div class="gif-bg"></div>
+<div class="gif-bg">
+<img id="bgimg">
+</div>
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
   <p id="introSub">digital underground archive</p>
