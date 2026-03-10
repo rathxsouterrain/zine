@@ -24,9 +24,14 @@ html{ scroll-behavior:smooth; }
 
 body{
 margin:0;
-background:#000;
 color:white;
 font-family:Arial, sans-serif;
+
+background-image:url("back1.jpg");
+background-size:cover;
+background-position:center 0px;
+background-repeat:no-repeat;
+background-attachment:scroll;
 }
 
 /* NAVBAR */
@@ -527,47 +532,7 @@ align-items:center;
 #zineSearch{
     font-family: Arial, sans-serif !important;
 }
-/* Semua teks dalam card glass lebih lembut */
-.gif-bg{
-position:fixed;
-top:0;
-left:0;
 
-width:100vw;
-height:100dvh;
-
-background-image:url("back1.jpg");
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-
-z-index:-1;
-}
-
-#bgimg{
-position:fixed;
-top:0;
-left:0;
-
-width:100%;
-height:100%;
-
-object-fit:cover;
-object-position:center;
-
-z-index:-1;
-pointer-events:none;
-}
-.gif-bg::after{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-
-background:rgba(0,0,0,0.63);
-}
 /* MENU CONTAINER */
 .menu{
 display:flex;
@@ -649,12 +614,6 @@ var sc=window.scrollY;
 document.querySelector(".bg-layer").style.transform="scale("+(1+sc*0.0003)+")";
 });
 
-</script>
-<div class="gif-bg"></div>
-<script>
-var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
-var bg = images[Math.floor(Math.random()*images.length)];
-document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </script>
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
