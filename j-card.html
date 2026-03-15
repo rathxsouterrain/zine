@@ -604,29 +604,34 @@ async function saveDesign(type, format) {
         btn.disabled = true;
     }
 
-    // Aktifkan mode export (garis potong jadi solid)
+    // Masuk ke mode export (garis jadi tipis solid)
     targetCanvas.classList.add('exporting');
 
     try {
-        // Gunakan konfigurasi yang lebih stabil untuk Mobile
+        // SOLUSI KUNCI: Menentukan opsi lebar & tinggi secara manual agar tidak terpotong
         const options = {
-            scale: 2, // 2 sudah cukup tajam untuk cetak (HD), kalau 4-5 sering crash di HP
+            scale: 2, // Resolusi HD tapi aman untuk RAM HP
             useCORS: true,
             allowTaint: true,
             backgroundColor: "#ffffff",
-            // Menangani masalah transformasi scale CSS agar hasil tidak burik/terpotong
             width: 1031,
             height: 1020,
-            windowWidth: 1031,
-            windowHeight: 1020
+            // Menghilangkan efek 'transform: scale' saat pemotretan
+            onclone: (clonedDoc) => {
+                const element = clonedDoc.getElementById(canvasId);
+                element.style.transform = "none";
+                element.style.left = "0";
+                element.style.top = "0";
+                element.style.position = "relative";
+            }
         };
 
         const canvas = await html2canvas(targetCanvas, options);
 
         if (format === 'jpg') {
-            const imgData = canvas.toDataURL("image/jpeg", 0.9); // Kualitas 90% agar file tidak terlalu raksasa
+            const imgData = canvas.toDataURL("image/jpeg", 0.98); // Kualitas tinggi
             const link = document.createElement("a");
-            link.download = `jcard-${type}.jpg`;
+            link.download = `jcard-${type}-${Date.now()}.jpg`;
             link.href = imgData;
             link.click();
         } 
@@ -642,8 +647,8 @@ async function saveDesign(type, format) {
             pdf.save(`jcard-${type}.pdf`);
         }
     } catch (error) {
-        console.error("Error:", error);
-        alert("Gagal menyimpan. Coba gunakan browser Chrome atau Safari versi terbaru.");
+        console.error("Error detail:", error);
+        alert("Gagal menyimpan. Pastikan kamu menggunakan Google Chrome atau Safari.");
     } finally {
         targetCanvas.classList.remove('exporting');
         if (btn) {
@@ -652,7 +657,6 @@ async function saveDesign(type, format) {
         }
     }
 }
-
 
 
 document.addEventListener("DOMContentLoaded", function() {
