@@ -57,8 +57,48 @@ body {
 .app-header{ text-align:center; margin-bottom:10px; }
 .controls{ background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--glass-border); padding:6px; border-radius:15px; width:100%; max-width:500px; display:flex; flex-direction:column; gap:10px; margin-bottom:15px; }
 input,select{ background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); padding:10px; color:white; border-radius:8px; }
-button{ background:white; color:black; border:none; padding:12px; border-radius:8px; font-weight:900; cursor:pointer; }
+button {
+    background: rgba(255, 255, 255, 0.1); /* glass effect */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 20px;
+    font-weight: 900;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
 
+/* Efek tekan animasi putih */
+button::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255,255,255,0.3);
+    border-radius: 12px;
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+button:active::after {
+    animation: pressAnim 0.3s forwards;
+}
+
+@keyframes pressAnim {
+    0% { transform: scale(0); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.3; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+/* Hover ringan */
+button:hover {
+    background: rgba(255,255,255,0.15);
+}
 /* CSS TOMBOL PAS DI BAWAH COVER */
 .action-buttons {
     display: flex;
@@ -312,7 +352,7 @@ button{ background:white; color:black; border:none; padding:12px; border-radius:
 <div class="web-info-tab">
     <div class="info-content">
         <h3>PENTING!</h3>
-        <p>Klik Text, Tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Back Cover: 254 x 1020 px</p>
+        <p>Klik Text, Tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
     </div>
 </div>
 <div class="canvas-viewport">
