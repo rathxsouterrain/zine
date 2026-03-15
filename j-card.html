@@ -585,40 +585,49 @@ document.querySelectorAll('.transform-box').forEach(box => {
 });
 
 async function saveDesign(type, format) {
-    // Tentukan target canvas
+    // Cari target canvas berdasarkan ID yang tepat
     const canvasId = (type === 'manual') ? 'jcard-canvas' : 'jcard-canvas-full';
     const targetCanvas = document.getElementById(canvasId);
-    const btn = event.currentTarget; // Tombol yang sedang diklik
     
-    if (!targetCanvas) return;
+    // Pastikan kita mendapatkan referensi tombol yang benar meskipun event tidak terdefinisi
+    const btn = event ? event.currentTarget : null;
+    
+    if (!targetCanvas) {
+        console.error("Elemen canvas tidak ditemukan: " + canvasId);
+        return;
+    }
 
-    // Feedback Visual: Ubah tombol jadi loading
-    const originalText = btn.innerText;
-    btn.innerText = "Processing...";
-    btn.style.opacity = "0.6";
-    btn.disabled = true;
+    // Feedback Visual: Loading state
+    let originalText = "SAVE";
+    if (btn) {
+        originalText = btn.innerText;
+        btn.innerText = "Processing...";
+        btn.style.opacity = "0.6";
+        btn.disabled = true;
+    }
 
+    // Tambahkan class exporting untuk menghilangkan garis bantu
     targetCanvas.classList.add('exporting');
 
     try {
+        // Beri jeda sedikit agar browser sempat merender class 'exporting'
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const canvas = await html2canvas(targetCanvas, {
+            scale: 3, // HD Resolution
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            logging: false
+        });
+
         if (format === 'jpg') {
-            const canvas = await html2canvas(targetCanvas, {
-                scale: 4, // High Definition
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: "#ffffff"
-            });
             const link = document.createElement("a");
-            link.download = `jcard--.jpg`;
-            link.href = canvas.toDataURL("image/jpeg", 1.0);
+            link.download = `jcard-${type}-${Date.now()}.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 0.95);
             link.click();
         } 
         else if (format === 'pdf') {
-            const canvas = await html2canvas(targetCanvas, {
-                scale: 3,
-                useCORS: true,
-                allowTaint: true
-            });
             const imgData = canvas.toDataURL("image/png");
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({
@@ -627,19 +636,22 @@ async function saveDesign(type, format) {
                 format: [1031, 1020]
             });
             pdf.addImage(imgData, "PNG", 0, 0, 1031, 1020);
-            pdf.save(`jcard--.pdf`);
+            pdf.save(`jcard-${type}-${Date.now()}.pdf`);
         }
     } catch (error) {
         console.error("Gagal menyimpan:", error);
-        alert("Terjadi kesalahan saat menyimpan. Pastikan koneksi stabil.");
+        alert("Terjadi kesalahan saat memproses gambar.");
     } finally {
-        // Kembalikan status tombol dan canvas
+        // Kembalikan ke tampilan semula
         targetCanvas.classList.remove('exporting');
-        btn.innerText = originalText;
-        btn.style.opacity = "1";
-        btn.disabled = false;
+        if (btn) {
+            btn.innerText = originalText;
+            btn.style.opacity = "1";
+            btn.disabled = false;
+        }
     }
 }
+
 
 
 
