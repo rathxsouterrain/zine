@@ -57,88 +57,85 @@ body {
 .app-header{ text-align:center; margin-bottom:10px; }
 .controls{ background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--glass-border); padding:6px; border-radius:15px; width:100%; max-width:500px; display:flex; flex-direction:column; gap:10px; margin-bottom:15px; }
 input,select{ background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); padding:10px; color:white; border-radius:8px; }
-button {
-    background: rgba(255, 255, 255, 0.1); /* glass effect */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+/* Gaya Tombol Glassmorphism Global */
+button, .btn-save, .btn-reset, .btn-upload-full {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
     padding: 12px 20px;
-    font-weight: 900;
+    font-weight: 700;
     border-radius: 12px;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 13px;
 }
 
-/* Efek tekan animasi putih */
-button::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(255,255,255,0.3);
-    border-radius: 12px;
-    transform: scale(0);
-    opacity: 0;
-    pointer-events: none;
-}
-
-button:active::after {
-    animation: pressAnim 0.3s forwards;
-}
-
-@keyframes pressAnim {
-    0% { transform: scale(0); opacity: 0.5; }
-    50% { transform: scale(1.2); opacity: 0.3; }
-    100% { transform: scale(1); opacity: 0; }
-}
-
-/* Hover ringan */
 button:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-2px);
 }
-/* CSS TOMBOL PAS DI BAWAH COVER */
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Tombol Reset (Tetap ada nuansa merah transparan) */
+.btn-reset {
+    background: rgba(255, 68, 68, 0.1) !important;
+    color: #ff4444 !important;
+    border-color: rgba(255, 68, 68, 0.2) !important;
+}
+
+/* Pastikan kontainer action-buttons menggunakan flex terpusat */
 .action-buttons {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center; /* Memusatkan semua elemen di dalamnya ke tengah */
+    gap: 12px;
     width: 100%;
     max-width: 500px;
-    margin-top: 5px;
-    margin-bottom: 50px;
+    margin: 20px auto 50px auto; /* auto kiri-kanan agar panel juga di tengah */
     
     /* Efek Glassmorphism */
-    background: var(--glass);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px); /* Support Safari */
-    border: 1px solid var(--glass-border);
-    padding: 15px;
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    padding: 20px;
+    border-radius: 20px;
     box-sizing: border-box;
-    z-index: 100;
 }
 
-/* Penyesuaian tombol di dalam tab glass */
-.action-buttons button {
-    margin: 0;
+/* Memusatkan teks label */
+.action-buttons p {
+    width: 100%; /* Agar teks punya ruang untuk bergeser ke tengah */
+    text-align: center !important; /* Paksa teks ke tengah */
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin: 5px 0;
+    text-transform: uppercase;
+}
+
+/* Mengatur grup tombol agar terpusat */
+.button-group {
+    display: flex;
+    gap: 10px;
     width: 100%;
+    justify-content: center; /* Memastikan tombol JPG/PDF juga di tengah */
 }
 
-.btn-reset {
-    background: rgba(255, 68, 68, 0.2) !important; /* Merah transparan */
-    color: #ff4444 !important;
-    border: 1px solid rgba(255, 68, 68, 0.4) !important;
+.button-group button {
+    flex: 1; /* Membuat tombol punya lebar yang sama */
+    max-width: 150px; /* Batasi lebar tombol agar tidak terlalu melar */
 }
 
-.btn-reset:hover {
-    background: rgba(255, 68, 68, 0.4) !important;
-}
-
-
-.btn-save { background: #ffffff !important; color: #000 !important; }
-.btn-reset { background: #ff4444 !important; color: white !important; font-size: 12px; padding: 8px !important; }
 
 .canvas-viewport {
     width: 100%;
@@ -314,6 +311,37 @@ button:hover {
 }
 
 
+/* Styling khusus Viewport Kedua */
+#jcard-canvas-full {
+    width: 1031px;
+    height: 1020px;
+    display: flex;
+    color: black;
+    transform-origin: top left;
+    transform: scale(0.35); /* Sesuaikan dengan skala viewport pertama */
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white; /* Default jika belum upload */
+    background-size: cover;
+    background-position: center;
+}
+
+/* Memastikan garis putus-putus tetap muncul di Viewport Kedua */
+#jcard-canvas-full .section {
+    background: transparent !important; /* Agar background utama terlihat */
+    border-right: 2px dashed #444; /* Garis pembatas yang Anda inginkan */
+}
+
+/* Hilangkan garis terakhir di ujung kanan */
+#jcard-canvas-full .front-cover {
+    border-right: none !important;
+}
+.exporting .section {
+    border-right: 1px solid #cccccc !important;
+}
+
+
 </style>
 </head>
 <body>
@@ -385,11 +413,60 @@ button:hover {
     </div>
 </div>
 </div>
+<button onclick="document.getElementById('fullWrapUpload').click()" style="background: rgba(0, 255, 150, 0.15); border: 1px solid #00ff96; color: #00ff96;">
+    Upload Full Wrap Image
+</button>
+<input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
+
+<div class="app-header"><h3>FULL WRAP MODE</h3></div>
+<div class="canvas-viewport">
+    <div id="jcard-canvas-full" class="full-wrap-container">
+        <div class="section back-flap">
+            <div class="transform-box" style="top:40px; left:20px;">
+                <div class="handle-move">+</div>
+                <div class="editable-content">
+                    <h3 contenteditable="true">playlist</h3>
+                    <div class="tracklist" contenteditable="true">1. track<br>2. track</div>
+                </div>
+                <div class="handle-resize"></div>
+            </div>
+        </div>
+        <div class="section spine">
+            <div class="transform-box">
+                <div class="handle-move">+</div>
+                <div class="editable-content spine-text" contenteditable="true">band name</div>
+                <div class="handle-resize"></div>
+            </div>
+        </div>
+        <div class="section front-cover">
+            <div class="transform-box" style="left:30px;">
+                <div class="handle-move">+</div>
+                <div class="front-overlay">
+                    <h1 class="editable-content" contenteditable="true">Cover</h1>
+                </div>
+                <div class="handle-resize"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="action-buttons">
-    <button onclick="downloadJPG()" class="btn-save">Save JPG</button>
-    <button onclick="downloadPDF()" class="btn-save">Save PDF</button>
-    <button onclick="location.reload()" class="btn-reset">Reset Design</button>
+    <p>DOWNLOAD DESIGN 1 (MANUAL)</p>
+    <div class="button-group">
+        <button onclick="saveDesign('manual', 'jpg')">JPG</button>
+        <button onclick="saveDesign('manual', 'pdf')">PDF</button>
+    </div>
+
+    <p style="margin-top: 15px;">DOWNLOAD DESIGN 2 (FULL WRAP)</p>
+    <div class="button-group">
+        <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
+        <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
+    </div>
+
+    <button onclick="location.reload()" class="btn-reset" style="margin-top: 15px; width: 100%;">RESET DESIGN</button>
+</div>
+
+
 </div>
 
 <script>
@@ -507,58 +584,66 @@ document.querySelectorAll('.transform-box').forEach(box => {
     resizeBtn.addEventListener('mousedown', startResize); resizeBtn.addEventListener('touchstart', startResize);
 });
 
-function downloadJPG(){
-    // Tambahkan class exporting untuk garis solid
-    canvas.classList.add('exporting');
+async function saveDesign(type, format) {
+    // Tentukan target canvas
+    const canvasId = (type === 'manual') ? 'jcard-canvas' : 'jcard-canvas-full';
+    const targetCanvas = document.getElementById(canvasId);
+    const btn = event.currentTarget; // Tombol yang sedang diklik
     
-    // Gunakan opsi resolusi tinggi
-    const options = {
-        scale: 4,            // Menaikkan resolusi 4x lipat (HD)
-        useCORS: true,       // Memastikan gambar dari link luar tetap terbawa
-        allowTaint: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 1031,   // Mengunci lebar asli canvas
-        windowHeight: 1020,  // Mengunci tinggi asli canvas
-        backgroundColor: null // Menghindari background hitam tak diinginkan
-    };
+    if (!targetCanvas) return;
 
-    setTimeout(() => {
-        html2canvas(canvas, options).then(c => {
-            const l = document.createElement("a");
-            l.download = "jcard-hd-print.jpg";
-            // Kualitas 1.0 berarti tanpa kompresi (Maksimal)
-            l.href = c.toDataURL("image/jpeg", 1.0); 
-            l.click();
-            
-            canvas.classList.remove('exporting');
-        });
-    }, 200);
-}
+    // Feedback Visual: Ubah tombol jadi loading
+    const originalText = btn.innerText;
+    btn.innerText = "Processing...";
+    btn.style.opacity = "0.6";
+    btn.disabled = true;
 
+    targetCanvas.classList.add('exporting');
 
-function downloadPDF(){
-    canvas.classList.add('exporting');
-    
-    setTimeout(() => {
-        html2canvas(canvas, {
-            scale: 3,
-            useCORS: true
-        }).then(c => {
-            const img = c.toDataURL("image/png");
+    try {
+        if (format === 'jpg') {
+            const canvas = await html2canvas(targetCanvas, {
+                scale: 4, // High Definition
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff"
+            });
+            const link = document.createElement("a");
+            link.download = `jcard--.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 1.0);
+            link.click();
+        } 
+        else if (format === 'pdf') {
+            const canvas = await html2canvas(targetCanvas, {
+                scale: 3,
+                useCORS: true,
+                allowTaint: true
+            });
+            const imgData = canvas.toDataURL("image/png");
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({
                 orientation: "landscape",
                 unit: "px",
                 format: [1031, 1020]
             });
-            pdf.addImage(img, "PNG", 0, 0, 1031, 1020);
-            pdf.save("jcard-siap-cetak.pdf");
-            
-            canvas.classList.remove('exporting');
-        });
-    }, 100);
+            pdf.addImage(imgData, "PNG", 0, 0, 1031, 1020);
+            pdf.save(`jcard--.pdf`);
+        }
+    } catch (error) {
+        console.error("Gagal menyimpan:", error);
+        alert("Terjadi kesalahan saat menyimpan. Pastikan koneksi stabil.");
+    } finally {
+        // Kembalikan status tombol dan canvas
+        targetCanvas.classList.remove('exporting');
+        btn.innerText = originalText;
+        btn.style.opacity = "1";
+        btn.disabled = false;
+    }
 }
+
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
     // Daftar nama file gambar kamu (pastikan file ini ada di folder yang sama)
     const backgrounds = [
@@ -578,7 +663,21 @@ document.addEventListener("DOMContentLoaded", function() {
         bgElement.style.backgroundImage = "url('" + randomBg + "')";
     }
 });
+function handleFullWrap(input) {
+    const file = input.files[0];
+    if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const fullCanvas = document.getElementById("jcard-canvas-full");
+        if (fullCanvas) {
+            fullCanvas.style.backgroundImage = "url(" + e.target.result + ")";
+            fullCanvas.style.backgroundSize = "cover";
+            fullCanvas.style.backgroundPosition = "center";
+        }
+    };
+    reader.readAsDataURL(file);
+}
 
 </script>
 </body>
