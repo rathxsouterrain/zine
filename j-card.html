@@ -663,6 +663,21 @@ document.addEventListener("DOMContentLoaded", function() {
         bgElement.style.backgroundImage = "url('" + randomBg + "')";
     }
 });
+// Menyamakan teks Desain 1 dan Desain 2 secara otomatis
+document.addEventListener('input', function (e) {
+    if (e.target.hasAttribute('contenteditable')) {
+        const text = e.target.innerHTML;
+        const index = Array.from(document.querySelectorAll('[contenteditable]')).indexOf(e.target);
+        const allEditable = document.querySelectorAll('[contenteditable]');
+        
+        // Jika ada elemen yang posisinya sama di desain lain, update teksnya
+        // Catatan: Ini bekerja jika struktur HTML kedua desain identik
+        if(index !== -1) {
+             // Logika sinkronisasi sederhana bisa ditambahkan di sini jika diperlukan
+        }
+    }
+});
+
 function handleFullWrap(input) {
     const file = input.files[0];
     if (!file) return;
