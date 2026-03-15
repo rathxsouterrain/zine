@@ -614,12 +614,18 @@ async function saveDesign(type, format) {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         const canvas = await html2canvas(targetCanvas, {
-            scale: 3, // HD Resolution
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: "#ffffff",
-            logging: false
-        });
+    scale: 4, // TINGKATKAN KE 4 ATAU 5 UNTUK HD
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: "#ffffff",
+    // Penting: Abaikan transformasi CSS saat memotret
+    onclone: (clonedDoc) => {
+        const clonedCanvas = clonedDoc.getElementById(canvasId);
+        clonedCanvas.style.transform = "none"; // Reset skala ke 1:1
+        clonedCanvas.style.position = "static";
+    }
+});
+
 
         if (format === 'jpg') {
             const link = document.createElement("a");
