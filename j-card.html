@@ -346,11 +346,111 @@ button:active {
     image-rendering: crisp-edges;
     image-rendering: pixelated; /* Bagus untuk gambar yang mengandung teks tajam */
 }
+/* --- Tambahan Animasi Profile (Web 1 Style) --- */
+.profile-photo {
+    display: flex;
+    justify-content: center;
+    /* Tambahkan margin atas yang cukup besar (minimal 100px) 
+       agar turun melewati batas navbar yang melayang */
+    margin-top: 110px; 
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.profile-photo img {
+    /* Ukuran disesuaikan agar proporsional di mobile */
+    width: 250px; 
+    height: auto;
+    display: block;
+    opacity: 0;
+    transform: translateY(40px);
+    /* Gunakan transisi atau biarkan dijalankan via JS Animation */
+}
+
+@keyframes profileSlide {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Berikan jarak tambahan pada header teks agar tidak menempel ke foto */
+.app-header h1 {
+    margin-top: 10px;
+    font-size: 24px;
+    letter-spacing: 2px;
+}
+
+/* --- Tambahan Navbar (Web 1 Style) --- */
+nav {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    z-index: 9999; /* Pastikan angka ini paling tinggi */
+    display: flex;
+    justify-content: center;
+    transition: transform 0.45s ease;
+}
+
+
+nav.nav-hidden { transform: translateY(-120%); }
+nav.nav-show { transform: translateY(0); }
+
+.nav-container {
+    width: 92%; 
+    max-width: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50px;
+}
+
+.brand img { height: 28px; width: auto; display: block; }
+
+.menu { display: flex; gap: 6px; }
+
+.nav-bubble {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 10px 15px;
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    text-decoration: none;
+    transition: 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-bubble:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+.nav-bubble.active { background: white; color: black; border: none; }
 
 
 </style>
 </head>
 <body>
+<nav class="nav-hidden">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="index.html"> <img src="logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="menu">
+                <a href="index.html#zine" class="nav-bubble">ZINE</a>
+                <a href="#" class="nav-bubble active">J-CARD</a>
+                <a href="index.html#about" class="nav-bubble">ABOUT</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="profile-photo">
+        <img src="profile.png" alt="Profile" id="profileImg">
+    </div>
+    
 <div class="gif-bg"></div>
 <div class="app-header"><h1>J-CARD MAKER</h1></div>
 <div class="web-info-tab">
@@ -631,7 +731,7 @@ async function saveDesign(type, format) {
         if (format === 'jpg') {
             const imgData = canvas.toDataURL("image/jpeg", 0.98); // Kualitas tinggi
             const link = document.createElement("a");
-            link.download = `jcard-${type}-${Date.now()}.jpg`;
+            link.download = `jcard--.jpg`;
             link.href = imgData;
             link.click();
         } 
@@ -644,7 +744,7 @@ async function saveDesign(type, format) {
                 format: [1031, 1020]
             });
             pdf.addImage(imgData, "PNG", 0, 0, 1031, 1020);
-            pdf.save(`jcard-${type}.pdf`);
+            pdf.save(`jcard-.pdf`);
         }
     } catch (error) {
         console.error("Error detail:", error);
@@ -708,7 +808,37 @@ function handleFullWrap(input) {
     };
     reader.readAsDataURL(file);
 }
+// Animasi Profile & Navbar Scroll (Persis Web 1)
+window.addEventListener("load", () => {
+    const nav = document.querySelector("nav");
+    const profile = document.getElementById("profileImg");
+    let lastScroll = window.pageYOffset;
+
+    // Jalankan animasi profil (Langsung atau bisa pakai timer)
+    setTimeout(() => {
+        if(profile) profile.style.animation = "profileSlide 1s ease forwards";
+    }, 500);
+
+    // Navbar muncul setelah jeda singkat
+    setTimeout(() => {
+        nav.classList.add("nav-show");
+    }, 1000);
+
+    // Logika Show/Hide Navbar saat Scroll
+    window.addEventListener("scroll", () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll > lastScroll && currentScroll > 120) {
+            nav.classList.remove("nav-show");
+            nav.classList.add("nav-hidden");
+        } else if (currentScroll < lastScroll) {
+            nav.classList.remove("nav-hidden");
+            nav.classList.add("nav-show");
+        }
+        lastScroll = currentScroll;
+    });
+});
+
 
 </script>
 </body>
-</html>
