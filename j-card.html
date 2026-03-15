@@ -4,25 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cassette J-Card Mobile</title>
-<link href="https://fonts.googleapis.com/css2?family=Abel&family=Abril+Fatface&family=Alegreya+Sans+SC:wght@800&family=Alfa+Slab+One&family=Alumni+Sans+Collegiate+One&family=Amatic+SC:wght@700&family=Anton&family=Archivo+Black&family=Bangers&family=Barlow+Condensed:wght@900&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Shade&family=Cabin+Sketch:wght@700&family=Cinzel:wght@900&family=Comfortaa:wght@700&family=Creepster&family=DM+Serif+Display&family=Faster+One&family=Fativa&family=Fredoka+One&family=Graduate&family=Gravitas+One&family=Gruppo&family=Iceberg&family=Inter:wght@400;900&family=JetBrains+Mono:wght@800&family=Jura:wght@700&family=Kanit:wght@900&family=Koulen&family=Lobster&family=Londrina+Solid:wght@900&family=Major+Mono+Display&family=Michroma&family=Monoton&family=Montserrat:wght@900&family=Nova+Mono&family=Orbitron:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Press+Start+2P&family=Quantico:wght@700&family=Rajdhani:wght@700&family=Righteous&family=Russo+One&family=Silkscreen&family=Special+Elite&family=Staatliches&family=Syncopate:wght@700&family=Teko:wght@700&family=Unica+One&family=Vampiro+One&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Abel&family=Abril+Fatface&family=Alegreya+Sans+SC:wght@800&family=Alfa+Slab+One&family=Alumni+Sans+Collegiate+One&family=Amatic+SC:wght@700&family=Anton&family=Archivo+Black&family=Bangers&family=Barlow+Condensed:wght@900&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Shade&family=Cabin+Sketch:wght@700&family=Cinzel:wght@900&family=Comfortaa:wght@700&family=Creepster&family=DM+Serif+Display&family=Faster+One&family=Fativa&family=Fredoka+One&family=Graduate&family=Gravitas+One&family=Gruppo&family=Iceberg&family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@800&family=Jura:wght@700&family=Kanit:wght@900&family=Koulen&family=Lobster&family=Londrina+Solid:wght@900&family=Major+Mono+Display&family=Michroma&family=Monoton&family=Montserrat:wght@900&family=Nova+Mono&family=Orbitron:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Press+Start+2P&family=Quantico:wght@700&family=Rajdhani:wght@700&family=Righteous&family=Russo+One&family=Silkscreen&family=Special+Elite&family=Staatliches&family=Syncopate:wght@700&family=Teko:wght@700&family=Unica+One&family=Vampiro+One&family=VT323&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root{ --glass: rgba(255,255,255,0.1); --glass-border: rgba(255,255,255,0.2); --backColor:white; }
+:root{ 
+    --glass: rgba(255,255,255,0.05); 
+    --glass-border: rgba(255,255,255,0.1); 
+    --backColor:white; 
+    --accent: #ff6b35;
+    --accent-secondary: #f7931e;
+    --dark-bg: #0a0a0a;
+    --panel-bg: rgba(20, 20, 20, 0.6);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    padding: 10px;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
-    color: white;
-    background: #000; /* Warna dasar jika gambar gagal load */
+    color: #e0e0e0;
+    background: var(--dark-bg);
+    line-height: 1.6;
 }
 
-/* Container Background Gambar */
+/* Background */
 .gif-bg {
     position: fixed;
     top: 0;
@@ -32,10 +48,9 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: -1; /* Berada di belakang semua elemen */
+    z-index: -1;
 }
 
-/* Overlay Gelap agar teks mudah dibaca */
 .gif-bg::after {
     content: "";
     position: absolute;
@@ -43,134 +58,382 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.60); /* Kehitaman 60% */
+    background: linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(20,20,20,0.9) 100%);
 }
 
-/* Pastikan tab kontrol kamu tetap transparan (Glassmorphism) */
-.controls, .web-info-tab, .action-buttons {
-    background: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+/* Navigation */
+nav {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.app-header{ text-align:center; margin-bottom:10px; }
-.controls{ background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--glass-border); padding:6px; border-radius:15px; width:100%; max-width:500px; display:flex; flex-direction:column; gap:10px; margin-bottom:15px; }
-input,select{ background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); padding:10px; color:white; border-radius:8px; }
-/* Gaya Tombol Glassmorphism Global */
-button, .btn-save, .btn-reset, .btn-upload-full {
-    background: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: white !important;
-    padding: 12px 20px;
+nav.nav-hidden { 
+    transform: translateY(-150%);
+    opacity: 0;
+}
+
+nav.nav-show { 
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.nav-container {
+    width: 90%;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.brand img { 
+    height: 24px; 
+    width: auto; 
+    display: block;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.menu { 
+    display: flex; 
+    gap: 8px; 
+}
+
+.nav-bubble {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 10px 18px;
+    border-radius: 30px;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.nav-bubble:hover { 
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255,255,255,0.9);
+    transform: translateY(-1px);
+}
+
+.nav-bubble.active { 
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Profile Section */
+.profile-photo {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.profile-photo img {
+    width: 180px;
+    height: auto;
+    display: block;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+}
+
+@keyframes profileSlide {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header */
+.app-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.app-header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0;
+    text-shadow: 0 0 40px rgba(255,255,255,0.1);
+}
+
+/* Info Cards */
+.web-info-tab {
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.web-info-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.info-content h2 {
+    margin: 0 0 12px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.info-content h3 {
+    margin: 0 0 12px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
     font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+}
+
+.info-content p {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+}
+
+/* Controls Panel */
+.controls {
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.controls label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: -15px;
+}
+
+/* Buttons */
+button, .btn-save, .btn-reset, .btn-upload-full {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255,255,255,0.8) !important;
+    padding: 16px 24px;
+    font-weight: 600;
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 13px;
+    letter-spacing: 1.5px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
 }
 
 button:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
     transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 button:active {
-    transform: scale(0.98);
+    transform: scale(0.98) translateY(0);
 }
 
-/* Tombol Reset (Tetap ada nuansa merah transparan) */
+/* Special Upload Button */
+button[onclick*="fullWrapUpload"] {
+    background: rgba(255, 107, 53, 0.1) !important;
+    border-color: rgba(255, 107, 53, 0.3) !important;
+    color: var(--accent) !important;
+    margin-top: 10px;
+}
+
+button[onclick*="fullWrapUpload"]:hover {
+    background: rgba(255, 107, 53, 0.2) !important;
+    box-shadow: 0 10px 30px rgba(255, 107, 53, 0.2);
+}
+
+/* Reset Button */
 .btn-reset {
-    background: rgba(255, 68, 68, 0.1) !important;
-    color: #ff4444 !important;
-    border-color: rgba(255, 68, 68, 0.2) !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+    color: rgba(239, 68, 68, 0.8) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Pastikan kontainer action-buttons menggunakan flex terpusat */
-.action-buttons {
+.btn-reset:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+/* Inputs */
+input, select {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 14px 16px;
+    color: rgba(255,255,255,0.9);
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.4);
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+select option {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px;
+}
+
+/* Color Inputs */
+.color-row {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.color-group {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Memusatkan semua elemen di dalamnya ke tengah */
-    gap: 12px;
+    gap: 8px;
+}
+
+.color-group label {
+    margin-bottom: 0;
+    font-size: 10px;
+}
+
+.color-group input[type="color"] {
     width: 100%;
-    max-width: 500px;
-    margin: 20px auto 50px auto; /* auto kiri-kanan agar panel juga di tengah */
-    
-    /* Efek Glassmorphism */
-    background: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    padding: 20px;
-    border-radius: 20px;
-    box-sizing: border-box;
+    height: 50px;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Memusatkan teks label */
-.action-buttons p {
-    width: 100%; /* Agar teks punya ruang untuk bergeser ke tengah */
-    text-align: center !important; /* Paksa teks ke tengah */
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    margin: 5px 0;
-    text-transform: uppercase;
-}
-
-/* Mengatur grup tombol agar terpusat */
-.button-group {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    justify-content: center; /* Memastikan tombol JPG/PDF juga di tengah */
-}
-
-.button-group button {
-    flex: 1; /* Membuat tombol punya lebar yang sama */
-    max-width: 150px; /* Batasi lebar tombol agar tidak terlalu melar */
-}
-
-
+/* Canvas Viewport */
 .canvas-viewport {
-    width: 100%;
-    /* Mengunci tinggi tampilan agar tidak ada sisa ruang kosong */
-    height: 380px; 
+    width: 90%;
+    max-width: 500px;
+    height: 360px;
     overflow: hidden;
     position: relative;
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 10px; /* Jarak kecil ke tombol */
+    margin-bottom: 20px;
+    border-radius: 16px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
 }
 
-/* Khusus layar besar, sesuaikan tingginya */
 @media (min-width: 600px) {
-    .canvas-viewport { height: 620px; }
+    .canvas-viewport { height: 600px; }
 }
+
 @media (min-width: 1100px) {
     .canvas-viewport { height: 1050px; }
 }
 
-#jcard-canvas {
+#jcard-canvas, #jcard-canvas-full {
     width: 1031px;
     height: 1020px;
     background: white;
     display: flex;
     color: black;
     transform-origin: top left;
-    transform: scale(0.35); /* Skala mobile */
-    position: absolute; /* Ubah ke absolute agar tidak makan space luar */
+    transform: scale(0.32);
+    position: absolute;
     top: 0;
-    left: 0;
+    left: 50%;
+    margin-left: -165px;
 }
 
-
-/* Tampilan di Editor (Garis Putus-putus) */
+/* Sections */
 .section { 
     height: 100%; 
     box-sizing: border-box; 
@@ -180,293 +443,348 @@ button:active {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    /* Menjaga kualitas gambar tetap tajam saat scaling */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 }
 
-/* Tampilan saat Simpan/Export (Garis Solid Tipis HD) */
 .exporting .section {
     border-right: 1px solid #cccccc !important;
 }
 
-/* Menghilangkan garis di ujung paling kanan agar tidak kotor */
 .exporting .front-cover {
     border-right: none !important;
 }
+
 .back-flap{ width:254px; padding:40px 20px; }
 .spine{ width:127px; display:flex; justify-content:center; align-items:center; }
 .front-cover{ width:650px; background-size:cover; background-position:center; display:flex; align-items:center; padding-left:30px; }
 
-.transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; }
-.transform-box.active { border-color: #007bff; background: rgba(0, 123, 255, 0.05); }
-.handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #007bff; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
-.handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #007bff; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
-.transform-box.active .handle-move, .transform-box.active .handle-resize { display: flex; }
+/* Transform Box */
+.transform-box { 
+    position: absolute; 
+    border: 2px solid transparent; 
+    padding: 5px; 
+    z-index: 10; 
+    display: inline-block; 
+    transition: border-color 0.3s ease;
+}
 
-.editable-content { outline: none; }
-.back-flap h3{ font-family:'Orbitron',sans-serif; font-size:30px; margin-bottom:15px; }
-.tracklist{ font-family:'Orbitron',sans-serif; font-size:20px; font-weight:700; line-height:1.4; }
-/* Update CSS Spine */
-/* Update CSS Spine agar Box Vertikal tapi Font Tetap Aman */
+.transform-box.active { 
+    border-color: var(--accent); 
+    background: rgba(255, 107, 53, 0.05);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
+}
+
+.handle-move { 
+    position: absolute; 
+    top: -25px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 32px; 
+    height: 32px; 
+    background: var(--accent); 
+    color: white; 
+    border-radius: 50%; 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: move; 
+    font-weight: bold; 
+    z-index: 20;
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+    transition: transform 0.2s ease;
+}
+
+.handle-move:hover {
+    transform: translateX(-50%) scale(1.1);
+}
+
+.handle-resize { 
+    position: absolute; 
+    bottom: -12px; 
+    right: -12px; 
+    width: 24px; 
+    height: 24px; 
+    background: white; 
+    border: 3px solid var(--accent); 
+    border-radius: 50%; 
+    display: none; 
+    cursor: nwse-resize; 
+    z-index: 20;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.handle-resize:hover {
+    transform: scale(1.2);
+}
+
+.transform-box.active .handle-move, 
+.transform-box.active .handle-resize { 
+    display: flex; 
+}
+
+.editable-content { 
+    outline: none; 
+    transition: all 0.3s ease;
+}
+
+.back-flap h3{ 
+    font-family:'Orbitron',sans-serif; 
+    font-size:30px; 
+    margin-bottom:15px; 
+}
+
+.tracklist{ 
+    font-family:'Orbitron',sans-serif; 
+    font-size:20px; 
+    font-weight:700; 
+    line-height:1.4; 
+}
+
+/* Spine */
 .spine .transform-box {
     transform: rotate(90deg);
     transform-origin: center;
-    display: inline-flex; /* Gunakan inline-flex agar box pas seukuran teks */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    width: auto;         /* Jangan dipaksa 100% */
-    height: auto;        /* Biarkan mengikuti tinggi font */
+    width: auto;
+    height: auto;
 }
 
 .spine .editable-content.spine-text {
-    /* Matikan semua rotasi individu pada teks agar tidak konflik */
     transform: none !important; 
-    
-    /* Pastikan font mengikuti variabel global atau setelan menu */
     font-family: "Orbitron"; 
-    font-size: 55px; /* Ukuran standar awal, nanti bisa di-resize */
+    font-size: 55px;
     color: inherit;
     line-height: 1;
 }
 
-/* Pastikan Handle tidak ikut gepeng saat box diputar */
-.spine .handle-move, .spine .handle-resize {
-    transform: rotate(-90deg); /* Putar balik handle agar tetap terlihat tegak */
+.spine .handle-move, 
+.spine .handle-resize {
+    transform: rotate(-90deg);
 }
 
-
-.front-overlay h1{ font-family:'Orbitron',sans-serif; font-size:110px; margin:0; line-height:0.8; }
-
-.exporting .transform-box { border: none !important; background: transparent !important; }
-.exporting .handle-move, .exporting .handle-resize { display: none !important; }
-.color-row {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-}
-.color-group {
-    flex: 1; /* Membuat kedua input punya lebar yang sama */
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-.color-group input[type="color"] {
-    width: 100%;
-    height: 40px;
-    padding: 2px; /* Membuat tampilan picker warna lebih rapi */
-    cursor: pointer;
-}
-/* Menghilangkan garis pembatas saat proses export/simpan */
-/* GANTI bagian .exporting lama dengan ini */
-.exporting .section {
-    border-right: 1px solid #cccccc !important; /* Garis tipis solid saat simpan */
+.front-overlay h1{ 
+    font-family:'Orbitron',sans-serif; 
+    font-size:110px; 
+    margin:0; 
+    line-height:0.8; 
 }
 
-.exporting .section:last-child {
-    border-right: none !important; /* Menghilangkan garis di paling ujung kanan */
+.exporting .transform-box { 
+    border: none !important; 
+    background: transparent !important; 
 }
 
-/* Pastikan garis putus-putus tetap ada saat editing */
-.section { 
-    height: 100%; 
-    box-sizing: border-box; 
-    border-right: 2px dashed #444; /* Garis putus-putus di editor */
-    position: relative; 
-    background: var(--backColor); 
+.exporting .handle-move, 
+.exporting .handle-resize { 
+    display: none !important; 
 }
 
-.web-info-tab {
-    background: var(--glass);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    
-    width: 100%;
-    max-width: 400px; /* Samakan dengan lebar kontrol lainnya */
-    padding: 50px;
-    margin-bottom: 20px; /* Jarak ke tab berikutnya */
-    box-sizing: border-box;
-    text-align: center;
-}
-
-.info-content h2 {
-    margin: 0 0 5px 0;
-    font-size: 17px;
-    letter-spacing: 4px;
-    font-weight: 900;
-    color: #ffffff;
-    text-transform: uppercase;
-}
-
-.info-content p {
-    margin: 0;
-    font-size: 13px;
-    letter-spacing: 1px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 400;
-}
-
-
-/* Styling khusus Viewport Kedua */
+/* Full Wrap Container */
 #jcard-canvas-full {
-    width: 1031px;
-    height: 1020px;
-    display: flex;
-    color: black;
-    transform-origin: top left;
-    transform: scale(0.35); /* Sesuaikan dengan skala viewport pertama */
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: white; /* Default jika belum upload */
+    background-color: white;
     background-size: cover;
     background-position: center;
 }
 
-/* Memastikan garis putus-putus tetap muncul di Viewport Kedua */
 #jcard-canvas-full .section {
-    background: transparent !important; /* Agar background utama terlihat */
-    border-right: 2px dashed #444; /* Garis pembatas yang Anda inginkan */
+    background: transparent !important;
+    border-right: 2px dashed #444;
 }
 
-/* Hilangkan garis terakhir di ujung kanan */
 #jcard-canvas-full .front-cover {
     border-right: none !important;
 }
-.exporting .section {
-    border-right: 1px solid #cccccc !important;
-}
-.section { 
-    /* ... kode lainnya ... */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    image-rendering: pixelated; /* Bagus untuk gambar yang mengandung teks tajam */
-}
-/* --- Tambahan Animasi Profile (Web 1 Style) --- */
-.profile-photo {
+
+/* Action Buttons Panel */
+.action-buttons {
     display: flex;
-    justify-content: center;
-    /* Tambahkan margin atas yang cukup besar (minimal 100px) 
-       agar turun melewati batas navbar yang melayang */
-    margin-top: 110px; 
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.profile-photo img {
-    /* Ukuran disesuaikan agar proporsional di mobile */
-    width: 250px; 
-    height: auto;
-    display: block;
-    opacity: 0;
-    transform: translateY(40px);
-    /* Gunakan transisi atau biarkan dijalankan via JS Animation */
-}
-
-@keyframes profileSlide {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Berikan jarak tambahan pada header teks agar tidak menempel ke foto */
-.app-header h1 {
-    margin-top: 10px;
-    font-size: 24px;
-    letter-spacing: 2px;
-}
-
-/* --- Tambahan Navbar (Web 1 Style) --- */
-nav {
-    position: fixed;
-    top: 10px;
-    left: 0;
-    width: 100%;
-    z-index: 9999; /* Pastikan angka ini paling tinggi */
-    display: flex;
-    justify-content: center;
-    transition: transform 0.45s ease;
-}
-
-
-nav.nav-hidden { transform: translateY(-120%); }
-nav.nav-show { transform: translateY(0); }
-
-.nav-container {
-    width: 92%; 
-    max-width: 450px;
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50px;
+    gap: 20px;
+    width: 90%;
+    max-width: 500px;
+    margin: 30px auto 60px auto;
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 35px 30px;
+    border-radius: 24px;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 }
 
-.brand img { height: 28px; width: auto; display: block; }
-
-.menu { display: flex; gap: 6px; }
-
-.nav-bubble {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
+.action-buttons p {
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
     font-size: 10px;
-    padding: 10px 15px;
-    border-radius: 40px;
-    background: rgba(255, 255, 255, 0.08);
-    color: white;
-    text-decoration: none;
-    transition: 0.25s ease;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin: 0;
+    text-transform: uppercase;
+    position: relative;
 }
 
-.nav-bubble:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
-.nav-bubble.active { background: white; color: black; border: none; }
+.action-buttons p::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 10px auto 0;
+}
 
+.button-group {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
 
+.button-group button {
+    flex: 1;
+    max-width: 140px;
+    background: rgba(255,255,255,0.05) !important;
+}
+
+.button-group button:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+/* Secondary Title */
+.app-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 40px;
+    margin-bottom: -10px;
+    font-weight: 600;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .controls, .action-buttons, .web-info-tab {
+        width: 92%;
+        padding: 25px 20px;
+    }
+    
+    .app-header h1 {
+        font-size: 22px;
+        letter-spacing: 5px;
+    }
+    
+    .nav-container {
+        width: 92%;
+        padding: 6px 12px;
+    }
+    
+    .nav-bubble {
+        padding: 8px 14px;
+        font-size: 10px;
+    }
+    
+    .profile-photo img {
+        width: 150px;
+    }
+}
+
+/* Loading animation for buttons */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+button:disabled::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    margin-left: 8px;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 </style>
 </head>
 <body>
 <nav class="nav-hidden">
-        <div class="nav-container">
-            <div class="brand">
-                <a href="index.html"> <img src="logo.png" alt="logo">
-                </a>
-            </div>
-            <div class="menu">
-                <a href="index.html#zine" class="nav-bubble">ZINE</a>
-                <a href="#" class="nav-bubble active">J-CARD</a>
-                <a href="index.html#about" class="nav-bubble">ABOUT</a>
-            </div>
+    <div class="nav-container">
+        <div class="brand">
+            <a href="index.html">
+                <img src="logo.png" alt="logo">
+            </a>
         </div>
-    </nav>
-    
-    <div class="profile-photo">
-        <img src="profile2.png" alt="Profile" id="profileImg">
+        <div class="menu">
+            <a href="index.html#zine" class="nav-bubble">ZINE</a>
+            <a href="#" class="nav-bubble active">J-CARD</a>
+            <a href="index.html#about" class="nav-bubble">ABOUT</a>
+        </div>
     </div>
-    
+</nav>
+
+<div class="profile-photo">
+    <img src="profile2.png" alt="Profile" id="profileImg">
+</div>
+
 <div class="gif-bg"></div>
-<div class="app-header"><h1>J-CARD MAKER</h1></div>
+
+<div class="app-header">
+    <h1>J-CARD MAKER</h1>
+</div>
+
 <div class="web-info-tab">
     <div class="info-content">
         <h2>J-CARD CASSETTE</h2>
         <p>Ini adalah J-Card Cassette Maker, tempat gambar biasa menjadi cover kaset yang unik dan tak terduga. Cukup drop gambar, atur posisinya, dan dalam sekejap, covermu siap dipakai.</p>
     </div>
 </div>
+
 <div class="controls">
-        <button onclick="document.getElementById('imageUpload').click()">Upload Front Cover</button>
-        <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'front')">
-        <button onclick="document.getElementById('spineUpload').click()">Upload Spine Cover</button>
-        <input type="file" id="spineUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'spine')">
-        <button onclick="document.getElementById('backUpload').click()">Upload Back Cover</button>
-        <input type="file" id="backUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'back')">
-        
+    <button onclick="document.getElementById('imageUpload').click()">Upload Front Cover</button>
+    <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'front')">
+    
+    <button onclick="document.getElementById('spineUpload').click()">Upload Spine Cover</button>
+    <input type="file" id="spineUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'spine')">
+    
+    <button onclick="document.getElementById('backUpload').click()">Upload Back Cover</button>
+    <input type="file" id="backUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'back')">
     
     <div class="color-row">
         <div class="color-group">
@@ -480,51 +798,56 @@ nav.nav-show { transform: translateY(0); }
     </div>
 
     <label>Font Family</label>
-        <select id="fontSelector" onchange="changeFont()"></select>
+    <select id="fontSelector" onchange="changeFont()"></select>
 </div>
-</div>
+
 <div class="web-info-tab">
     <div class="info-content">
         <h3>PENTING!</h3>
         <p>Klik Text, Tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
     </div>
 </div>
+
 <div class="canvas-viewport">
-<div id="jcard-canvas">
-    <div class="section back-flap" id="playlistSection">
-        <div class="transform-box" style="top:40px; left:20px;">
-            <div class="handle-move">+</div>
-            <div class="editable-content">
-                <h3 contenteditable="true">playlist</h3>
-                <div class="tracklist" contenteditable="true">1. track<br>2. track<br>3. track</div>
+    <div id="jcard-canvas">
+        <div class="section back-flap" id="playlistSection">
+            <div class="transform-box" style="top:40px; left:20px;">
+                <div class="handle-move">+</div>
+                <div class="editable-content">
+                    <h3 contenteditable="true">playlist</h3>
+                    <div class="tracklist" contenteditable="true">1. track<br>2. track<br>3. track</div>
+                </div>
+                <div class="handle-resize"></div>
             </div>
-            <div class="handle-resize"></div>
         </div>
-    </div>
-    <div class="section spine">
-        <div class="transform-box">
-            <div class="handle-move">+</div>
-            <div class="editable-content spine-text" contenteditable="true">band name</div>
-            <div class="handle-resize"></div>
-        </div>
-    </div>
-    <div class="section front-cover" id="albumArt">
-        <div class="transform-box" style="left:30px;">
-            <div class="handle-move">+</div>
-            <div class="front-overlay">
-                <h1 class="editable-content" contenteditable="true">Cover</h1>
+        <div class="section spine">
+            <div class="transform-box">
+                <div class="handle-move">+</div>
+                <div class="editable-content spine-text" contenteditable="true">band name</div>
+                <div class="handle-resize"></div>
             </div>
-            <div class="handle-resize"></div>
+        </div>
+        <div class="section front-cover" id="albumArt">
+            <div class="transform-box" style="left:30px;">
+                <div class="handle-move">+</div>
+                <div class="front-overlay">
+                    <h1 class="editable-content" contenteditable="true">Cover</h1>
+                </div>
+                <div class="handle-resize"></div>
+            </div>
         </div>
     </div>
 </div>
-</div>
+
 <button onclick="document.getElementById('fullWrapUpload').click()" style="background: rgba(0, 255, 150, 0.15); border: 1px solid #00ff96; color: #00ff96;">
     Upload Full Wrap Image
 </button>
 <input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
 
-<div class="app-header"><h3>COVER FULL WRAP MODE</h3></div>
+<div class="app-header">
+    <h3>COVER FULL WRAP MODE</h3>
+</div>
+
 <div class="canvas-viewport">
     <div id="jcard-canvas-full" class="full-wrap-container">
         <div class="section back-flap">
@@ -557,22 +880,19 @@ nav.nav-show { transform: translateY(0); }
 </div>
 
 <div class="action-buttons">
-    <p>DOWNLOAD DESIGN COVER</p>
+    <p>Download Design Cover</p>
     <div class="button-group">
         <button onclick="saveDesign('manual', 'jpg')">JPG</button>
         <button onclick="saveDesign('manual', 'pdf')">PDF</button>
     </div>
 
-    <p style="margin-top: 15px;">DOWNLOAD DESIGN BACK (FULL WRAP)</p>
+    <p>Download Design Back (Full Wrap)</p>
     <div class="button-group">
         <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
         <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
     </div>
 
-    <button onclick="location.reload()" class="btn-reset" style="margin-top: 15px; width: 100%;">RESET DESIGN</button>
-</div>
-
-
+    <button onclick="location.reload()" class="btn-reset">Reset Design</button>
 </div>
 
 <script>
@@ -589,28 +909,25 @@ function populateFonts() {
     const selector = document.getElementById('fontSelector');
     if(!selector) return;
     
-    selector.innerHTML = ""; // Bersihkan dulu
+    selector.innerHTML = "";
     fontList.sort().forEach(font => {
         let opt = document.createElement('option');
-        // Simpan nama font asli sebagai value
         opt.value = font; 
         opt.innerHTML = font;
-        opt.style.fontFamily = font; // Preview font di dalam dropdown
+        opt.style.fontFamily = font;
         selector.appendChild(opt);
     });
 }
 
 function changeFont() {
     const selectedFont = document.getElementById("fontSelector").value;
-    // Terapkan font ke semua elemen teks
     const elements = document.querySelectorAll(".editable-content, .editable-content h3, .tracklist, .spine-text");
     
     elements.forEach(el => {
-        el.style.fontFamily = `'', sans-serif`;
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;
     });
 }
 
-// Panggil fungsi saat halaman siap
 document.addEventListener("DOMContentLoaded", populateFonts);
 
 function handleUpload(input, target) {
@@ -622,7 +939,7 @@ function handleUpload(input, target) {
         const targetElement = {
             'front': document.getElementById("albumArt"),
             'back': document.getElementById("playlistSection"),
-            'spine': document.querySelector(".spine") // Mengambil elemen spine
+            'spine': document.querySelector(".spine")
         };
 
         if (targetElement[target]) {
@@ -634,12 +951,10 @@ function handleUpload(input, target) {
     reader.readAsDataURL(file);
 }
 
-
-function changeBackColor(){ document.documentElement.style.setProperty("--backColor", document.getElementById("coverColor").value); }
-function changeFont(){
-    const font=document.getElementById("fontSelector").value;
-    document.querySelectorAll(".editable-content, .editable-content h3, .tracklist").forEach(el=>{el.style.fontFamily=font});
+function changeBackColor(){ 
+    document.documentElement.style.setProperty("--backColor", document.getElementById("coverColor").value); 
 }
+
 function changeFontColor(){
     const color=document.getElementById("fontColor").value;
     document.querySelectorAll(".editable-content, .editable-content h3, .tracklist").forEach(el=>{el.style.color=color});
@@ -686,8 +1001,11 @@ document.querySelectorAll('.transform-box').forEach(box => {
         document.addEventListener('touchmove', resize, {passive:false});
         document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
     };
-    moveBtn.addEventListener('mousedown', startDrag); moveBtn.addEventListener('touchstart', startDrag);
-    resizeBtn.addEventListener('mousedown', startResize); resizeBtn.addEventListener('touchstart', startResize);
+    
+    moveBtn.addEventListener('mousedown', startDrag); 
+    moveBtn.addEventListener('touchstart', startDrag);
+    resizeBtn.addEventListener('mousedown', startResize); 
+    resizeBtn.addEventListener('touchstart', startResize);
 });
 
 async function saveDesign(type, format) {
@@ -697,26 +1015,22 @@ async function saveDesign(type, format) {
     
     if (!targetCanvas) return;
 
-    // UI Feedback
     const originalText = btn ? btn.innerText : "SAVE";
     if (btn) {
         btn.innerText = "Processing...";
         btn.disabled = true;
     }
 
-    // Masuk ke mode export (garis jadi tipis solid)
     targetCanvas.classList.add('exporting');
 
     try {
-        // SOLUSI KUNCI: Menentukan opsi lebar & tinggi secara manual agar tidak terpotong
         const options = {
-            scale: 2, // Resolusi HD tapi aman untuk RAM HP
+            scale: 2,
             useCORS: true,
             allowTaint: true,
             backgroundColor: "#ffffff",
             width: 1031,
             height: 1020,
-            // Menghilangkan efek 'transform: scale' saat pemotretan
             onclone: (clonedDoc) => {
                 const element = clonedDoc.getElementById(canvasId);
                 element.style.transform = "none";
@@ -729,9 +1043,9 @@ async function saveDesign(type, format) {
         const canvas = await html2canvas(targetCanvas, options);
 
         if (format === 'jpg') {
-            const imgData = canvas.toDataURL("image/jpeg", 0.98); // Kualitas tinggi
+            const imgData = canvas.toDataURL("image/jpeg", 0.98);
             const link = document.createElement("a");
-            link.download = `jcard--.jpg`;
+            link.download = `jcard-design.jpg`;
             link.href = imgData;
             link.click();
         } 
@@ -744,7 +1058,7 @@ async function saveDesign(type, format) {
                 format: [1031, 1020]
             });
             pdf.addImage(imgData, "PNG", 0, 0, 1031, 1020);
-            pdf.save(`jcard-.pdf`);
+            pdf.save(`jcard-design.pdf`);
         }
     } catch (error) {
         console.error("Error detail:", error);
@@ -758,38 +1072,19 @@ async function saveDesign(type, format) {
     }
 }
 
-
 document.addEventListener("DOMContentLoaded", function() {
-    // Daftar nama file gambar kamu (pastikan file ini ada di folder yang sama)
-    const backgrounds = [
-        "back1.jpg", 
-        "back2.jpg", 
-        "back3.jpg", 
-        "back4.jpg", 
-        "back5.jpg"
-    ];
-
-    // Pilih secara acak
+    const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
     
-    // Terapkan ke elemen .gif-bg
     const bgElement = document.querySelector(".gif-bg");
     if (bgElement) {
         bgElement.style.backgroundImage = "url('" + randomBg + "')";
     }
 });
-// Menyamakan teks Desain 1 dan Desain 2 secara otomatis
+
 document.addEventListener('input', function (e) {
     if (e.target.hasAttribute('contenteditable')) {
         const text = e.target.innerHTML;
-        const index = Array.from(document.querySelectorAll('[contenteditable]')).indexOf(e.target);
-        const allEditable = document.querySelectorAll('[contenteditable]');
-        
-        // Jika ada elemen yang posisinya sama di desain lain, update teksnya
-        // Catatan: Ini bekerja jika struktur HTML kedua desain identik
-        if(index !== -1) {
-             // Logika sinkronisasi sederhana bisa ditambahkan di sini jika diperlukan
-        }
     }
 });
 
@@ -808,23 +1103,20 @@ function handleFullWrap(input) {
     };
     reader.readAsDataURL(file);
 }
-// Animasi Profile & Navbar Scroll (Persis Web 1)
+
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
     const profile = document.getElementById("profileImg");
     let lastScroll = window.pageYOffset;
 
-    // Jalankan animasi profil (Langsung atau bisa pakai timer)
     setTimeout(() => {
         if(profile) profile.style.animation = "profileSlide 1s ease forwards";
     }, 500);
 
-    // Navbar muncul setelah jeda singkat
     setTimeout(() => {
         nav.classList.add("nav-show");
     }, 1000);
 
-    // Logika Show/Hide Navbar saat Scroll
     window.addEventListener("scroll", () => {
         const currentScroll = window.pageYOffset;
 
@@ -838,7 +1130,6 @@ window.addEventListener("load", () => {
         lastScroll = currentScroll;
     });
 });
-
-
 </script>
 </body>
+</html>
