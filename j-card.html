@@ -591,52 +591,43 @@ document.querySelectorAll('.transform-box').forEach(box => {
 });
 
 async function saveDesign(type, format) {
-    // Cari target canvas berdasarkan ID yang tepat
     const canvasId = (type === 'manual') ? 'jcard-canvas' : 'jcard-canvas-full';
     const targetCanvas = document.getElementById(canvasId);
-    
-    // Pastikan kita mendapatkan referensi tombol yang benar meskipun event tidak terdefinisi
     const btn = event ? event.currentTarget : null;
     
-    if (!targetCanvas) {
-        console.error("Elemen canvas tidak ditemukan: " + canvasId);
-        return;
-    }
+    if (!targetCanvas) return;
 
-    // Feedback Visual: Loading state
-    let originalText = "SAVE";
+    // UI Feedback
+    const originalText = btn ? btn.innerText : "SAVE";
     if (btn) {
-        originalText = btn.innerText;
         btn.innerText = "Processing...";
-        btn.style.opacity = "0.6";
         btn.disabled = true;
     }
 
-    // Tambahkan class exporting untuk menghilangkan garis bantu
+    // Aktifkan mode export (garis potong jadi solid)
     targetCanvas.classList.add('exporting');
 
     try {
-        // Beri jeda sedikit agar browser sempat merender class 'exporting'
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Gunakan konfigurasi yang lebih stabil untuk Mobile
+        const options = {
+            scale: 2, // 2 sudah cukup tajam untuk cetak (HD), kalau 4-5 sering crash di HP
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            // Menangani masalah transformasi scale CSS agar hasil tidak burik/terpotong
+            width: 1031,
+            height: 1020,
+            windowWidth: 1031,
+            windowHeight: 1020
+        };
 
-        const canvas = await html2canvas(targetCanvas, {
-    scale: 4, // TINGKATKAN KE 4 ATAU 5 UNTUK HD
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: "#ffffff",
-    // Penting: Abaikan transformasi CSS saat memotret
-    onclone: (clonedDoc) => {
-        const clonedCanvas = clonedDoc.getElementById(canvasId);
-        clonedCanvas.style.transform = "none"; // Reset skala ke 1:1
-        clonedCanvas.style.position = "static";
-    }
-});
-
+        const canvas = await html2canvas(targetCanvas, options);
 
         if (format === 'jpg') {
+            const imgData = canvas.toDataURL("image/jpeg", 0.9); // Kualitas 90% agar file tidak terlalu raksasa
             const link = document.createElement("a");
-            link.download = `jcard-${type}-${Date.now()}.jpg`;
-            link.href = canvas.toDataURL("image/jpeg", 0.95);
+            link.download = `jcard-${type}.jpg`;
+            link.href = imgData;
             link.click();
         } 
         else if (format === 'pdf') {
@@ -648,23 +639,19 @@ async function saveDesign(type, format) {
                 format: [1031, 1020]
             });
             pdf.addImage(imgData, "PNG", 0, 0, 1031, 1020);
-            pdf.save(`jcard-${type}-${Date.now()}.pdf`);
+            pdf.save(`jcard-${type}.pdf`);
         }
     } catch (error) {
-        console.error("Gagal menyimpan:", error);
-        alert("Terjadi kesalahan saat memproses gambar.");
+        console.error("Error:", error);
+        alert("Gagal menyimpan. Coba gunakan browser Chrome atau Safari versi terbaru.");
     } finally {
-        // Kembalikan ke tampilan semula
         targetCanvas.classList.remove('exporting');
         if (btn) {
             btn.innerText = originalText;
-            btn.style.opacity = "1";
             btn.disabled = false;
         }
     }
 }
-
-
 
 
 
