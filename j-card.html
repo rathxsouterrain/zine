@@ -990,14 +990,17 @@ function changeFont() {
     const selectedFont = document.getElementById("fontSelector").value;
     const elements = document.querySelectorAll(".editable-content, .editable-content h3, .tracklist, .spine-text");
     elements.forEach(el => {
-        el.style.fontFamily = `'', sans-serif`;
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;  // ✅ BENAR
     });
     
     // Update font di 3D preview juga
     const text3dElements = document.querySelectorAll('.text-3d-overlay, .text-3d-overlay h3, .tracklist-3d');
     text3dElements.forEach(el => {
-        el.style.fontFamily = `'', sans-serif`;
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;  // ✅ BENAR
     });
+    
+    // Trigger sync ke 3D
+    syncTextTo3D();
 }
 
 document.addEventListener("DOMContentLoaded", populateFonts);
