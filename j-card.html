@@ -1357,7 +1357,7 @@ let rotX = 15, rotY = -35;
 
 function update3D() {
     if(jcardObj) {
-        jcardObj.style.transform = `scale(0.25) rotateX(deg) rotateY(deg)`;
+        jcardObj.style.transform = `scale(0.25) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
     }
 }
 
@@ -1678,8 +1678,8 @@ if(scene3D && jcardObj) {
     let cDrag = false, cPx = 0, cPy = 0, cRx = 20, cRy = -25;
 
     function updateCas3DObj() {
-        cObj.style.transform = `translateZ(-15px) rotateX(deg) rotateY(deg)`;
-    }
+    cObj.style.transform = `translateZ(-15px) rotateX(${cRx}deg) rotateY(${cRy}deg)`;
+}
 
     if(cScene && cObj) {
         cScene.addEventListener('mousedown', (e) => {
