@@ -725,10 +725,10 @@ nav.nav-show { transform: translateY(0); }
         position: absolute; 
         top: 0; 
         left: 0; 
-        width: 352px; 
-        height: 182px; 
+        width: 350px; 
+        height: 180px; 
         transform-origin: top left;
-        transform: scale(0.63); /* 220/350 = 0.628571 */
+        transform: scale(0.628571); /* 220/350 = 0.628571 */
     }
 </style>
 </head>
@@ -1546,13 +1546,12 @@ function uploadStickerLabel(input, side) {
         const font = document.getElementById('labelFontSelector').value || 'Orbitron';
         
         // Sync Side A
-if(contentA && boxA && textA && bgA) {
-    const leftA = parseInt(boxA.style.left) || 120;
-    const topA = parseInt(boxA.style.top) || 50;
-    
-    contentA.style.backgroundColor = canvasCol;  // ← TAMBAH INI
-    
-    // Clear dan setup container
+        if(contentA && boxA && textA && bgA) {
+            const leftA = parseInt(boxA.style.left) || 120;
+            const topA = parseInt(boxA.style.top) || 50;
+            const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
+            
+            // Clear dan setup container
             contentA.innerHTML = '';
             contentA.style.width = '350px';
             contentA.style.height = '180px';
@@ -1602,12 +1601,10 @@ if(contentA && boxA && textA && bgA) {
         }
         // Sync Side B
         if(contentB && boxB && textB && bgB) {
-    const leftB = parseInt(boxB.style.left) || 120;
-    const topB = parseInt(boxB.style.top) || 50;
-    
-    contentB.style.backgroundColor = canvasCol;  // ← TAMBAH INI
-    
-    // Clear dan setup container
+            const leftB = parseInt(boxB.style.left) || 120;
+            const topB = parseInt(boxB.style.top) || 50;
+            const fontSizeB = parseFloat(window.getComputedStyle(textB).fontSize) || 24;
+            
             contentB.innerHTML = '';
             contentB.style.width = '350px';
             contentB.style.height = '180px';
