@@ -623,36 +623,30 @@ nav.nav-show { transform: translateY(0); }
     <div class="scene-3d">
         <div class="jcard-3d-wrapper" id="jcard-3d-object">
             <div class="panel front-panel">
-                <!-- Front Outer Face dengan Text -->
                 <div class="face outer front-outer" id="3d-front-outer">
                     <div class="text-3d-overlay" id="front-text-3d">Cover</div>
                 </div>
-                <!-- Front Inner Face dengan Text -->
                 <div class="face inner front-inner">
                     <div class="inner-texture" id="3d-front-inner"></div>
                     <div class="text-3d-overlay" id="front-text-3d-inner">Cover</div>
                 </div>
                 
                 <div class="panel spine-panel">
-                    <!-- Spine Outer Face dengan Text -->
                     <div class="face outer spine-outer" id="3d-spine-outer">
                         <div class="text-3d-overlay" id="spine-text-3d">band name</div>
                     </div>
-                    <!-- Spine Inner Face dengan Text -->
                     <div class="face inner spine-inner">
                         <div class="inner-texture" id="3d-spine-inner"></div>
                         <div class="text-3d-overlay" id="spine-text-3d-inner">band name</div>
                     </div>
                     
                     <div class="panel back-panel">
-                        <!-- Back Outer Face dengan Text -->
                         <div class="face outer back-outer" id="3d-back-outer">
                             <div class="text-3d-overlay" id="back-text-3d">
                                 <h3>playlist</h3>
                                 <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
                             </div>
                         </div>
-                        <!-- Back Inner Face dengan Text -->
                         <div class="face inner back-inner">
                             <div class="inner-texture" id="3d-back-inner"></div>
                             <div class="text-3d-overlay" id="back-text-3d-inner">
@@ -1127,6 +1121,357 @@ if(scene3D && jcardObj) {
         update3D();
     }, {passive: true});
 }
+</script>
+
+<style>
+    .label-maker-section { margin-top: 60px; width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10;}
+    .label-canvas { width: 350px; height: 180px; background: #ffffff; position: relative; border-radius: 12px; overflow: hidden; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+    .label-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; }
+    
+    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 50px; left: 120px; }
+    .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
+    .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
+    .label-transform-box .handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #00ff96; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
+    .label-transform-box.active .handle-move, .label-transform-box.active .handle-resize { display: flex; }
+    
+    .label-text { font-family: 'Orbitron', sans-serif; font-size: 24px; color: #000; outline: none; font-weight: 900; line-height: 1.2; text-transform: uppercase; text-align: center; white-space: nowrap;}
+    .tape-cutout { position: absolute; width: 220px; height: 60px; background: transparent; border: 2px dashed rgba(0,0,0,0.3); border-radius: 10px; z-index: 2; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;}
+    
+    .exporting-label .tape-cutout { display: none !important; }
+    .exporting-label .label-transform-box { border: none !important; background: transparent !important; }
+    .exporting-label .handle-move, .exporting-label .handle-resize { display: none !important; }
+    .exporting-label { box-shadow: none !important; }
+
+    /* 3D Cassette Styles */
+    .cassette-3d-scene { width: 100%; max-width: 500px; height: 350px; perspective: 1200px; display: flex; justify-content: center; align-items: center; cursor: grab; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 20px; overflow: hidden;}
+    .cassette-3d-scene:active { cursor: grabbing; }
+    .cas-wrapper { position: relative; width: 300px; height: 192px; transform-style: preserve-3d; transform: translateZ(-18px) rotateX(20deg) rotateY(-20deg); transition: transform 0.1s ease-out;}
+    .cas-face { position: absolute; background-color: #222222; border: 1px solid #000; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; backface-visibility: hidden;}
+    
+    .cas-front, .cas-back { width: 300px; height: 192px; border-radius: 8px; }
+    .cas-front { transform: rotateY(0deg) translateZ(18px); }
+    .cas-back { transform: rotateY(180deg) translateZ(18px); }
+    
+    .cas-right { width: 36px; height: 176px; left: 132px; top: 8px; transform: rotateY(90deg) translateZ(146px); }
+    .cas-left { width: 36px; height: 176px; left: 132px; top: 8px; transform: rotateY(-90deg) translateZ(146px); }
+    .cas-top { width: 284px; height: 36px; top: 78px; left: 8px; transform: rotateX(90deg) translateZ(92px); }
+    .cas-bottom { width: 284px; height: 36px; top: 78px; left: 8px; transform: rotateX(-90deg) translateZ(92px); }
+
+    .cas-window-3d { position: absolute; width: 140px; height: 45px; background: rgba(0,0,0,0.8); border-radius: 8px; z-index: 10; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 10px #000;}
+    .cas-wheel-l, .cas-wheel-r { position: absolute; width: 35px; height: 35px; background: radial-gradient(circle, #111 20%, #ddd 25%, #ddd 75%, #111 80%); border-radius: 50%; z-index: 11; top: 50%; transform: translateY(-50%); }
+    .cas-wheel-l { left: 80px; } .cas-wheel-r { right: 80px; }
+    
+    .cas-label-3d { position: absolute; width: 220px; height: 113px; background: #fff; border-radius: 8px; z-index: 5; display: block; overflow: hidden;}
+    .cas-texture { position: absolute; width:100%; height:100%; top:0; left:0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.3) 100%); pointer-events: none; border-radius: inherit; z-index: 20;}
+</style>
+
+<div class="label-maker-section">
+    <div class="app-header"><h3>CASSETTE LABEL MAKER</h3></div>
+    
+    <div class="controls">
+        <div class="button-group">
+            <button onclick="document.getElementById('uploadSideA').click()">Upload Side A</button>
+            <input type="file" id="uploadSideA" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideA')">
+            <button onclick="document.getElementById('uploadSideB').click()">Upload Side B</button>
+            <input type="file" id="uploadSideB" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideB')">
+        </div>
+        
+        <div class="color-row">
+            <div class="color-group">
+                <label>Warna Kaset</label>
+                <input type="color" id="casShellColor" value="#222222" onchange="updateLabelColors()">
+            </div>
+            <div class="color-group">
+                <label>Warna Label</label>
+                <input type="color" id="lblCanvasColor" value="#ffffff" onchange="updateLabelColors()">
+            </div>
+            <div class="color-group">
+                <label>Warna Text</label>
+                <input type="color" id="lblTextColor" value="#000000" onchange="updateLabelColors()">
+            </div>
+        </div>
+
+        <label>Font Label</label>
+        <select id="labelFontSelector" onchange="updateLabelFont()"></select>
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; width: 100%; max-width: 800px;">
+        <div>
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE A DESIGN</p>
+            <div id="canvas-sideA" class="label-canvas">
+                <div class="label-bg" id="bg-sideA"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" contenteditable="true">SIDE A<br>ALBUM TITLE</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE B DESIGN</p>
+            <div id="canvas-sideB" class="label-canvas">
+                <div class="label-bg" id="bg-sideB"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" contenteditable="true">SIDE B<br>TRACKLIST</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-header"><h3>3D CASSETTE PREVIEW</h3></div>
+    <div class="cassette-3d-scene" id="cas-scene">
+        <div class="cas-wrapper" id="cas-object">
+            <div class="cas-face cas-front">
+                <div class="cas-texture"></div>
+                <div class="cas-label-3d" id="preview-sideA"></div>
+                <div class="cas-window-3d"></div>
+                <div class="cas-wheel-l"></div><div class="cas-wheel-r"></div>
+            </div>
+            <div class="cas-face cas-back">
+                <div class="cas-texture"></div>
+                <div class="cas-label-3d" id="preview-sideB"></div>
+                <div class="cas-window-3d"></div>
+                <div class="cas-wheel-l"></div><div class="cas-wheel-r"></div>
+            </div>
+            <div class="cas-face cas-top"><div class="cas-texture"></div></div>
+            <div class="cas-face cas-bottom"><div class="cas-texture"></div></div>
+            <div class="cas-face cas-left"><div class="cas-texture"></div></div>
+            <div class="cas-face cas-right"><div class="cas-texture"></div></div>
+        </div>
+    </div>
+
+    <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
+        <p>DOWNLOAD LABEL (PNG TRANSPARAN)</p>
+        <div class="button-group">
+            <button onclick="downloadLabelPng('sideA')">SIDE A</button>
+            <button onclick="downloadLabelPng('sideB')">SIDE B</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Init Label Fonts using existing fontList
+    function initLabelFonts() {
+        const selector = document.getElementById('labelFontSelector');
+        if(!selector || typeof fontList === 'undefined') return;
+        fontList.sort().forEach(font => {
+            let opt = document.createElement('option');
+            opt.value = font; 
+            opt.innerHTML = font;
+            opt.style.fontFamily = font;
+            if(font === 'Orbitron') opt.selected = true;
+            selector.appendChild(opt);
+        });
+    }
+    setTimeout(initLabelFonts, 500); 
+
+    function updateLabelFont() {
+        const font = document.getElementById('labelFontSelector').value;
+        document.querySelectorAll('.label-text').forEach(el => {
+            el.style.fontFamily = `'${font}', sans-serif`;
+        });
+        syncLabelTo3D();
+    }
+
+    function updateLabelColors() {
+        const shellCol = document.getElementById('casShellColor').value;
+        const canvasCol = document.getElementById('lblCanvasColor').value;
+        const textCol = document.getElementById('lblTextColor').value;
+
+        // Update Cassette Shell
+        document.querySelectorAll('.cas-face').forEach(el => el.style.backgroundColor = shellCol);
+        
+        // Update Label Background
+        document.getElementById('canvas-sideA').style.backgroundColor = canvasCol;
+        document.getElementById('canvas-sideB').style.backgroundColor = canvasCol;
+        
+        // Update Text Color
+        document.querySelectorAll('.label-text').forEach(el => el.style.color = textCol);
+
+        syncLabelTo3D();
+    }
+
+    function uploadStickerLabel(input, side) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById(`bg-${side}`).style.backgroundImage = `url(${e.target.result})`;
+            syncLabelTo3D();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Sync HTML from Label Canvas to 3D Preview Canvas
+    function syncLabelTo3D() {
+        const prevA = document.getElementById('preview-sideA');
+        const prevB = document.getElementById('preview-sideB');
+        
+        prevA.innerHTML = document.getElementById('canvas-sideA').innerHTML;
+        prevB.innerHTML = document.getElementById('canvas-sideB').innerHTML;
+        
+        const canvasCol = document.getElementById('lblCanvasColor').value;
+        prevA.style.backgroundColor = canvasCol;
+        prevB.style.backgroundColor = canvasCol;
+        
+        // Adjust scale inside 3D preview since 3D area is smaller than 2D canvas
+        // Canvas is 350x180, 3D is 220x113. Scale = ~0.628
+        const scale = 0.628;
+        [prevA, prevB].forEach(prev => {
+            // Remove active dragging classes and clean it up for the preview
+            prev.querySelectorAll('.label-transform-box').forEach(el => {
+                el.classList.remove('active');
+                el.style.border = 'none';
+                el.style.background = 'transparent';
+            });
+            
+            Array.from(prev.children).forEach(child => {
+                if(!child.classList.contains('label-bg')) {
+                    child.style.transformOrigin = 'top left';
+                    child.style.transform = `scale(${scale})`;
+                }
+            });
+        });
+    }
+
+    // Drag and Resize specifically tailored for Label text
+    document.querySelectorAll('.label-transform-box').forEach(box => {
+        const moveBtn = box.querySelector('.handle-move');
+        const resizeBtn = box.querySelector('.handle-resize');
+        const textPart = box.querySelector('.label-text');
+
+        box.addEventListener('mousedown', (e) => {
+            if(e.target === moveBtn || e.target === resizeBtn) return;
+            document.querySelectorAll('.label-transform-box, .transform-box').forEach(b => b.classList.remove('active'));
+            box.classList.add('active');
+        });
+
+        const startDrag = (e) => {
+            e.preventDefault(); e.stopPropagation();
+            const ev = e.touches ? e.touches[0] : e;
+            let sX = ev.clientX, sY = ev.clientY, iL = box.offsetLeft, iT = box.offsetTop;
+            const move = me => {
+                const mev = me.touches ? me.touches[0] : me;
+                box.style.left = iL + (mev.clientX - sX) + 'px';
+                box.style.top = iT + (mev.clientY - sY) + 'px';
+                syncLabelTo3D();
+            };
+            const stop = () => { document.removeEventListener('mousemove', move); document.removeEventListener('touchmove', move); };
+            document.addEventListener('mousemove', move);
+            document.addEventListener('touchmove', move, {passive:false});
+            document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+        };
+
+        const startResize = (e) => {
+            e.preventDefault(); e.stopPropagation();
+            const ev = e.touches ? e.touches[0] : e;
+            let sX = ev.clientX, iSize = parseFloat(window.getComputedStyle(textPart).fontSize);
+            const resize = re => {
+                const rev = re.touches ? re.touches[0] : re;
+                textPart.style.fontSize = iSize + (rev.clientX - sX) + 'px';
+                syncLabelTo3D();
+            };
+            const stop = () => { document.removeEventListener('mousemove', resize); document.removeEventListener('touchmove', resize); };
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('touchmove', resize, {passive:false});
+            document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+        };
+        
+        moveBtn.addEventListener('mousedown', startDrag); moveBtn.addEventListener('touchstart', startDrag);
+        resizeBtn.addEventListener('mousedown', startResize); resizeBtn.addEventListener('touchstart', startResize);
+    });
+
+    // Observer for live text typing on Labels
+    document.addEventListener("DOMContentLoaded", function() {
+        const obs = new MutationObserver(syncLabelTo3D);
+        document.querySelectorAll('.label-text').forEach(el => {
+            obs.observe(el, { childList: true, subtree: true, characterData: true });
+        });
+        setTimeout(syncLabelTo3D, 800);
+    });
+
+    // 3D Cassette Drag & Rotate System
+    const cScene = document.getElementById('cas-scene');
+    const cObj = document.getElementById('cas-object');
+    let cDrag = false, cPx = 0, cPy = 0, cRx = 20, cRy = -20;
+
+    function updateCas3DObj() {
+        cObj.style.transform = `translateZ(-18px) rotateX(${cRx}deg) rotateY(${cRy}deg)`;
+    }
+
+    if(cScene && cObj) {
+        cScene.addEventListener('mousedown', (e) => {
+            cDrag = true; cPx = e.clientX; cPy = e.clientY;
+            cScene.style.cursor = 'grabbing';
+        });
+        window.addEventListener('mouseup', () => { cDrag = false; cScene.style.cursor = 'grab'; });
+        window.addEventListener('mousemove', (e) => {
+            if (!cDrag) return;
+            cRy += (e.clientX - cPx) * 0.7;
+            cRx -= (e.clientY - cPy) * 0.7;
+            cPx = e.clientX; cPy = e.clientY;
+            updateCas3DObj();
+        });
+
+        cScene.addEventListener('touchstart', (e) => {
+            cDrag = true; cPx = e.touches[0].clientX; cPy = e.touches[0].clientY;
+        }, {passive: true});
+        window.addEventListener('touchend', () => { cDrag = false; });
+        window.addEventListener('touchmove', (e) => {
+            if (!cDrag) return;
+            cRy += (e.touches[0].clientX - cPx) * 0.9;
+            cRx -= (e.touches[0].clientY - cPy) * 0.9;
+            cPx = e.touches[0].clientX; cPy = e.touches[0].clientY;
+            updateCas3DObj();
+        }, {passive: true});
+    }
+
+    // Download Label Function (Transparent Background)
+    async function downloadLabelPng(side) {
+        const target = document.getElementById('canvas-' + side);
+        const btn = event.currentTarget;
+        const origText = btn.innerText;
+        
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+        
+        // Preparation to keep the canvas clean during export
+        target.classList.add('exporting-label');
+        target.querySelectorAll('.label-transform-box').forEach(b => b.classList.remove('active'));
+
+        try {
+            // Force transparent background for the container to get PNG transparency 
+            const originalBackground = target.style.background;
+            target.style.background = 'transparent'; 
+            
+            const canvas = await html2canvas(target, {
+                scale: 3, 
+                backgroundColor: null, 
+                useCORS: true,
+                allowTaint: true
+            });
+            
+            // Restore background after render
+            target.style.background = originalBackground;
+
+            const imgData = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.download = `cassette-label-${side}.png`;
+            link.href = imgData;
+            link.click();
+        } catch (err) {
+            console.error(err);
+            alert("Gagal mendownload label. Pastikan gambarmu ter-load dengan benar.");
+        } finally {
+            target.classList.remove('exporting-label');
+            btn.innerText = origText;
+            btn.disabled = false;
+        }
+    }
 </script>
 </body>
 </html>
