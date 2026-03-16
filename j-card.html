@@ -1410,26 +1410,36 @@ if(scene3D && jcardObj) {
 }
     // Init Label Fonts using existing fontList
     function initLabelFonts() {
-        const selector = document.getElementById('labelFontSelector');
-        if(!selector || typeof fontList === 'undefined') return;
-        fontList.sort().forEach(font => {
-            let opt = document.createElement('option');
-            opt.value = font; 
-            opt.innerHTML = font;
-            opt.style.fontFamily = font;
-            if(font === 'Orbitron') opt.selected = true;
-            selector.appendChild(opt);
-        });
-    }
-    setTimeout(initLabelFonts, 500); 
-
-    function updateLabelFont() {
-        const font = document.getElementById('labelFontSelector').value;
+    const selector = document.getElementById('labelFontSelector');
+    if(!selector || typeof fontList === 'undefined') return;
+    fontList.sort().forEach(font => {
+        let opt = document.createElement('option');
+        opt.value = font; 
+        opt.innerHTML = font;
+        opt.style.fontFamily = font;
+        if(font === 'Orbitron') opt.selected = true;
+        selector.appendChild(opt);
+    });
+    
+    // Set default font ke label text setelah populate
+    setTimeout(() => {
+        const defaultFont = selector.value || 'Orbitron';
         document.querySelectorAll('.label-text').forEach(el => {
-            el.style.fontFamily = `'', sans-serif`;
+            el.style.fontFamily = `'${defaultFont}', sans-serif`;
         });
         syncLabelTo3D();
-    }
+    }, 100);
+}
+setTimeout(initLabelFonts, 500);
+ 
+
+function updateLabelFont() {
+    const font = document.getElementById('labelFontSelector').value;
+    document.querySelectorAll('.label-text').forEach(el => {
+        el.style.fontFamily = `'${font}', sans-serif`;
+    });
+    syncLabelTo3D();
+}
 
     function updateLabelColors() {
         const shellCol = document.getElementById('casShellColor').value;
@@ -1523,10 +1533,10 @@ function uploadStickerLabel(input, side) {
                 contentA.style.backgroundColor = canvasCol;
             }
 
-            // TEXT - SYNC
+                        // TEXT - SYNC
             const textDivA = document.createElement('div');
             textDivA.innerHTML = textA.innerHTML;
-            textDivA.style.fontFamily = `'', sans-serif`;
+            textDivA.style.fontFamily = textA.style.fontFamily || `'${font}', sans-serif`;
             textDivA.style.color = textCol;
             textDivA.style.fontSize = fontSizeA + 'px';
             textDivA.style.fontWeight = '900';
@@ -1543,8 +1553,6 @@ function uploadStickerLabel(input, side) {
             
             contentA.appendChild(textDivA);
         }
-        
-        // Sync Side B
         // Sync Side B
         if(contentB && boxB && textB && bgB) {
             const leftB = parseInt(boxB.style.left) || 120;
@@ -1580,9 +1588,10 @@ function uploadStickerLabel(input, side) {
 
             
             // TEXT - SYNC
+                        // TEXT - SYNC
             const textDivB = document.createElement('div');
             textDivB.innerHTML = textB.innerHTML;
-            textDivB.style.fontFamily = `'', sans-serif`;
+            textDivB.style.fontFamily = textB.style.fontFamily || `'${font}', sans-serif`;
             textDivB.style.color = textCol;
             textDivB.style.fontSize = fontSizeB + 'px';
             textDivB.style.fontWeight = '900';
