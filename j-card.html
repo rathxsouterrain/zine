@@ -509,7 +509,7 @@ nav.nav-show { transform: translateY(0); }
     .exporting-label .handle-move, .exporting-label .handle-resize { display: none !important; }
     .exporting-label { box-shadow: none !important; }
 
-    /* 3D Cassette Styles - RAPIH & REALISTIS */
+    /* 3D Cassette Styles - SISI RAPAT & TUMPUL */
     .cassette-3d-scene { 
         width: 100%; 
         max-width: 500px; 
@@ -548,11 +548,11 @@ nav.nav-show { transform: translateY(0); }
         backface-visibility: hidden;
     }
     
-    /* Front dan Back - kotak rapih dengan rounded corners */
+    /* Front dan Back */
     .cas-front { 
         width: 300px; 
         height: 190px; 
-        border-radius: 12px; 
+        border-radius: 16px; 
         transform: rotateY(0deg) translateZ(15px); 
         background: #2a2a2a;
         box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
@@ -561,52 +561,52 @@ nav.nav-show { transform: translateY(0); }
     .cas-back { 
         width: 300px; 
         height: 190px; 
-        border-radius: 12px; 
+        border-radius: 16px; 
         transform: rotateY(180deg) translateZ(15px); 
         background: #2a2a2a;
         box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
     }
     
-    /* Sisi kanan dan kiri - RAPIH & RAPAT */
+    /* Sisi kanan dan kiri - RAPAT & TUMPUL */
     .cas-right { 
         width: 30px; 
-        height: 166px; 
+        height: 190px; 
         left: 135px; 
-        top: 12px; 
+        top: 0; 
         transform: rotateY(90deg) translateZ(150px); 
         background: #1f1f1f;
-        border-radius: 8px;
+        border-radius: 16px;
     }
     
     .cas-left { 
         width: 30px; 
-        height: 166px; 
+        height: 190px; 
         left: 135px; 
-        top: 12px; 
+        top: 0; 
         transform: rotateY(-90deg) translateZ(150px); 
         background: #1f1f1f;
-        border-radius: 8px;
+        border-radius: 16px;
     }
     
-    /* Atas dan bawah - RAPIH & RAPAT */
+    /* Atas dan bawah - RAPAT & TUMPUL */
     .cas-top { 
-        width: 276px; 
+        width: 300px; 
         height: 30px; 
         top: 80px; 
-        left: 12px; 
+        left: 0; 
         transform: rotateX(90deg) translateZ(95px); 
         background: #1f1f1f;
-        border-radius: 8px;
+        border-radius: 16px;
     }
     
     .cas-bottom { 
-        width: 276px; 
+        width: 300px; 
         height: 30px; 
         top: 80px; 
-        left: 12px; 
+        left: 0; 
         transform: rotateX(-90deg) translateZ(95px); 
         background: #1f1f1f;
-        border-radius: 8px;
+        border-radius: 16px;
     }
 
     /* Window cassette */
@@ -670,7 +670,7 @@ nav.nav-show { transform: translateY(0); }
         outline: none;
     }
     
-    /* Texture */
+    /* Texture - ikut rounded parent */
     .cas-texture { 
         position: absolute; 
         width:100%; 
@@ -683,7 +683,7 @@ nav.nav-show { transform: translateY(0); }
         z-index: 20;
     }
     
-    /* Container konten label - SYNC PRESISI */
+    /* Container konten label */
     .cas-label-content { 
         position: absolute; 
         top: 0; 
@@ -702,6 +702,7 @@ nav.nav-show { transform: translateY(0); }
         outline: none !important;
         box-shadow: none !important;
     }
+
 
 </style>
 </head>
