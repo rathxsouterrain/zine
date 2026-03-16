@@ -1487,37 +1487,42 @@ if(scene3D && jcardObj) {
         const font = document.getElementById('labelFontSelector').value || 'Orbitron';
         
         // Sync Side A
-        if(contentA && boxA && textA && bgA) {
-            const leftA = parseInt(boxA.style.left) || 120;
-            const topA = parseInt(boxA.style.top) || 50;
-            const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
-            
-            // Clear dan setup container
-            contentA.innerHTML = '';
-            contentA.style.width = '350px';
-            contentA.style.height = '180px';
-            contentA.style.position = 'absolute';
-            contentA.style.top = '0';
-            contentA.style.left = '0';
-            
-            // GAMBAR BACKGROUND - SYNC
-            if(bgA.style.backgroundImage && bgA.style.backgroundImage !== 'none') {
-                const bgDiv = document.createElement('div');
-                bgDiv.style.width = '350px';
-                bgDiv.style.height = '180px';
-                bgDiv.style.position = 'absolute';
-                bgDiv.style.top = '0';
-                bgDiv.style.left = '0';
-                bgDiv.style.backgroundImage = bgA.style.backgroundImage;
-                bgDiv.style.backgroundSize = bgA.style.backgroundSize || 'cover';
-                bgDiv.style.backgroundPosition = bgA.style.backgroundPosition || 'center';
-                bgDiv.style.backgroundRepeat = 'no-repeat';
-                bgDiv.style.zIndex = '1';
-                contentA.appendChild(bgDiv);
-            } else {
-                contentA.style.backgroundColor = canvasCol;
-            }
-            
+// Sync Side A
+if(contentA && boxA && textA && bgA) {
+    const leftA = parseInt(boxA.style.left) || 120;
+    const topA = parseInt(boxA.style.top) || 50;
+    const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
+    
+    // Clear dan setup container
+    contentA.innerHTML = '';
+    contentA.style.width = '350px';
+    contentA.style.height = '180px';
+    contentA.style.position = 'absolute';
+    contentA.style.top = '0';
+    contentA.style.left = '0';
+    contentA.style.backgroundColor = 'transparent'; // Reset dulu
+    
+    // GAMBAR BACKGROUND - SYNC (CEK JUGA computed style)
+    const computedBg = window.getComputedStyle(bgA).backgroundImage;
+    const inlineBg = bgA.style.backgroundImage;
+    
+    if((inlineBg && inlineBg !== 'none') || (computedBg && computedBg !== 'none')) {
+        const bgImage = inlineBg !== 'none' && inlineBg ? inlineBg : computedBg;
+        const bgDiv = document.createElement('div');
+        bgDiv.style.width = '350px';
+        bgDiv.style.height = '180px';
+        bgDiv.style.position = 'absolute';
+        bgDiv.style.top = '0';
+        bgDiv.style.left = '0';
+        bgDiv.style.backgroundImage = bgImage;
+        bgDiv.style.backgroundSize = 'cover';
+        bgDiv.style.backgroundPosition = 'center';
+        bgDiv.style.backgroundRepeat = 'no-repeat';
+        bgDiv.style.zIndex = '1';
+        contentA.appendChild(bgDiv);
+    } else {
+        contentA.style.backgroundColor = canvasCol;
+    }
             // TEXT - SYNC
             const textDivA = document.createElement('div');
             textDivA.innerHTML = textA.innerHTML;
