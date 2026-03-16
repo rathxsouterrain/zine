@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cassette J-Card Mobile</title>
+<title>Cassette J-Card Mobile + 3D Preview</title>
 <link href="https://fonts.googleapis.com/css2?family=Abel&family=Abril+Fatface&family=Alegreya+Sans+SC:wght@800&family=Alfa+Slab+One&family=Alumni+Sans+Collegiate+One&family=Amatic+SC:wght@700&family=Anton&family=Archivo+Black&family=Bangers&family=Barlow+Condensed:wght@900&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Shade&family=Cabin+Sketch:wght@700&family=Cinzel:wght@900&family=Comfortaa:wght@700&family=Creepster&family=DM+Serif+Display&family=Faster+One&family=Fativa&family=Fredoka+One&family=Graduate&family=Gravitas+One&family=Gruppo&family=Iceberg&family=Inter:wght@400;900&family=JetBrains+Mono:wght@800&family=Jura:wght@700&family=Kanit:wght@900&family=Koulen&family=Lobster&family=Londrina+Solid:wght@900&family=Major+Mono+Display&family=Michroma&family=Monoton&family=Montserrat:wght@900&family=Nova+Mono&family=Orbitron:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Press+Start+2P&family=Quantico:wght@700&family=Rajdhani:wght@700&family=Righteous&family=Russo+One&family=Silkscreen&family=Special+Elite&family=Staatliches&family=Syncopate:wght@700&family=Teko:wght@700&family=Unica+One&family=Vampiro+One&family=VT323&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -19,10 +19,9 @@ body {
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
     color: white;
-    background: #000; /* Warna dasar jika gambar gagal load */
+    background: #000;
 }
 
-/* Container Background Gambar */
 .gif-bg {
     position: fixed;
     top: 0;
@@ -32,10 +31,9 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: -1; /* Berada di belakang semua elemen */
+    z-index: -1;
 }
 
-/* Overlay Gelap agar teks mudah dibaca */
 .gif-bg::after {
     content: "";
     position: absolute;
@@ -43,10 +41,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.60); /* Kehitaman 60% */
+    background: rgba(0, 0, 0, 0.60);
 }
 
-/* Pastikan tab kontrol kamu tetap transparan (Glassmorphism) */
 .controls, .web-info-tab, .action-buttons {
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(14px) !important;
@@ -57,7 +54,7 @@ body {
 .app-header{ text-align:center; margin-bottom:10px; }
 .controls{ background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--glass-border); padding:6px; border-radius:15px; width:100%; max-width:500px; display:flex; flex-direction:column; gap:10px; margin-bottom:15px; }
 input,select{ background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); padding:10px; color:white; border-radius:8px; }
-/* Gaya Tombol Glassmorphism Global */
+
 button, .btn-save, .btn-reset, .btn-upload-full {
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(12px) !important;
@@ -84,24 +81,20 @@ button:active {
     transform: scale(0.98);
 }
 
-/* Tombol Reset (Tetap ada nuansa merah transparan) */
 .btn-reset {
     background: rgba(255, 68, 68, 0.1) !important;
     color: #ff4444 !important;
     border-color: rgba(255, 68, 68, 0.2) !important;
 }
 
-/* Pastikan kontainer action-buttons menggunakan flex terpusat */
 .action-buttons {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Memusatkan semua elemen di dalamnya ke tengah */
+    align-items: center;
     gap: 12px;
     width: 100%;
     max-width: 500px;
-    margin: 20px auto 50px auto; /* auto kiri-kanan agar panel juga di tengah */
-    
-    /* Efek Glassmorphism */
+    margin: 20px auto 50px auto;
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px) !important;
@@ -111,10 +104,9 @@ button:active {
     box-sizing: border-box;
 }
 
-/* Memusatkan teks label */
 .action-buttons p {
-    width: 100%; /* Agar teks punya ruang untuk bergeser ke tengah */
-    text-align: center !important; /* Paksa teks ke tengah */
+    width: 100%;
+    text-align: center !important;
     color: rgba(255, 255, 255, 0.6);
     font-size: 11px;
     font-weight: 700;
@@ -123,38 +115,30 @@ button:active {
     text-transform: uppercase;
 }
 
-/* Mengatur grup tombol agar terpusat */
 .button-group {
     display: flex;
     gap: 10px;
     width: 100%;
-    justify-content: center; /* Memastikan tombol JPG/PDF juga di tengah */
+    justify-content: center;
 }
 
 .button-group button {
-    flex: 1; /* Membuat tombol punya lebar yang sama */
-    max-width: 150px; /* Batasi lebar tombol agar tidak terlalu melar */
+    flex: 1;
+    max-width: 150px;
 }
-
 
 .canvas-viewport {
     width: 100%;
-    /* Mengunci tinggi tampilan agar tidak ada sisa ruang kosong */
     height: 380px; 
     overflow: hidden;
     position: relative;
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 10px; /* Jarak kecil ke tombol */
+    margin-bottom: 10px;
 }
 
-/* Khusus layar besar, sesuaikan tingginya */
-@media (min-width: 600px) {
-    .canvas-viewport { height: 620px; }
-}
-@media (min-width: 1100px) {
-    .canvas-viewport { height: 1050px; }
-}
+@media (min-width: 600px) { .canvas-viewport { height: 620px; } }
+@media (min-width: 1100px) { .canvas-viewport { height: 1050px; } }
 
 #jcard-canvas {
     width: 1031px;
@@ -163,14 +147,12 @@ button:active {
     display: flex;
     color: black;
     transform-origin: top left;
-    transform: scale(0.35); /* Skala mobile */
-    position: absolute; /* Ubah ke absolute agar tidak makan space luar */
+    transform: scale(0.35);
+    position: absolute;
     top: 0;
     left: 0;
 }
 
-
-/* Tampilan di Editor (Garis Putus-putus) */
 .section { 
     height: 100%; 
     box-sizing: border-box; 
@@ -180,20 +162,15 @@ button:active {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    /* Menjaga kualitas gambar tetap tajam saat scaling */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+    image-rendering: pixelated;
 }
 
-/* Tampilan saat Simpan/Export (Garis Solid Tipis HD) */
-.exporting .section {
-    border-right: 1px solid #cccccc !important;
-}
+.exporting .section { border-right: 1px solid #cccccc !important; }
+.exporting .section:last-child { border-right: none !important; }
+.exporting .front-cover { border-right: none !important; }
 
-/* Menghilangkan garis di ujung paling kanan agar tidak kotor */
-.exporting .front-cover {
-    border-right: none !important;
-}
 .back-flap{ width:254px; padding:40px 20px; }
 .spine{ width:127px; display:flex; justify-content:center; align-items:center; }
 .front-cover{ width:650px; background-size:cover; background-position:center; display:flex; align-items:center; padding-left:30px; }
@@ -207,75 +184,35 @@ button:active {
 .editable-content { outline: none; }
 .back-flap h3{ font-family:'Orbitron',sans-serif; font-size:30px; margin-bottom:15px; }
 .tracklist{ font-family:'Orbitron',sans-serif; font-size:20px; font-weight:700; line-height:1.4; }
-/* Update CSS Spine */
-/* Update CSS Spine agar Box Vertikal tapi Font Tetap Aman */
+
 .spine .transform-box {
     transform: rotate(90deg);
     transform-origin: center;
-    display: inline-flex; /* Gunakan inline-flex agar box pas seukuran teks */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    width: auto;         /* Jangan dipaksa 100% */
-    height: auto;        /* Biarkan mengikuti tinggi font */
+    width: auto;
+    height: auto;
 }
 
 .spine .editable-content.spine-text {
-    /* Matikan semua rotasi individu pada teks agar tidak konflik */
     transform: none !important; 
-    
-    /* Pastikan font mengikuti variabel global atau setelan menu */
     font-family: "Orbitron"; 
-    font-size: 55px; /* Ukuran standar awal, nanti bisa di-resize */
+    font-size: 55px;
     color: inherit;
     line-height: 1;
 }
 
-/* Pastikan Handle tidak ikut gepeng saat box diputar */
-.spine .handle-move, .spine .handle-resize {
-    transform: rotate(-90deg); /* Putar balik handle agar tetap terlihat tegak */
-}
-
-
+.spine .handle-move, .spine .handle-resize { transform: rotate(-90deg); }
 .front-overlay h1{ font-family:'Orbitron',sans-serif; font-size:110px; margin:0; line-height:0.8; }
 
 .exporting .transform-box { border: none !important; background: transparent !important; }
 .exporting .handle-move, .exporting .handle-resize { display: none !important; }
-.color-row {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-}
-.color-group {
-    flex: 1; /* Membuat kedua input punya lebar yang sama */
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-.color-group input[type="color"] {
-    width: 100%;
-    height: 40px;
-    padding: 2px; /* Membuat tampilan picker warna lebih rapi */
-    cursor: pointer;
-}
-/* Menghilangkan garis pembatas saat proses export/simpan */
-/* GANTI bagian .exporting lama dengan ini */
-.exporting .section {
-    border-right: 1px solid #cccccc !important; /* Garis tipis solid saat simpan */
-}
 
-.exporting .section:last-child {
-    border-right: none !important; /* Menghilangkan garis di paling ujung kanan */
-}
-
-/* Pastikan garis putus-putus tetap ada saat editing */
-.section { 
-    height: 100%; 
-    box-sizing: border-box; 
-    border-right: 2px dashed #444; /* Garis putus-putus di editor */
-    position: relative; 
-    background: var(--backColor); 
-}
+.color-row { display: flex; gap: 10px; width: 100%; }
+.color-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.color-group input[type="color"] { width: 100%; height: 40px; padding: 2px; cursor: pointer; }
 
 .web-info-tab {
     background: var(--glass);
@@ -283,114 +220,66 @@ button:active {
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    
     width: 100%;
-    max-width: 400px; /* Samakan dengan lebar kontrol lainnya */
+    max-width: 400px;
     padding: 50px;
-    margin-bottom: 20px; /* Jarak ke tab berikutnya */
+    margin-bottom: 20px;
     box-sizing: border-box;
     text-align: center;
 }
 
-.info-content h2 {
-    margin: 0 0 5px 0;
-    font-size: 17px;
-    letter-spacing: 4px;
-    font-weight: 900;
-    color: #ffffff;
-    text-transform: uppercase;
-}
+.info-content h2 { margin: 0 0 5px 0; font-size: 17px; letter-spacing: 4px; font-weight: 900; color: #ffffff; text-transform: uppercase; }
+.info-content p { margin: 0; font-size: 13px; letter-spacing: 1px; line-height: 1.5; color: rgba(255, 255, 255, 0.7); font-weight: 400; }
 
-.info-content p {
-    margin: 0;
-    font-size: 13px;
-    letter-spacing: 1px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 400;
-}
-
-
-/* Styling khusus Viewport Kedua */
 #jcard-canvas-full {
     width: 1031px;
     height: 1020px;
     display: flex;
     color: black;
     transform-origin: top left;
-    transform: scale(0.35); /* Sesuaikan dengan skala viewport pertama */
+    transform: scale(0.35);
     position: absolute;
     top: 0;
     left: 0;
-    background-color: white; /* Default jika belum upload */
+    background-color: white;
     background-size: cover;
     background-position: center;
 }
 
-/* Memastikan garis putus-putus tetap muncul di Viewport Kedua */
 #jcard-canvas-full .section {
-    background: transparent !important; /* Agar background utama terlihat */
-    border-right: 2px dashed #444; /* Garis pembatas yang Anda inginkan */
+    background: transparent !important;
+    border-right: 2px dashed #444;
 }
 
-/* Hilangkan garis terakhir di ujung kanan */
-#jcard-canvas-full .front-cover {
-    border-right: none !important;
-}
-.exporting .section {
-    border-right: 1px solid #cccccc !important;
-}
-.section { 
-    /* ... kode lainnya ... */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    image-rendering: pixelated; /* Bagus untuk gambar yang mengandung teks tajam */
-}
-/* --- Tambahan Animasi Profile (Web 1 Style) --- */
+#jcard-canvas-full .front-cover { border-right: none !important; }
+
 .profile-photo {
     display: flex;
     justify-content: center;
-    /* Tambahkan margin atas yang cukup besar (minimal 100px) 
-       agar turun melewati batas navbar yang melayang */
     margin-top: 110px; 
     margin-bottom: 20px;
     width: 100%;
 }
 
-.profile-photo img {
-    /* Ukuran disesuaikan agar proporsional di mobile */
-    width: 250px; 
-    height: auto;
-    display: block;
-    opacity: 0;
-    transform: translateY(40px);
-    /* Gunakan transisi atau biarkan dijalankan via JS Animation */
-}
+.profile-photo img { width: 250px; height: auto; display: block; opacity: 0; transform: translateY(40px); }
 
 @keyframes profileSlide {
     from { opacity: 0; transform: translateY(40px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Berikan jarak tambahan pada header teks agar tidak menempel ke foto */
-.app-header h1 {
-    margin-top: 10px;
-    font-size: 24px;
-    letter-spacing: 2px;
-}
+.app-header h1 { margin-top: 10px; font-size: 24px; letter-spacing: 2px; }
 
-/* --- Tambahan Navbar (Web 1 Style) --- */
 nav {
     position: fixed;
     top: 10px;
     left: 0;
     width: 100%;
-    z-index: 9999; /* Pastikan angka ini paling tinggi */
+    z-index: 9999;
     display: flex;
     justify-content: center;
     transition: transform 0.45s ease;
 }
-
 
 nav.nav-hidden { transform: translateY(-120%); }
 nav.nav-show { transform: translateY(0); }
@@ -410,7 +299,6 @@ nav.nav-show { transform: translateY(0); }
 }
 
 .brand img { height: 28px; width: auto; display: block; }
-
 .menu { display: flex; gap: 6px; }
 
 .nav-bubble {
@@ -429,15 +317,121 @@ nav.nav-show { transform: translateY(0); }
 .nav-bubble:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
 .nav-bubble.active { background: white; color: black; border: none; }
 
+/* ============================
+   TAMBAHAN CSS 3D PREVIEW - DIPERBAIKI
+============================ */
+.scene-3d {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    perspective: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+    cursor: grab;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+}
+.scene-3d:active { cursor: grabbing; }
+
+.jcard-3d-wrapper {
+    position: relative;
+    width: 650px;
+    height: 1020px;
+    transform-style: preserve-3d;
+    transform: scale(0.25) rotateX(15deg) rotateY(-35deg);
+    transition: transform 0.1s ease-out;
+}
+
+.panel {
+    position: absolute;
+    transform-style: preserve-3d;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.front-panel {
+    width: 650px;
+    height: 1020px;
+    transform-origin: left center;
+}
+
+.spine-panel {
+    width: 127px;
+    height: 1020px;
+    left: -127px;
+    transform-origin: right center; 
+    transform: rotateY(-90deg); 
+}
+
+.back-panel {
+    width: 254px;
+    height: 1020px;
+    left: -254px;
+    transform-origin: right center; 
+    transform: rotateY(-90deg); 
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background-color: #ffffff;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    top: 0;
+    left: 0;
+}
+
+.face.outer { 
+    transform: rotateY(0deg); 
+    z-index: 2;
+}
+
+.face.inner { 
+    transform: rotateY(180deg); 
+    z-index: 1;
+}
+
+.inner-texture {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Background positioning untuk inner faces */
+#3d-front-inner { 
+    background-size: 1031px 1020px; 
+    background-position: left center; 
+}
+#3d-spine-inner { 
+    background-size: 1031px 1020px; 
+    background-position: -650px center; 
+}
+#3d-back-inner  { 
+    background-size: 1031px 1020px; 
+    background-position: right center; 
+}
 
 </style>
 </head>
 <body>
-<nav class="nav-hidden">
+    <nav class="nav-hidden">
         <div class="nav-container">
             <div class="brand">
-                <a href="index.html"> <img src="logo.png" alt="logo">
-                </a>
+                <a href="index.html"> <img src="logo.png" alt="logo"> </a>
             </div>
             <div class="menu">
                 <a href="index.html#zine" class="nav-bubble">ZINE</a>
@@ -451,15 +445,16 @@ nav.nav-show { transform: translateY(0); }
         <img src="profile2.png" alt="Profile" id="profileImg">
     </div>
     
-<div class="gif-bg"></div>
-<div class="app-header"><h1>J-CARD MAKER</h1></div>
-<div class="web-info-tab">
-    <div class="info-content">
-        <h2>J-CARD CASSETTE</h2>
-        <p>Ini adalah J-Card Cassette Maker, tempat gambar biasa menjadi cover kaset yang unik dan tak terduga. Cukup drop gambar, atur posisinya, dan dalam sekejap, covermu siap dipakai.</p>
+    <div class="gif-bg"></div>
+    <div class="app-header"><h1>J-CARD MAKER</h1></div>
+    <div class="web-info-tab">
+        <div class="info-content">
+            <h2>J-CARD CASSETTE</h2>
+            <p>Ini adalah J-Card Cassette Maker, tempat gambar biasa menjadi cover kaset yang unik dan tak terduga. Cukup drop gambar, atur posisinya, dan dalam sekejap, covermu siap dipakai.</p>
+        </div>
     </div>
-</div>
-<div class="controls">
+    
+    <div class="controls">
         <button onclick="document.getElementById('imageUpload').click()">Upload Front Cover</button>
         <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'front')">
         <button onclick="document.getElementById('spineUpload').click()">Upload Spine Cover</button>
@@ -467,116 +462,139 @@ nav.nav-show { transform: translateY(0); }
         <button onclick="document.getElementById('backUpload').click()">Upload Back Cover</button>
         <input type="file" id="backUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'back')">
         
-    
-    <div class="color-row">
-        <div class="color-group">
-            <label>Cover Color</label>
-            <input type="color" id="coverColor" value="#ffffff" onchange="changeBackColor()">
+        <div class="color-row">
+            <div class="color-group">
+                <label>Cover Color</label>
+                <input type="color" id="coverColor" value="#ffffff" onchange="changeBackColor()">
+            </div>
+            <div class="color-group">
+                <label>Font Color</label>
+                <input type="color" id="fontColor" value="#000000" onchange="changeFontColor()">
+            </div>
         </div>
-        <div class="color-group">
-            <label>Font Color</label>
-            <input type="color" id="fontColor" value="#000000" onchange="changeFontColor()">
-        </div>
-    </div>
 
-    <label>Font Family</label>
+        <label>Font Family</label>
         <select id="fontSelector" onchange="changeFont()"></select>
-</div>
-</div>
-<div class="web-info-tab">
-    <div class="info-content">
-        <h3>PENTING!</h3>
-        <p>Klik Text, Tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
     </div>
-</div>
-<div class="canvas-viewport">
-<div id="jcard-canvas">
-    <div class="section back-flap" id="playlistSection">
-        <div class="transform-box" style="top:40px; left:20px;">
-            <div class="handle-move">+</div>
-            <div class="editable-content">
-                <h3 contenteditable="true">playlist</h3>
-                <div class="tracklist" contenteditable="true">1. track<br>2. track<br>3. track</div>
-            </div>
-            <div class="handle-resize"></div>
-        </div>
-    </div>
-    <div class="section spine">
-        <div class="transform-box">
-            <div class="handle-move">+</div>
-            <div class="editable-content spine-text" contenteditable="true">band name</div>
-            <div class="handle-resize"></div>
-        </div>
-    </div>
-    <div class="section front-cover" id="albumArt">
-        <div class="transform-box" style="left:30px;">
-            <div class="handle-move">+</div>
-            <div class="front-overlay">
-                <h1 class="editable-content" contenteditable="true">Cover</h1>
-            </div>
-            <div class="handle-resize"></div>
-        </div>
-    </div>
-</div>
-</div>
-<button onclick="document.getElementById('fullWrapUpload').click()" style="background: rgba(0, 255, 150, 0.15); border: 1px solid #00ff96; color: #00ff96;">
-    Upload Full Wrap Image
-</button>
-<input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
 
-<div class="app-header"><h3>COVER FULL WRAP MODE</h3></div>
-<div class="canvas-viewport">
-    <div id="jcard-canvas-full" class="full-wrap-container">
-        <div class="section back-flap">
-            <div class="transform-box" style="top:40px; left:20px;">
-                <div class="handle-move">+</div>
-                <div class="editable-content">
-                    <h3 contenteditable="true">playlist</h3>
-                    <div class="tracklist" contenteditable="true">1. track<br>2. track</div>
+    <div class="web-info-tab">
+        <div class="info-content">
+            <h3>PENTING!</h3>
+            <p>Klik Text, Tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
+        </div>
+    </div>
+    
+    <div class="canvas-viewport">
+        <div id="jcard-canvas">
+            <div class="section back-flap" id="playlistSection">
+                <div class="transform-box" style="top:40px; left:20px;">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content">
+                        <h3 contenteditable="true">playlist</h3>
+                        <div class="tracklist" contenteditable="true">1. track<br>2. track<br>3. track</div>
+                    </div>
+                    <div class="handle-resize"></div>
                 </div>
-                <div class="handle-resize"></div>
             </div>
-        </div>
-        <div class="section spine">
-            <div class="transform-box">
-                <div class="handle-move">+</div>
-                <div class="editable-content spine-text" contenteditable="true">band name</div>
-                <div class="handle-resize"></div>
-            </div>
-        </div>
-        <div class="section front-cover">
-            <div class="transform-box" style="left:30px;">
-                <div class="handle-move">+</div>
-                <div class="front-overlay">
-                    <h1 class="editable-content" contenteditable="true">Cover</h1>
+            <div class="section spine">
+                <div class="transform-box">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content spine-text" contenteditable="true">band name</div>
+                    <div class="handle-resize"></div>
                 </div>
-                <div class="handle-resize"></div>
+            </div>
+            <div class="section front-cover" id="albumArt">
+                <div class="transform-box" style="left:30px;">
+                    <div class="handle-move">+</div>
+                    <div class="front-overlay">
+                        <h1 class="editable-content" contenteditable="true">Cover</h1>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="action-buttons">
-    <p>DOWNLOAD DESIGN COVER</p>
-    <div class="button-group">
-        <button onclick="saveDesign('manual', 'jpg')">JPG</button>
-        <button onclick="saveDesign('manual', 'pdf')">PDF</button>
+    <button onclick="document.getElementById('fullWrapUpload').click()" style="background: rgba(0, 255, 150, 0.15); border: 1px solid #00ff96; color: #00ff96; margin-bottom: 20px;">
+        Upload Full Wrap Image
+    </button>
+    <input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
+
+    <div class="app-header"><h3>COVER FULL WRAP MODE</h3></div>
+    <div class="canvas-viewport">
+        <div id="jcard-canvas-full" class="full-wrap-container">
+            <div class="section back-flap">
+                <div class="transform-box" style="top:40px; left:20px;">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content">
+                        <h3 contenteditable="true">playlist</h3>
+                        <div class="tracklist" contenteditable="true">1. track<br>2. track</div>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+            <div class="section spine">
+                <div class="transform-box">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content spine-text" contenteditable="true">band name</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+            <div class="section front-cover">
+                <div class="transform-box" style="left:30px;">
+                    <div class="handle-move">+</div>
+                    <div class="front-overlay">
+                        <h1 class="editable-content" contenteditable="true">Cover</h1>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <p style="margin-top: 15px;">DOWNLOAD DESIGN BACK (FULL WRAP)</p>
-    <div class="button-group">
-        <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
-        <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
+    <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
+    <div class="scene-3d">
+        <div class="jcard-3d-wrapper" id="jcard-3d-object">
+            <div class="panel front-panel">
+                <div class="face outer front-outer" id="3d-front-outer"></div>
+                <div class="face inner front-inner">
+                    <div class="inner-texture" id="3d-front-inner"></div>
+                </div>
+                
+                <div class="panel spine-panel">
+                    <div class="face outer spine-outer" id="3d-spine-outer"></div>
+                    <div class="face inner spine-inner">
+                        <div class="inner-texture" id="3d-spine-inner"></div>
+                    </div>
+                    
+                    <div class="panel back-panel">
+                        <div class="face outer back-outer" id="3d-back-outer"></div>
+                        <div class="face inner back-inner">
+                            <div class="inner-texture" id="3d-back-inner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <button onclick="location.reload()" class="btn-reset" style="margin-top: 15px; width: 100%;">RESET DESIGN</button>
-</div>
+    <div class="action-buttons">
+        <p>DOWNLOAD DESIGN COVER</p>
+        <div class="button-group">
+            <button onclick="saveDesign('manual', 'jpg')">JPG</button>
+            <button onclick="saveDesign('manual', 'pdf')">PDF</button>
+        </div>
 
+        <p style="margin-top: 15px;">DOWNLOAD DESIGN BACK (FULL WRAP)</p>
+        <div class="button-group">
+            <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
+            <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
+        </div>
 
-</div>
+        <button onclick="location.reload()" class="btn-reset" style="margin-top: 15px; width: 100%;">RESET DESIGN</button>
+    </div>
 
 <script>
-// Pastikan daftar nama sesuai dengan Google Fonts
 const fontList = [
     "Archivo Black", "Bebas Neue", "Anton", "Orbitron", "Russo One", "Kanit", "Montserrat", "Oswald", "Teko", "Rajdhani",
     "Press Start 2P", "Monoton", "Bungee", "Bungee Shade", "Alfa Slab One", "Abril Fatface", "Permanent Marker", "Lobster", "Righteous", "Staatliches",
@@ -589,28 +607,24 @@ function populateFonts() {
     const selector = document.getElementById('fontSelector');
     if(!selector) return;
     
-    selector.innerHTML = ""; // Bersihkan dulu
+    selector.innerHTML = ""; 
     fontList.sort().forEach(font => {
         let opt = document.createElement('option');
-        // Simpan nama font asli sebagai value
         opt.value = font; 
         opt.innerHTML = font;
-        opt.style.fontFamily = font; // Preview font di dalam dropdown
+        opt.style.fontFamily = font; 
         selector.appendChild(opt);
     });
 }
 
 function changeFont() {
     const selectedFont = document.getElementById("fontSelector").value;
-    // Terapkan font ke semua elemen teks
     const elements = document.querySelectorAll(".editable-content, .editable-content h3, .tracklist, .spine-text");
-    
     elements.forEach(el => {
-        el.style.fontFamily = `'', sans-serif`;
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;
     });
 }
 
-// Panggil fungsi saat halaman siap
 document.addEventListener("DOMContentLoaded", populateFonts);
 
 function handleUpload(input, target) {
@@ -622,7 +636,7 @@ function handleUpload(input, target) {
         const targetElement = {
             'front': document.getElementById("albumArt"),
             'back': document.getElementById("playlistSection"),
-            'spine': document.querySelector(".spine") // Mengambil elemen spine
+            'spine': document.querySelector(".spine") 
         };
 
         if (targetElement[target]) {
@@ -630,16 +644,26 @@ function handleUpload(input, target) {
             targetElement[target].style.backgroundSize = "cover";
             targetElement[target].style.backgroundPosition = "center";
         }
+
+        // UPDATE TEKSTUR 3D - DIPERBAIKI
+        const map3D = { 
+            'front': '3d-front-outer', 
+            'spine': '3d-spine-outer', 
+            'back': '3d-back-outer' 
+        };
+        
+        const target3D = document.getElementById(map3D[target]);
+        if (target3D) {
+            target3D.style.backgroundImage = "url(" + e.target.result + ")";
+            target3D.style.backgroundSize = "cover";
+            target3D.style.backgroundPosition = "center";
+        }
     };
     reader.readAsDataURL(file);
 }
 
-
 function changeBackColor(){ document.documentElement.style.setProperty("--backColor", document.getElementById("coverColor").value); }
-function changeFont(){
-    const font=document.getElementById("fontSelector").value;
-    document.querySelectorAll(".editable-content, .editable-content h3, .tracklist").forEach(el=>{el.style.fontFamily=font});
-}
+
 function changeFontColor(){
     const color=document.getElementById("fontColor").value;
     document.querySelectorAll(".editable-content, .editable-content h3, .tracklist").forEach(el=>{el.style.color=color});
@@ -697,26 +721,22 @@ async function saveDesign(type, format) {
     
     if (!targetCanvas) return;
 
-    // UI Feedback
     const originalText = btn ? btn.innerText : "SAVE";
     if (btn) {
         btn.innerText = "Processing...";
         btn.disabled = true;
     }
 
-    // Masuk ke mode export (garis jadi tipis solid)
     targetCanvas.classList.add('exporting');
 
     try {
-        // SOLUSI KUNCI: Menentukan opsi lebar & tinggi secara manual agar tidak terpotong
         const options = {
-            scale: 2, // Resolusi HD tapi aman untuk RAM HP
+            scale: 2, 
             useCORS: true,
             allowTaint: true,
             backgroundColor: "#ffffff",
             width: 1031,
             height: 1020,
-            // Menghilangkan efek 'transform: scale' saat pemotretan
             onclone: (clonedDoc) => {
                 const element = clonedDoc.getElementById(canvasId);
                 element.style.transform = "none";
@@ -729,7 +749,7 @@ async function saveDesign(type, format) {
         const canvas = await html2canvas(targetCanvas, options);
 
         if (format === 'jpg') {
-            const imgData = canvas.toDataURL("image/jpeg", 0.98); // Kualitas tinggi
+            const imgData = canvas.toDataURL("image/jpeg", 0.98);
             const link = document.createElement("a");
             link.download = `jcard--.jpg`;
             link.href = imgData;
@@ -758,38 +778,12 @@ async function saveDesign(type, format) {
     }
 }
 
-
 document.addEventListener("DOMContentLoaded", function() {
-    // Daftar nama file gambar kamu (pastikan file ini ada di folder yang sama)
-    const backgrounds = [
-        "back1.jpg", 
-        "back2.jpg", 
-        "back3.jpg", 
-        "back4.jpg", 
-        "back5.jpg"
-    ];
-
-    // Pilih secara acak
+    const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-    
-    // Terapkan ke elemen .gif-bg
     const bgElement = document.querySelector(".gif-bg");
     if (bgElement) {
         bgElement.style.backgroundImage = "url('" + randomBg + "')";
-    }
-});
-// Menyamakan teks Desain 1 dan Desain 2 secara otomatis
-document.addEventListener('input', function (e) {
-    if (e.target.hasAttribute('contenteditable')) {
-        const text = e.target.innerHTML;
-        const index = Array.from(document.querySelectorAll('[contenteditable]')).indexOf(e.target);
-        const allEditable = document.querySelectorAll('[contenteditable]');
-        
-        // Jika ada elemen yang posisinya sama di desain lain, update teksnya
-        // Catatan: Ini bekerja jika struktur HTML kedua desain identik
-        if(index !== -1) {
-             // Logika sinkronisasi sederhana bisa ditambahkan di sini jika diperlukan
-        }
     }
 });
 
@@ -805,26 +799,33 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundSize = "cover";
             fullCanvas.style.backgroundPosition = "center";
         }
+
+        // UPDATE TEKSTUR 3D UNTUK BAGIAN DALAM (FULL WRAP) - DIPERBAIKI
+        const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
+        innerIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundSize = "1031px 1020px";
+            }
+        });
     };
     reader.readAsDataURL(file);
 }
-// Animasi Profile & Navbar Scroll (Persis Web 1)
+
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
     const profile = document.getElementById("profileImg");
     let lastScroll = window.pageYOffset;
 
-    // Jalankan animasi profil (Langsung atau bisa pakai timer)
     setTimeout(() => {
         if(profile) profile.style.animation = "profileSlide 1s ease forwards";
     }, 500);
 
-    // Navbar muncul setelah jeda singkat
     setTimeout(() => {
         nav.classList.add("nav-show");
     }, 1000);
 
-    // Logika Show/Hide Navbar saat Scroll
     window.addEventListener("scroll", () => {
         const currentScroll = window.pageYOffset;
 
@@ -839,5 +840,70 @@ window.addEventListener("load", () => {
     });
 });
 
+// ============================
+// JS DRAG & ROTATE 3D PREVIEW - DIPERBAIKI
+// ============================
+const scene3D = document.querySelector('.scene-3d');
+const jcardObj = document.getElementById('jcard-3d-object');
+let isDragging3D = false, prevX = 0, prevY = 0;
+let rotX = 15, rotY = -35; 
 
+function update3D() {
+    if(jcardObj) {
+        jcardObj.style.transform = `scale(0.25) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+}
+
+if(scene3D && jcardObj) {
+    // Cek apakah klik berasal dari transform-box atau tidak
+    const isTransformBox = (target) => {
+        return target.closest('.transform-box') !== null;
+    };
+
+    // Mouse events
+    scene3D.addEventListener('mousedown', (e) => {
+        if(isTransformBox(e.target)) return; // Jangan trigger 3D drag jika klik di transform-box
+        isDragging3D = true; 
+        prevX = e.clientX; 
+        prevY = e.clientY;
+        scene3D.style.cursor = 'grabbing';
+    });
+    
+    window.addEventListener('mouseup', () => {
+        isDragging3D = false;
+        scene3D.style.cursor = 'grab';
+    });
+    
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging3D) return;
+        rotY += (e.clientX - prevX) * 0.6;
+        rotX -= (e.clientY - prevY) * 0.6;
+        prevX = e.clientX; 
+        prevY = e.clientY;
+        update3D();
+    });
+
+    // Touch events
+    scene3D.addEventListener('touchstart', (e) => {
+        if(isTransformBox(e.target)) return;
+        isDragging3D = true; 
+        prevX = e.touches[0].clientX; 
+        prevY = e.touches[0].clientY;
+    }, {passive: true});
+    
+    window.addEventListener('touchend', () => {
+        isDragging3D = false;
+    });
+    
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging3D) return;
+        rotY += (e.touches[0].clientX - prevX) * 0.8;
+        rotX -= (e.touches[0].clientY - prevY) * 0.8;
+        prevX = e.touches[0].clientX; 
+        prevY = e.touches[0].clientY;
+        update3D();
+    }, {passive: true});
+}
 </script>
+</body>
+</html>
