@@ -1460,16 +1460,19 @@ if(scene3D && jcardObj) {
         return "#" + (0x1000000 + (R>0?R:0)*0x10000 + (B>0?B:0)*0x100 + (G>0?G:0)).toString(16).slice(1);
     }
 
-    function uploadStickerLabel(input, side) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById(`bg-`).style.backgroundImage = `url()`;
-            syncLabelTo3D();
-        };
-        reader.readAsDataURL(file);
-    }
+function uploadStickerLabel(input, side) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById(`bg-${side}`).style.backgroundImage = `url(${e.target.result})`;
+        document.getElementById(`bg-${side}`).style.backgroundSize = 'cover';
+        document.getElementById(`bg-${side}`).style.backgroundPosition = 'center';
+        syncLabelTo3D();
+    };
+    reader.readAsDataURL(file);
+}
+
 
     // SYNC LABEL TO 3D - DIPERBAIKI GAMBAR & TEXT
     function syncLabelTo3D() {
@@ -1487,42 +1490,39 @@ if(scene3D && jcardObj) {
         const font = document.getElementById('labelFontSelector').value || 'Orbitron';
         
         // Sync Side A
-// Sync Side A
-if(contentA && boxA && textA && bgA) {
-    const leftA = parseInt(boxA.style.left) || 120;
-    const topA = parseInt(boxA.style.top) || 50;
-    const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
-    
-    // Clear dan setup container
-    contentA.innerHTML = '';
-    contentA.style.width = '350px';
-    contentA.style.height = '180px';
-    contentA.style.position = 'absolute';
-    contentA.style.top = '0';
-    contentA.style.left = '0';
-    contentA.style.backgroundColor = 'transparent'; // Reset dulu
-    
-    // GAMBAR BACKGROUND - SYNC (CEK JUGA computed style)
-    const computedBg = window.getComputedStyle(bgA).backgroundImage;
-    const inlineBg = bgA.style.backgroundImage;
-    
-    if((inlineBg && inlineBg !== 'none') || (computedBg && computedBg !== 'none')) {
-        const bgImage = inlineBg !== 'none' && inlineBg ? inlineBg : computedBg;
-        const bgDiv = document.createElement('div');
-        bgDiv.style.width = '350px';
-        bgDiv.style.height = '180px';
-        bgDiv.style.position = 'absolute';
-        bgDiv.style.top = '0';
-        bgDiv.style.left = '0';
-        bgDiv.style.backgroundImage = bgImage;
-        bgDiv.style.backgroundSize = 'cover';
-        bgDiv.style.backgroundPosition = 'center';
-        bgDiv.style.backgroundRepeat = 'no-repeat';
-        bgDiv.style.zIndex = '1';
-        contentA.appendChild(bgDiv);
-    } else {
-        contentA.style.backgroundColor = canvasCol;
-    }
+        if(contentA && boxA && textA && bgA) {
+            const leftA = parseInt(boxA.style.left) || 120;
+            const topA = parseInt(boxA.style.top) || 50;
+            const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
+            
+            // Clear dan setup container
+            contentA.innerHTML = '';
+            contentA.style.width = '350px';
+            contentA.style.height = '180px';
+            contentA.style.position = 'absolute';
+            contentA.style.top = '0';
+            contentA.style.left = '0';
+            contentA.style.backgroundColor = 'transparent';
+            
+            // GAMBAR BACKGROUND - SYNC
+            const bgImageA = bgA.style.backgroundImage;
+            if(bgImageA && bgImageA !== 'none' && bgImageA !== '') {
+                const bgDiv = document.createElement('div');
+                bgDiv.style.width = '350px';
+                bgDiv.style.height = '180px';
+                bgDiv.style.position = 'absolute';
+                bgDiv.style.top = '0';
+                bgDiv.style.left = '0';
+                bgDiv.style.backgroundImage = bgImageA;
+                bgDiv.style.backgroundSize = 'cover';
+                bgDiv.style.backgroundPosition = 'center';
+                bgDiv.style.backgroundRepeat = 'no-repeat';
+                bgDiv.style.zIndex = '1';
+                contentA.appendChild(bgDiv);
+            } else {
+                contentA.style.backgroundColor = canvasCol;
+            }
+
             // TEXT - SYNC
             const textDivA = document.createElement('div');
             textDivA.innerHTML = textA.innerHTML;
@@ -1545,6 +1545,7 @@ if(contentA && boxA && textA && bgA) {
         }
         
         // Sync Side B
+        // Sync Side B
         if(contentB && boxB && textB && bgB) {
             const leftB = parseInt(boxB.style.left) || 120;
             const topB = parseInt(boxB.style.top) || 50;
@@ -1556,24 +1557,27 @@ if(contentA && boxA && textA && bgA) {
             contentB.style.position = 'absolute';
             contentB.style.top = '0';
             contentB.style.left = '0';
+            contentB.style.backgroundColor = 'transparent';
             
             // GAMBAR BACKGROUND - SYNC
-            if(bgB.style.backgroundImage && bgB.style.backgroundImage !== 'none') {
+            const bgImageB = bgB.style.backgroundImage;
+            if(bgImageB && bgImageB !== 'none' && bgImageB !== '') {
                 const bgDiv = document.createElement('div');
                 bgDiv.style.width = '350px';
                 bgDiv.style.height = '180px';
                 bgDiv.style.position = 'absolute';
                 bgDiv.style.top = '0';
                 bgDiv.style.left = '0';
-                bgDiv.style.backgroundImage = bgB.style.backgroundImage;
-                bgDiv.style.backgroundSize = bgB.style.backgroundSize || 'cover';
-                bgDiv.style.backgroundPosition = bgB.style.backgroundPosition || 'center';
+                bgDiv.style.backgroundImage = bgImageB;
+                bgDiv.style.backgroundSize = 'cover';
+                bgDiv.style.backgroundPosition = 'center';
                 bgDiv.style.backgroundRepeat = 'no-repeat';
                 bgDiv.style.zIndex = '1';
                 contentB.appendChild(bgDiv);
             } else {
                 contentB.style.backgroundColor = canvasCol;
             }
+
             
             // TEXT - SYNC
             const textDivB = document.createElement('div');
