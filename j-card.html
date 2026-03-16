@@ -1553,36 +1553,44 @@ if(scene3D && jcardObj) {
         syncLabelTo3D();
     }, 100);
 }
-setTimeout(initLabelFonts, 500);
- 
 
-function updateLabelFont() {
-    const font = document.getElementById('labelFontSelector').value;
-    document.querySelectorAll('.label-text').forEach(el => {
-        el.style.fontFamily = `'${font}', sans-serif`;
-    });
-    syncLabelTo3D();
+setTimeout(initLabelFonts, 500);
+function lightenColor(color, percent) {
+    const num = parseInt(color.replace("#",""), 16),
+    amt = Math.round(2.55 * percent),
+    R = (num >> 16) + amt,
+    B = (num >> 8 & 0x00FF) + amt,
+    G = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R<255?R:255)*0x10000 + (B<255?B:255)*0x100 + (G<255?G:255)).toString(16).slice(1);
 }
 
-    function updateLabelColors() {
-        const shellCol = document.getElementById('casShellColor').value;
-        const canvasCol = document.getElementById('lblCanvasColor').value;
-        const textCol = document.getElementById('lblTextColor').value;
 
-        document.querySelectorAll('.cas-face').forEach(el => {
-            if(el.classList.contains('cas-front') || el.classList.contains('cas-back')) {
-                el.style.backgroundColor = shellCol;
-            } else {
-                el.style.backgroundColor = darkenColor(shellCol, 10);
-            }
-        });
-        
-        document.getElementById('canvas-sideA').style.backgroundColor = canvasCol;
-        document.getElementById('canvas-sideB').style.backgroundColor = canvasCol;
-        document.querySelectorAll('.label-text').forEach(el => el.style.color = textCol);
+function updateLabelColors() {
+    const shellCol = document.getElementById('casShellColor').value;
+    const canvasCol = document.getElementById('lblCanvasColor').value;
+    const textCol = document.getElementById('lblTextColor').value;
 
-        syncLabelTo3D();
-    }
+    // Update warna kaset 3D - dengan gradasi realistis
+    document.querySelectorAll('.cas-face').forEach(el => {
+        if(el.classList.contains('cas-front') || el.classList.contains('cas-back')) {
+            el.style.background = `linear-gradient(145deg, ${lightenColor(shellCol, 20)} 0%, ${shellCol} 50%, ${darkenColor(shellCol, 20)} 100%)`;
+        } else if(el.classList.contains('cas-right')) {
+            el.style.background = `linear-gradient(to right, ${shellCol} 0%, ${darkenColor(shellCol, 10)} 50%, ${darkenColor(shellCol, 20)} 100%)`;
+        } else if(el.classList.contains('cas-left')) {
+            el.style.background = `linear-gradient(to left, ${shellCol} 0%, ${darkenColor(shellCol, 10)} 50%, ${darkenColor(shellCol, 20)} 100%)`;
+        } else if(el.classList.contains('cas-top')) {
+            el.style.background = `linear-gradient(to top, ${shellCol} 0%, ${darkenColor(shellCol, 10)} 50%, ${darkenColor(shellCol, 20)} 100%)`;
+        } else if(el.classList.contains('cas-bottom')) {
+            el.style.background = `linear-gradient(to bottom, ${shellCol} 0%, ${darkenColor(shellCol, 10)} 50%, ${darkenColor(shellCol, 20)} 100%)`;
+        }
+    });
+    
+    document.getElementById('canvas-sideA').style.backgroundColor = canvasCol;
+    document.getElementById('canvas-sideB').style.backgroundColor = canvasCol;
+    document.querySelectorAll('.label-text').forEach(el => el.style.color = textCol);
+
+    syncLabelTo3D();
+}
 
     function darkenColor(color, percent) {
         const num = parseInt(color.replace("#",""), 16),
@@ -1656,26 +1664,26 @@ function uploadStickerLabel(input, side) {
                 contentA.style.backgroundColor = canvasCol;
             }
 
-                        // TEXT - SYNC
+               // TEXT - SYNC
             const textDivA = document.createElement('div');
             textDivA.innerHTML = textA.innerHTML;
             textDivA.style.fontFamily = textA.style.fontFamily || `'${font}', sans-serif`;
             textDivA.style.color = textCol;
-            textDivA.style.fontSize = fontSizeA + 'px';
+            textDivA.style.fontSize = (fontSizeA * 1.2) + 'px'; // Scale up untuk 3D
             textDivA.style.fontWeight = '900';
             textDivA.style.lineHeight = '1.2';
             textDivA.style.textTransform = 'uppercase';
             textDivA.style.textAlign = 'center';
             textDivA.style.whiteSpace = 'nowrap';
             textDivA.style.position = 'absolute';
-            textDivA.style.left = leftA + 'px';
-            textDivA.style.top = topA + 'px';
+            // Hitung posisi yang tepat untuk 3D preview
+            const scaleFactor = 220 / 350; // ratio label 3D vs canvas
+            textDivA.style.left = (leftA * scaleFactor) + 'px';
+            textDivA.style.top = (topA * scaleFactor) + 'px';
             textDivA.style.zIndex = '10';
             textDivA.style.margin = '0';
             textDivA.style.padding = '0';
-            
-            contentA.appendChild(textDivA);
-        }
+
         // Sync Side B
         if(contentB && boxB && textB && bgB) {
             const leftB = parseInt(boxB.style.left) || 120;
@@ -1711,25 +1719,24 @@ function uploadStickerLabel(input, side) {
 
             
             // TEXT - SYNC
-                        // TEXT - SYNC
             const textDivB = document.createElement('div');
             textDivB.innerHTML = textB.innerHTML;
             textDivB.style.fontFamily = textB.style.fontFamily || `'${font}', sans-serif`;
             textDivB.style.color = textCol;
-            textDivB.style.fontSize = fontSizeB + 'px';
+            textDivB.style.fontSize = (fontSizeB * 1.2) + 'px'; // Scale up untuk 3D
             textDivB.style.fontWeight = '900';
             textDivB.style.lineHeight = '1.2';
             textDivB.style.textTransform = 'uppercase';
             textDivB.style.textAlign = 'center';
             textDivB.style.whiteSpace = 'nowrap';
             textDivB.style.position = 'absolute';
-            textDivB.style.left = leftB + 'px';
-            textDivB.style.top = topB + 'px';
+            // Hitung posisi yang tepat untuk 3D preview
+            const scaleFactorB = 220 / 350; // ratio label 3D vs canvas
+            textDivB.style.left = (leftB * scaleFactorB) + 'px';
+            textDivB.style.top = (topB * scaleFactorB) + 'px';
             textDivB.style.zIndex = '10';
             textDivB.style.margin = '0';
             textDivB.style.padding = '0';
-            
-            contentB.appendChild(textDivB);
         }
     }
 
@@ -1745,25 +1752,28 @@ function uploadStickerLabel(input, side) {
             box.classList.add('active');
         });
 
-        const startDrag = (e) => {
-            e.preventDefault(); e.stopPropagation();
-            const ev = e.touches ? e.touches[0] : e;
-            let sX = ev.clientX, sY = ev.clientY, iL = box.offsetLeft, iT = box.offsetTop;
-            const move = me => {
-                const mev = me.touches ? me.touches[0] : me;
-                box.style.left = iL + (mev.clientX - sX) + 'px';
-                box.style.top = iT + (mev.clientY - sY) + 'px';
-                requestAnimationFrame(syncLabelTo3D);
-            };
-            const stop = () => { 
-                document.removeEventListener('mousemove', move); 
-                document.removeEventListener('touchmove', move);
-                syncLabelTo3D();
-            };
-            document.addEventListener('mousemove', move);
-            document.addEventListener('touchmove', move, {passive:false});
-            document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+    const startDrag = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const ev = e.touches ? e.touches[0] : e;
+        let sX = ev.clientX, sY = ev.clientY, iL = box.offsetLeft, iT = box.offsetTop;
+        const move = me => {
+            const mev = me.touches ? me.touches[0] : me;
+            box.style.left = iL + (mev.clientX - sX) + 'px';
+            box.style.top = iT + (mev.clientY - sY) + 'px';
+            // Sync posisi real-time
+            syncLabelTo3D();
         };
+        const stop = () => { 
+            document.removeEventListener('mousemove', move); 
+            document.removeEventListener('touchmove', move);
+            syncLabelTo3D();
+        };
+        document.addEventListener('mousemove', move);
+        document.addEventListener('touchmove', move, {passive:false});
+        document.addEventListener('mouseup', stop); 
+        document.addEventListener('touchend', stop);
+    };
+
 
         const startResize = (e) => {
             e.preventDefault(); e.stopPropagation();
