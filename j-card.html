@@ -491,7 +491,202 @@ nav.nav-show { transform: translateY(0); }
 .face.inner #spine-text-3d {
     transform: translate(-50%, -50%) rotate(90deg) scaleX(-1);
 }
+    .label-maker-section { margin-top: 60px; width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10;}
+    .label-canvas { width: 350px; height: 180px; background: #ffffff; position: relative; border-radius: 12px; overflow: hidden; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+    .label-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; }
+    
+    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 50px; left: 120px; }
+    .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
+    .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
+    .label-transform-box .handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #00ff96; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
+    .label-transform-box.active .handle-move, .label-transform-box.active .handle-resize { display: flex; }
+    
+    .label-text { font-family: 'Orbitron', sans-serif; font-size: 24px; color: #000; outline: none; font-weight: 900; line-height: 1.2; text-transform: uppercase; text-align: center; white-space: nowrap;}
+    .tape-cutout { position: absolute; width: 220px; height: 60px; background: transparent; border: 2px dashed rgba(0,0,0,0.3); border-radius: 10px; z-index: 2; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;}
+    
+    .exporting-label .tape-cutout { display: none !important; }
+    .exporting-label .label-transform-box { border: none !important; background: transparent !important; }
+    .exporting-label .handle-move, .exporting-label .handle-resize { display: none !important; }
+    .exporting-label { box-shadow: none !important; }
 
+    /* 3D Cassette Styles - RAPIH & REALISTIS */
+    .cassette-3d-scene { 
+        width: 100%; 
+        max-width: 500px; 
+        height: 380px; 
+        perspective: 1200px; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        cursor: grab; 
+        background: rgba(255, 255, 255, 0.05); 
+        backdrop-filter: blur(10px); 
+        border-radius: 20px; 
+        border: 1px solid rgba(255, 255, 255, 0.15); 
+        margin-bottom: 20px; 
+        overflow: hidden;
+    }
+    .cassette-3d-scene:active { cursor: grabbing; }
+    
+    .cas-wrapper { 
+        position: relative; 
+        width: 300px; 
+        height: 190px; 
+        transform-style: preserve-3d; 
+        transform: translateZ(-15px) rotateX(20deg) rotateY(-25deg); 
+        transition: transform 0.1s ease-out;
+    }
+    
+    .cas-face { 
+        position: absolute; 
+        background-color: #2a2a2a; 
+        border: none;
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        transform-style: preserve-3d; 
+        backface-visibility: hidden;
+    }
+    
+    /* Front dan Back - kotak rapih */
+    .cas-front { 
+        width: 300px; 
+        height: 190px; 
+        border-radius: 8px; 
+        transform: rotateY(0deg) translateZ(15px); 
+        background: #2a2a2a;
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+    
+    .cas-back { 
+        width: 300px; 
+        height: 190px; 
+        border-radius: 8px; 
+        transform: rotateY(180deg) translateZ(15px); 
+        background: #2a2a2a;
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+    
+    /* Sisi kanan dan kiri - RAPIH */
+    .cas-right { 
+        width: 30px; 
+        height: 190px; 
+        left: 135px; 
+        top: 0; 
+        transform: rotateY(90deg) translateZ(150px); 
+        background: #1f1f1f;
+    }
+    
+    .cas-left { 
+        width: 30px; 
+        height: 190px; 
+        left: 135px; 
+        top: 0; 
+        transform: rotateY(-90deg) translateZ(150px); 
+        background: #1f1f1f;
+    }
+    
+    /* Atas dan bawah - RAPIH */
+    .cas-top { 
+        width: 300px; 
+        height: 30px; 
+        top: 80px; 
+        left: 0; 
+        transform: rotateX(90deg) translateZ(95px); 
+        background: #1f1f1f;
+    }
+    
+    .cas-bottom { 
+        width: 300px; 
+        height: 30px; 
+        top: 80px; 
+        left: 0; 
+        transform: rotateX(-90deg) translateZ(95px); 
+        background: #1f1f1f;
+    }
+
+    /* Window cassette */
+    .cas-window-3d { 
+        position: absolute; 
+        width: 140px; 
+        height: 45px; 
+        background: rgba(0,0,0,0.9); 
+        border-radius: 22px; 
+        z-index: 10; 
+        border: 2px solid #333;
+        box-shadow: inset 0 0 10px #000;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    /* Reel/Spool */
+    .cas-wheel-l, .cas-wheel-r { 
+        position: absolute; 
+        width: 35px; 
+        height: 35px; 
+        background: conic-gradient(from 0deg, #666 0deg, #aaa 90deg, #666 180deg, #444 270deg, #666 360deg);
+        border-radius: 50%; 
+        z-index: 11; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        box-shadow: 0 0 5px rgba(0,0,0,0.8);
+    }
+    
+    .cas-wheel-l { left: 85px; } 
+    .cas-wheel-r { right: 85px; }
+    
+    .cas-wheel-l::after, .cas-wheel-r::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #111;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    /* Label area */
+    .cas-label-3d { 
+        position: absolute; 
+        width: 220px; 
+        height: 115px; 
+        background: #fff; 
+        border-radius: 4px; 
+        z-index: 5; 
+        display: block; 
+        overflow: hidden;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* Texture */
+    .cas-texture { 
+        position: absolute; 
+        width:100%; 
+        height:100%; 
+        top:0; 
+        left:0; 
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%); 
+        pointer-events: none; 
+        border-radius: inherit; 
+        z-index: 20;
+    }
+    
+    /* Container konten label - SYNC PRESISI */
+    .cas-label-content { 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 350px; 
+        height: 180px; 
+        transform-origin: top left;
+        transform: scale(0.628571); /* 220/350 = 0.628571 */
+    }
 </style>
 </head>
 <body>
@@ -581,13 +776,15 @@ nav.nav-show { transform: translateY(0); }
             </div>
         </div>
     </div>
-
+ <div class="controls">
     <button onclick="document.getElementById('fullWrapUpload').click()" style="background: rgba(0, 255, 150, 0.15); border: 1px solid #00ff96; color: #00ff96; margin-bottom: 20px;">
         Upload Full Wrap Image
     </button>
     <input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
 
     <div class="app-header"><h3>COVER BACK FULL WRAP MODE</h3></div>
+    </div>
+   </div>
     <div class="canvas-viewport">
         <div id="jcard-canvas-full" class="full-wrap-container">
             <div class="section back-flap">
@@ -659,7 +856,97 @@ nav.nav-show { transform: translateY(0); }
             </div>
         </div>
     </div>
+<div class="label-maker-section">
+    <div class="app-header"><h3>CASSETTE LABEL MAKER</h3></div>
+    
+    <div class="controls">
+        <div class="button-group">
+            <button onclick="document.getElementById('uploadSideA').click()">Upload Side A</button>
+            <input type="file" id="uploadSideA" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideA')">
+            <button onclick="document.getElementById('uploadSideB').click()">Upload Side B</button>
+            <input type="file" id="uploadSideB" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideB')">
+        </div>
+        
+        <div class="color-row">
+            <div class="color-group">
+                <label>Warna Kaset</label>
+                <input type="color" id="casShellColor" value="#222222" onchange="updateLabelColors()">
+            </div>
+            <div class="color-group">
+                <label>Warna Label</label>
+                <input type="color" id="lblCanvasColor" value="#ffffff" onchange="updateLabelColors()">
+            </div>
+            <div class="color-group">
+                <label>Warna Text</label>
+                <input type="color" id="lblTextColor" value="#000000" onchange="updateLabelColors()">
+            </div>
+        </div>
 
+        <label>Font Label</label>
+        <select id="labelFontSelector" onchange="updateLabelFont()"></select>
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; width: 100%; max-width: 800px;">
+        <div>
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE A DESIGN</p>
+            <div id="canvas-sideA" class="label-canvas">
+                <div class="label-bg" id="bg-sideA"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box" id="label-box-sideA" style="top: 50px; left: 120px;">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" id="text-sideA" contenteditable="true">SIDE A</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE B DESIGN</p>
+            <div id="canvas-sideB" class="label-canvas">
+                <div class="label-bg" id="bg-sideB"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box" id="label-box-sideB" style="top: 50px; left: 120px;">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" id="text-sideB" contenteditable="true">SIDE B</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-header"><h3>3D CASSETTE PREVIEW</h3></div>
+    <div class="cassette-3d-scene" id="cas-scene">
+        <div class="cas-wrapper" id="cas-object">
+            <div class="cas-face cas-front">
+                <div class="cas-texture"></div>
+                <div class="cas-label-3d" id="preview-sideA">
+                    <div class="cas-label-content" id="content-sideA"></div>
+                </div>
+                <div class="cas-window-3d"></div>
+                <div class="cas-wheel-l"></div><div class="cas-wheel-r"></div>
+            </div>
+            <div class="cas-face cas-back">
+                <div class="cas-texture"></div>
+                <div class="cas-label-3d" id="preview-sideB">
+                    <div class="cas-label-content" id="content-sideB"></div>
+                </div>
+                <div class="cas-window-3d"></div>
+                <div class="cas-wheel-l"></div><div class="cas-wheel-r"></div>
+            </div>
+            <div class="cas-face cas-top"><div class="cas-texture"></div></div>
+            <div class="cas-face cas-bottom"><div class="cas-texture"></div></div>
+            <div class="cas-face cas-left"><div class="cas-texture"></div></div>
+            <div class="cas-face cas-right"><div class="cas-texture"></div></div>
+        </div>
+    </div>
+
+    <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
+        <p>DOWNLOAD LABEL (PNG TRANSPARAN)</p>
+        <div class="button-group">
+            <button onclick="downloadLabelPng('sideA')">SIDE A</button>
+            <button onclick="downloadLabelPng('sideB')">SIDE B</button>
+        </div>
+    </div>
+</div>
     <div class="action-buttons">
         <p>DOWNLOAD DESIGN COVER</p>
         <div class="button-group">
@@ -703,13 +990,13 @@ function changeFont() {
     const selectedFont = document.getElementById("fontSelector").value;
     const elements = document.querySelectorAll(".editable-content, .editable-content h3, .tracklist, .spine-text");
     elements.forEach(el => {
-        el.style.fontFamily = `'${selectedFont}', sans-serif`;
+        el.style.fontFamily = `'', sans-serif`;
     });
     
     // Update font di 3D preview juga
     const text3dElements = document.querySelectorAll('.text-3d-overlay, .text-3d-overlay h3, .tracklist-3d');
     text3dElements.forEach(el => {
-        el.style.fontFamily = `'${selectedFont}', sans-serif`;
+        el.style.fontFamily = `'', sans-serif`;
     });
 }
 
@@ -1070,7 +1357,7 @@ let rotX = 15, rotY = -35;
 
 function update3D() {
     if(jcardObj) {
-        jcardObj.style.transform = `scale(0.25) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        jcardObj.style.transform = `scale(0.25) rotateX(deg) rotateY(deg)`;
     }
 }
 
@@ -1121,139 +1408,6 @@ if(scene3D && jcardObj) {
         update3D();
     }, {passive: true});
 }
-</script>
-
-<style>
-    .label-maker-section { margin-top: 60px; width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10;}
-    .label-canvas { width: 350px; height: 180px; background: #ffffff; position: relative; border-radius: 12px; overflow: hidden; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-    .label-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; }
-    
-    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 50px; left: 120px; }
-    .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
-    .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
-    .label-transform-box .handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #00ff96; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
-    .label-transform-box.active .handle-move, .label-transform-box.active .handle-resize { display: flex; }
-    
-    .label-text { font-family: 'Orbitron', sans-serif; font-size: 24px; color: #000; outline: none; font-weight: 900; line-height: 1.2; text-transform: uppercase; text-align: center; white-space: nowrap;}
-    .tape-cutout { position: absolute; width: 220px; height: 60px; background: transparent; border: 2px dashed rgba(0,0,0,0.3); border-radius: 10px; z-index: 2; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;}
-    
-    .exporting-label .tape-cutout { display: none !important; }
-    .exporting-label .label-transform-box { border: none !important; background: transparent !important; }
-    .exporting-label .handle-move, .exporting-label .handle-resize { display: none !important; }
-    .exporting-label { box-shadow: none !important; }
-
-    /* 3D Cassette Styles */
-    .cassette-3d-scene { width: 100%; max-width: 500px; height: 350px; perspective: 1200px; display: flex; justify-content: center; align-items: center; cursor: grab; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 20px; overflow: hidden;}
-    .cassette-3d-scene:active { cursor: grabbing; }
-    .cas-wrapper { position: relative; width: 300px; height: 192px; transform-style: preserve-3d; transform: translateZ(-18px) rotateX(20deg) rotateY(-20deg); transition: transform 0.1s ease-out;}
-    .cas-face { position: absolute; background-color: #222222; border: 1px solid #000; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; backface-visibility: hidden;}
-    
-    .cas-front, .cas-back { width: 300px; height: 192px; border-radius: 8px; }
-    .cas-front { transform: rotateY(0deg) translateZ(18px); }
-    .cas-back { transform: rotateY(180deg) translateZ(18px); }
-    
-    .cas-right { width: 36px; height: 176px; left: 132px; top: 8px; transform: rotateY(90deg) translateZ(146px); }
-    .cas-left { width: 36px; height: 176px; left: 132px; top: 8px; transform: rotateY(-90deg) translateZ(146px); }
-    .cas-top { width: 284px; height: 36px; top: 78px; left: 8px; transform: rotateX(90deg) translateZ(92px); }
-    .cas-bottom { width: 284px; height: 36px; top: 78px; left: 8px; transform: rotateX(-90deg) translateZ(92px); }
-
-    .cas-window-3d { position: absolute; width: 140px; height: 45px; background: rgba(0,0,0,0.8); border-radius: 8px; z-index: 10; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 10px #000;}
-    .cas-wheel-l, .cas-wheel-r { position: absolute; width: 35px; height: 35px; background: radial-gradient(circle, #111 20%, #ddd 25%, #ddd 75%, #111 80%); border-radius: 50%; z-index: 11; top: 50%; transform: translateY(-50%); }
-    .cas-wheel-l { left: 80px; } .cas-wheel-r { right: 80px; }
-    
-    .cas-label-3d { position: absolute; width: 220px; height: 113px; background: #fff; border-radius: 8px; z-index: 5; display: block; overflow: hidden;}
-    .cas-texture { position: absolute; width:100%; height:100%; top:0; left:0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.3) 100%); pointer-events: none; border-radius: inherit; z-index: 20;}
-</style>
-
-<div class="label-maker-section">
-    <div class="app-header"><h3>CASSETTE LABEL MAKER</h3></div>
-    
-    <div class="controls">
-        <div class="button-group">
-            <button onclick="document.getElementById('uploadSideA').click()">Upload Side A</button>
-            <input type="file" id="uploadSideA" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideA')">
-            <button onclick="document.getElementById('uploadSideB').click()">Upload Side B</button>
-            <input type="file" id="uploadSideB" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideB')">
-        </div>
-        
-        <div class="color-row">
-            <div class="color-group">
-                <label>Warna Kaset</label>
-                <input type="color" id="casShellColor" value="#222222" onchange="updateLabelColors()">
-            </div>
-            <div class="color-group">
-                <label>Warna Label</label>
-                <input type="color" id="lblCanvasColor" value="#ffffff" onchange="updateLabelColors()">
-            </div>
-            <div class="color-group">
-                <label>Warna Text</label>
-                <input type="color" id="lblTextColor" value="#000000" onchange="updateLabelColors()">
-            </div>
-        </div>
-
-        <label>Font Label</label>
-        <select id="labelFontSelector" onchange="updateLabelFont()"></select>
-    </div>
-
-    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; width: 100%; max-width: 800px;">
-        <div>
-            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE A DESIGN</p>
-            <div id="canvas-sideA" class="label-canvas">
-                <div class="label-bg" id="bg-sideA"></div>
-                <div class="tape-cutout"></div>
-                <div class="label-transform-box">
-                    <div class="handle-move">+</div>
-                    <div class="label-text editable-content" contenteditable="true">SIDE A<br>ALBUM TITLE</div>
-                    <div class="handle-resize"></div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE B DESIGN</p>
-            <div id="canvas-sideB" class="label-canvas">
-                <div class="label-bg" id="bg-sideB"></div>
-                <div class="tape-cutout"></div>
-                <div class="label-transform-box">
-                    <div class="handle-move">+</div>
-                    <div class="label-text editable-content" contenteditable="true">SIDE B<br>TRACKLIST</div>
-                    <div class="handle-resize"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-header"><h3>3D CASSETTE PREVIEW</h3></div>
-    <div class="cassette-3d-scene" id="cas-scene">
-        <div class="cas-wrapper" id="cas-object">
-            <div class="cas-face cas-front">
-                <div class="cas-texture"></div>
-                <div class="cas-label-3d" id="preview-sideA"></div>
-                <div class="cas-window-3d"></div>
-                <div class="cas-wheel-l"></div><div class="cas-wheel-r"></div>
-            </div>
-            <div class="cas-face cas-back">
-                <div class="cas-texture"></div>
-                <div class="cas-label-3d" id="preview-sideB"></div>
-                <div class="cas-window-3d"></div>
-                <div class="cas-wheel-l"></div><div class="cas-wheel-r"></div>
-            </div>
-            <div class="cas-face cas-top"><div class="cas-texture"></div></div>
-            <div class="cas-face cas-bottom"><div class="cas-texture"></div></div>
-            <div class="cas-face cas-left"><div class="cas-texture"></div></div>
-            <div class="cas-face cas-right"><div class="cas-texture"></div></div>
-        </div>
-    </div>
-
-    <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
-        <p>DOWNLOAD LABEL (PNG TRANSPARAN)</p>
-        <div class="button-group">
-            <button onclick="downloadLabelPng('sideA')">SIDE A</button>
-            <button onclick="downloadLabelPng('sideB')">SIDE B</button>
-        </div>
-    </div>
-</div>
-
-<script>
     // Init Label Fonts using existing fontList
     function initLabelFonts() {
         const selector = document.getElementById('labelFontSelector');
@@ -1272,7 +1426,7 @@ if(scene3D && jcardObj) {
     function updateLabelFont() {
         const font = document.getElementById('labelFontSelector').value;
         document.querySelectorAll('.label-text').forEach(el => {
-            el.style.fontFamily = `'${font}', sans-serif`;
+            el.style.fontFamily = `'', sans-serif`;
         });
         syncLabelTo3D();
     }
@@ -1282,17 +1436,28 @@ if(scene3D && jcardObj) {
         const canvasCol = document.getElementById('lblCanvasColor').value;
         const textCol = document.getElementById('lblTextColor').value;
 
-        // Update Cassette Shell
-        document.querySelectorAll('.cas-face').forEach(el => el.style.backgroundColor = shellCol);
+        document.querySelectorAll('.cas-face').forEach(el => {
+            if(el.classList.contains('cas-front') || el.classList.contains('cas-back')) {
+                el.style.backgroundColor = shellCol;
+            } else {
+                el.style.backgroundColor = darkenColor(shellCol, 10);
+            }
+        });
         
-        // Update Label Background
         document.getElementById('canvas-sideA').style.backgroundColor = canvasCol;
         document.getElementById('canvas-sideB').style.backgroundColor = canvasCol;
-        
-        // Update Text Color
         document.querySelectorAll('.label-text').forEach(el => el.style.color = textCol);
 
         syncLabelTo3D();
+    }
+
+    function darkenColor(color, percent) {
+        const num = parseInt(color.replace("#",""), 16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) - amt,
+        B = (num >> 8 & 0x00FF) - amt,
+        G = (num & 0x0000FF) - amt;
+        return "#" + (0x1000000 + (R>0?R:0)*0x10000 + (B>0?B:0)*0x100 + (G>0?G:0)).toString(16).slice(1);
     }
 
     function uploadStickerLabel(input, side) {
@@ -1300,45 +1465,134 @@ if(scene3D && jcardObj) {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById(`bg-${side}`).style.backgroundImage = `url(${e.target.result})`;
+            document.getElementById(`bg-`).style.backgroundImage = `url()`;
             syncLabelTo3D();
         };
         reader.readAsDataURL(file);
     }
 
-    // Sync HTML from Label Canvas to 3D Preview Canvas
+    // SYNC LABEL TO 3D - DIPERBAIKI GAMBAR & TEXT
     function syncLabelTo3D() {
-        const prevA = document.getElementById('preview-sideA');
-        const prevB = document.getElementById('preview-sideB');
-        
-        prevA.innerHTML = document.getElementById('canvas-sideA').innerHTML;
-        prevB.innerHTML = document.getElementById('canvas-sideB').innerHTML;
+        const boxA = document.getElementById('label-box-sideA');
+        const boxB = document.getElementById('label-box-sideB');
+        const textA = document.getElementById('text-sideA');
+        const textB = document.getElementById('text-sideB');
+        const bgA = document.getElementById('bg-sideA');
+        const bgB = document.getElementById('bg-sideB');
+        const contentA = document.getElementById('content-sideA');
+        const contentB = document.getElementById('content-sideB');
         
         const canvasCol = document.getElementById('lblCanvasColor').value;
-        prevA.style.backgroundColor = canvasCol;
-        prevB.style.backgroundColor = canvasCol;
+        const textCol = document.getElementById('lblTextColor').value;
+        const font = document.getElementById('labelFontSelector').value || 'Orbitron';
         
-        // Adjust scale inside 3D preview since 3D area is smaller than 2D canvas
-        // Canvas is 350x180, 3D is 220x113. Scale = ~0.628
-        const scale = 0.628;
-        [prevA, prevB].forEach(prev => {
-            // Remove active dragging classes and clean it up for the preview
-            prev.querySelectorAll('.label-transform-box').forEach(el => {
-                el.classList.remove('active');
-                el.style.border = 'none';
-                el.style.background = 'transparent';
-            });
+        // Sync Side A
+        if(contentA && boxA && textA && bgA) {
+            const leftA = parseInt(boxA.style.left) || 120;
+            const topA = parseInt(boxA.style.top) || 50;
+            const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
             
-            Array.from(prev.children).forEach(child => {
-                if(!child.classList.contains('label-bg')) {
-                    child.style.transformOrigin = 'top left';
-                    child.style.transform = `scale(${scale})`;
-                }
-            });
-        });
+            // Clear dan setup container
+            contentA.innerHTML = '';
+            contentA.style.width = '350px';
+            contentA.style.height = '180px';
+            contentA.style.position = 'absolute';
+            contentA.style.top = '0';
+            contentA.style.left = '0';
+            
+            // GAMBAR BACKGROUND - SYNC
+            if(bgA.style.backgroundImage && bgA.style.backgroundImage !== 'none') {
+                const bgDiv = document.createElement('div');
+                bgDiv.style.width = '350px';
+                bgDiv.style.height = '180px';
+                bgDiv.style.position = 'absolute';
+                bgDiv.style.top = '0';
+                bgDiv.style.left = '0';
+                bgDiv.style.backgroundImage = bgA.style.backgroundImage;
+                bgDiv.style.backgroundSize = bgA.style.backgroundSize || 'cover';
+                bgDiv.style.backgroundPosition = bgA.style.backgroundPosition || 'center';
+                bgDiv.style.backgroundRepeat = 'no-repeat';
+                bgDiv.style.zIndex = '1';
+                contentA.appendChild(bgDiv);
+            } else {
+                contentA.style.backgroundColor = canvasCol;
+            }
+            
+            // TEXT - SYNC
+            const textDivA = document.createElement('div');
+            textDivA.innerHTML = textA.innerHTML;
+            textDivA.style.fontFamily = `'', sans-serif`;
+            textDivA.style.color = textCol;
+            textDivA.style.fontSize = fontSizeA + 'px';
+            textDivA.style.fontWeight = '900';
+            textDivA.style.lineHeight = '1.2';
+            textDivA.style.textTransform = 'uppercase';
+            textDivA.style.textAlign = 'center';
+            textDivA.style.whiteSpace = 'nowrap';
+            textDivA.style.position = 'absolute';
+            textDivA.style.left = leftA + 'px';
+            textDivA.style.top = topA + 'px';
+            textDivA.style.zIndex = '10';
+            textDivA.style.margin = '0';
+            textDivA.style.padding = '0';
+            
+            contentA.appendChild(textDivA);
+        }
+        
+        // Sync Side B
+        if(contentB && boxB && textB && bgB) {
+            const leftB = parseInt(boxB.style.left) || 120;
+            const topB = parseInt(boxB.style.top) || 50;
+            const fontSizeB = parseFloat(window.getComputedStyle(textB).fontSize) || 24;
+            
+            contentB.innerHTML = '';
+            contentB.style.width = '350px';
+            contentB.style.height = '180px';
+            contentB.style.position = 'absolute';
+            contentB.style.top = '0';
+            contentB.style.left = '0';
+            
+            // GAMBAR BACKGROUND - SYNC
+            if(bgB.style.backgroundImage && bgB.style.backgroundImage !== 'none') {
+                const bgDiv = document.createElement('div');
+                bgDiv.style.width = '350px';
+                bgDiv.style.height = '180px';
+                bgDiv.style.position = 'absolute';
+                bgDiv.style.top = '0';
+                bgDiv.style.left = '0';
+                bgDiv.style.backgroundImage = bgB.style.backgroundImage;
+                bgDiv.style.backgroundSize = bgB.style.backgroundSize || 'cover';
+                bgDiv.style.backgroundPosition = bgB.style.backgroundPosition || 'center';
+                bgDiv.style.backgroundRepeat = 'no-repeat';
+                bgDiv.style.zIndex = '1';
+                contentB.appendChild(bgDiv);
+            } else {
+                contentB.style.backgroundColor = canvasCol;
+            }
+            
+            // TEXT - SYNC
+            const textDivB = document.createElement('div');
+            textDivB.innerHTML = textB.innerHTML;
+            textDivB.style.fontFamily = `'', sans-serif`;
+            textDivB.style.color = textCol;
+            textDivB.style.fontSize = fontSizeB + 'px';
+            textDivB.style.fontWeight = '900';
+            textDivB.style.lineHeight = '1.2';
+            textDivB.style.textTransform = 'uppercase';
+            textDivB.style.textAlign = 'center';
+            textDivB.style.whiteSpace = 'nowrap';
+            textDivB.style.position = 'absolute';
+            textDivB.style.left = leftB + 'px';
+            textDivB.style.top = topB + 'px';
+            textDivB.style.zIndex = '10';
+            textDivB.style.margin = '0';
+            textDivB.style.padding = '0';
+            
+            contentB.appendChild(textDivB);
+        }
     }
 
-    // Drag and Resize specifically tailored for Label text
+    // Drag and Resize untuk Label
     document.querySelectorAll('.label-transform-box').forEach(box => {
         const moveBtn = box.querySelector('.handle-move');
         const resizeBtn = box.querySelector('.handle-resize');
@@ -1358,9 +1612,13 @@ if(scene3D && jcardObj) {
                 const mev = me.touches ? me.touches[0] : me;
                 box.style.left = iL + (mev.clientX - sX) + 'px';
                 box.style.top = iT + (mev.clientY - sY) + 'px';
+                requestAnimationFrame(syncLabelTo3D);
+            };
+            const stop = () => { 
+                document.removeEventListener('mousemove', move); 
+                document.removeEventListener('touchmove', move);
                 syncLabelTo3D();
             };
-            const stop = () => { document.removeEventListener('mousemove', move); document.removeEventListener('touchmove', move); };
             document.addEventListener('mousemove', move);
             document.addEventListener('touchmove', move, {passive:false});
             document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
@@ -1373,9 +1631,13 @@ if(scene3D && jcardObj) {
             const resize = re => {
                 const rev = re.touches ? re.touches[0] : re;
                 textPart.style.fontSize = iSize + (rev.clientX - sX) + 'px';
+                requestAnimationFrame(syncLabelTo3D);
+            };
+            const stop = () => { 
+                document.removeEventListener('mousemove', resize); 
+                document.removeEventListener('touchmove', resize);
                 syncLabelTo3D();
             };
-            const stop = () => { document.removeEventListener('mousemove', resize); document.removeEventListener('touchmove', resize); };
             document.addEventListener('mousemove', resize);
             document.addEventListener('touchmove', resize, {passive:false});
             document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
@@ -1385,22 +1647,38 @@ if(scene3D && jcardObj) {
         resizeBtn.addEventListener('mousedown', startResize); resizeBtn.addEventListener('touchstart', startResize);
     });
 
-    // Observer for live text typing on Labels
+    // Observer untuk live sync
     document.addEventListener("DOMContentLoaded", function() {
-        const obs = new MutationObserver(syncLabelTo3D);
-        document.querySelectorAll('.label-text').forEach(el => {
-            obs.observe(el, { childList: true, subtree: true, characterData: true });
-        });
-        setTimeout(syncLabelTo3D, 800);
+        const textA = document.getElementById('text-sideA');
+        const textB = document.getElementById('text-sideB');
+        const boxA = document.getElementById('label-box-sideA');
+        const boxB = document.getElementById('label-box-sideB');
+        const bgA = document.getElementById('bg-sideA');
+        const bgB = document.getElementById('bg-sideB');
+        
+        const textObserver = new MutationObserver(syncLabelTo3D);
+        if(textA) textObserver.observe(textA, { childList: true, subtree: true, characterData: true });
+        if(textB) textObserver.observe(textB, { childList: true, subtree: true, characterData: true });
+        
+        const styleObserver = new MutationObserver(syncLabelTo3D);
+        if(boxA) styleObserver.observe(boxA, { attributes: true, attributeFilter: ['style'] });
+        if(boxB) styleObserver.observe(boxB, { attributes: true, attributeFilter: ['style'] });
+        
+        // Observer untuk background image changes
+        const bgObserver = new MutationObserver(syncLabelTo3D);
+        if(bgA) bgObserver.observe(bgA, { attributes: true, attributeFilter: ['style'] });
+        if(bgB) bgObserver.observe(bgB, { attributes: true, attributeFilter: ['style'] });
+        
+        setTimeout(syncLabelTo3D, 100);
     });
 
-    // 3D Cassette Drag & Rotate System
+    // 3D Cassette Drag & Rotate
     const cScene = document.getElementById('cas-scene');
     const cObj = document.getElementById('cas-object');
-    let cDrag = false, cPx = 0, cPy = 0, cRx = 20, cRy = -20;
+    let cDrag = false, cPx = 0, cPy = 0, cRx = 20, cRy = -25;
 
     function updateCas3DObj() {
-        cObj.style.transform = `translateZ(-18px) rotateX(${cRx}deg) rotateY(${cRy}deg)`;
+        cObj.style.transform = `translateZ(-15px) rotateX(deg) rotateY(deg)`;
     }
 
     if(cScene && cObj) {
@@ -1430,7 +1708,7 @@ if(scene3D && jcardObj) {
         }, {passive: true});
     }
 
-    // Download Label Function (Transparent Background)
+    // Download Label - HD & Transparan
     async function downloadLabelPng(side) {
         const target = document.getElementById('canvas-' + side);
         const btn = event.currentTarget;
@@ -1439,33 +1717,55 @@ if(scene3D && jcardObj) {
         btn.innerText = "Processing...";
         btn.disabled = true;
         
-        // Preparation to keep the canvas clean during export
         target.classList.add('exporting-label');
         target.querySelectorAll('.label-transform-box').forEach(b => b.classList.remove('active'));
 
         try {
-            // Force transparent background for the container to get PNG transparency 
             const originalBackground = target.style.background;
-            target.style.background = 'transparent'; 
+            const originalBgImage = target.style.backgroundImage;
+            
+            target.style.background = 'transparent';
+            target.style.backgroundImage = 'none';
             
             const canvas = await html2canvas(target, {
-                scale: 3, 
+                scale: 4, 
                 backgroundColor: null, 
                 useCORS: true,
-                allowTaint: true
+                allowTaint: true,
+                width: 350,
+                height: 180,
+                logging: false
             });
             
-            // Restore background after render
             target.style.background = originalBackground;
+            target.style.backgroundImage = originalBgImage;
 
-            const imgData = canvas.toDataURL("image/png");
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const cutoutWidth = 220 * 4;
+            const cutoutHeight = 60 * 4;
+            const cutoutLeft = centerX - (cutoutWidth / 2);
+            const cutoutTop = centerY - (cutoutHeight / 2);
+            
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = canvas.width;
+            finalCanvas.height = canvas.height;
+            const finalCtx = finalCanvas.getContext('2d');
+            
+            finalCtx.putImageData(imageData, 0, 0);
+            finalCtx.clearRect(cutoutLeft, cutoutTop, cutoutWidth, cutoutHeight);
+            
+            const imgData = finalCanvas.toDataURL("image/png");
             const link = document.createElement("a");
-            link.download = `cassette-label-${side}.png`;
+            link.download = `cassette-label--HD.png`;
             link.href = imgData;
             link.click();
         } catch (err) {
             console.error(err);
-            alert("Gagal mendownload label. Pastikan gambarmu ter-load dengan benar.");
+            alert("Gagal mendownload label.");
         } finally {
             target.classList.remove('exporting-label');
             btn.innerText = origText;
