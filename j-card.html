@@ -318,7 +318,7 @@ nav.nav-show { transform: translateY(0); }
 .nav-bubble.active { background: white; color: black; border: none; }
 
 /* ============================
-   TAMBAHAN CSS 3D PREVIEW - DIPERBAIKI
+   TAMBAHAN CSS 3D PREVIEW - DIPERBAIKI DENGAN TEXT SUPPORT
 ============================ */
 .scene-3d {
     width: 100%;
@@ -390,6 +390,7 @@ nav.nav-show { transform: translateY(0); }
     border: 1px solid rgba(0,0,0,0.1);
     top: 0;
     left: 0;
+    overflow: hidden;
 }
 
 .face.outer { 
@@ -423,6 +424,72 @@ nav.nav-show { transform: translateY(0); }
 #3d-back-inner  { 
     background-size: 1031px 1020px; 
     background-position: right center; 
+}
+
+/* ============================
+   TEXT 3D STYLES - BARU
+============================ */
+.text-3d-overlay {
+    position: absolute;
+    font-family: 'Orbitron', sans-serif;
+    color: #000;
+    font-weight: 900;
+    text-align: left;
+    pointer-events: none;
+    user-select: none;
+    z-index: 10;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+/* Front Cover Text */
+#front-text-3d {
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    font-size: 110px;
+    line-height: 0.8;
+    max-width: 90%;
+}
+
+/* Spine Text */
+#spine-text-3d {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    font-size: 55px;
+    white-space: nowrap;
+    transform-origin: center;
+}
+
+/* Back Cover Text */
+#back-text-3d {
+    top: 40px;
+    left: 20px;
+    font-size: 30px;
+    max-width: 90%;
+}
+
+#back-text-3d h3 {
+    font-size: 30px;
+    margin-bottom: 15px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+#back-text-3d .tracklist-3d {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Mirror text untuk inner faces */
+.face.inner .text-3d-overlay {
+    transform: scaleX(-1);
+}
+
+.face.inner #spine-text-3d {
+    transform: translate(-50%, -50%) rotate(90deg) scaleX(-1);
 }
 
 </style>
@@ -480,7 +547,7 @@ nav.nav-show { transform: translateY(0); }
     <div class="web-info-tab">
         <div class="info-content">
             <h3>PENTING!</h3>
-            <p>Klik Text, Tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
+            <p>Jika Sudah Mempunyai design tinggal drop<br>design yang sudah ada, Klik Text<br>untuk menghapus, atau tahan<br>tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
         </div>
     </div>
     
@@ -490,8 +557,8 @@ nav.nav-show { transform: translateY(0); }
                 <div class="transform-box" style="top:40px; left:20px;">
                     <div class="handle-move">+</div>
                     <div class="editable-content">
-                        <h3 contenteditable="true">playlist</h3>
-                        <div class="tracklist" contenteditable="true">1. track<br>2. track<br>3. track</div>
+                        <h3 contenteditable="true" id="backTitle">playlist</h3>
+                        <div class="tracklist" contenteditable="true" id="backTracklist">1. track<br>2. track<br>3. track</div>
                     </div>
                     <div class="handle-resize"></div>
                 </div>
@@ -499,7 +566,7 @@ nav.nav-show { transform: translateY(0); }
             <div class="section spine">
                 <div class="transform-box">
                     <div class="handle-move">+</div>
-                    <div class="editable-content spine-text" contenteditable="true">band name</div>
+                    <div class="editable-content spine-text" contenteditable="true" id="spineTitle">band name</div>
                     <div class="handle-resize"></div>
                 </div>
             </div>
@@ -507,7 +574,7 @@ nav.nav-show { transform: translateY(0); }
                 <div class="transform-box" style="left:30px;">
                     <div class="handle-move">+</div>
                     <div class="front-overlay">
-                        <h1 class="editable-content" contenteditable="true">Cover</h1>
+                        <h1 class="editable-content" contenteditable="true" id="frontTitle">Cover</h1>
                     </div>
                     <div class="handle-resize"></div>
                 </div>
@@ -520,7 +587,7 @@ nav.nav-show { transform: translateY(0); }
     </button>
     <input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
 
-    <div class="app-header"><h3>COVER FULL WRAP MODE</h3></div>
+    <div class="app-header"><h3>COVER BACK FULL WRAP MODE</h3></div>
     <div class="canvas-viewport">
         <div id="jcard-canvas-full" class="full-wrap-container">
             <div class="section back-flap">
@@ -556,21 +623,42 @@ nav.nav-show { transform: translateY(0); }
     <div class="scene-3d">
         <div class="jcard-3d-wrapper" id="jcard-3d-object">
             <div class="panel front-panel">
-                <div class="face outer front-outer" id="3d-front-outer"></div>
+                <!-- Front Outer Face dengan Text -->
+                <div class="face outer front-outer" id="3d-front-outer">
+                    <div class="text-3d-overlay" id="front-text-3d">Cover</div>
+                </div>
+                <!-- Front Inner Face dengan Text -->
                 <div class="face inner front-inner">
                     <div class="inner-texture" id="3d-front-inner"></div>
+                    <div class="text-3d-overlay" id="front-text-3d-inner">Cover</div>
                 </div>
                 
                 <div class="panel spine-panel">
-                    <div class="face outer spine-outer" id="3d-spine-outer"></div>
+                    <!-- Spine Outer Face dengan Text -->
+                    <div class="face outer spine-outer" id="3d-spine-outer">
+                        <div class="text-3d-overlay" id="spine-text-3d">band name</div>
+                    </div>
+                    <!-- Spine Inner Face dengan Text -->
                     <div class="face inner spine-inner">
                         <div class="inner-texture" id="3d-spine-inner"></div>
+                        <div class="text-3d-overlay" id="spine-text-3d-inner">band name</div>
                     </div>
                     
                     <div class="panel back-panel">
-                        <div class="face outer back-outer" id="3d-back-outer"></div>
+                        <!-- Back Outer Face dengan Text -->
+                        <div class="face outer back-outer" id="3d-back-outer">
+                            <div class="text-3d-overlay" id="back-text-3d">
+                                <h3>playlist</h3>
+                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
+                            </div>
+                        </div>
+                        <!-- Back Inner Face dengan Text -->
                         <div class="face inner back-inner">
                             <div class="inner-texture" id="3d-back-inner"></div>
+                            <div class="text-3d-overlay" id="back-text-3d-inner">
+                                <h3>playlist</h3>
+                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -623,9 +711,144 @@ function changeFont() {
     elements.forEach(el => {
         el.style.fontFamily = `'${selectedFont}', sans-serif`;
     });
+    
+    // Update font di 3D preview juga
+    const text3dElements = document.querySelectorAll('.text-3d-overlay, .text-3d-overlay h3, .tracklist-3d');
+    text3dElements.forEach(el => {
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;
+    });
 }
 
 document.addEventListener("DOMContentLoaded", populateFonts);
+
+// ============================
+// SYNC TEXT DARI CANVAS KE 3D
+// ============================
+function syncTextTo3D() {
+    // Sync Front Title
+    const frontTitle = document.getElementById('frontTitle');
+    const frontText3D = document.getElementById('front-text-3d');
+    const frontText3DInner = document.getElementById('front-text-3d-inner');
+    if(frontTitle && frontText3D) {
+        frontText3D.textContent = frontTitle.textContent;
+        if(frontText3DInner) frontText3DInner.textContent = frontTitle.textContent;
+    }
+    
+    // Sync Spine Title
+    const spineTitle = document.getElementById('spineTitle');
+    const spineText3D = document.getElementById('spine-text-3d');
+    const spineText3DInner = document.getElementById('spine-text-3d-inner');
+    if(spineTitle && spineText3D) {
+        spineText3D.textContent = spineTitle.textContent;
+        if(spineText3DInner) spineText3DInner.textContent = spineTitle.textContent;
+    }
+    
+    // Sync Back Title dan Tracklist
+    const backTitle = document.getElementById('backTitle');
+    const backTracklist = document.getElementById('backTracklist');
+    const backText3D = document.getElementById('back-text-3d');
+    const backText3DInner = document.getElementById('back-text-3d-inner');
+    
+    if(backTitle && backText3D) {
+        const h3 = backText3D.querySelector('h3');
+        const tracklist = backText3D.querySelector('.tracklist-3d');
+        if(h3) h3.textContent = backTitle.textContent;
+        if(tracklist) tracklist.innerHTML = backTracklist.innerHTML;
+        
+        // Sync ke inner juga
+        if(backText3DInner) {
+            const h3Inner = backText3DInner.querySelector('h3');
+            const tracklistInner = backText3DInner.querySelector('.tracklist-3d');
+            if(h3Inner) h3Inner.textContent = backTitle.textContent;
+            if(tracklistInner) tracklistInner.innerHTML = backTracklist.innerHTML;
+        }
+    }
+}
+
+// Setup MutationObserver untuk auto-sync
+document.addEventListener("DOMContentLoaded", function() {
+    const frontTitle = document.getElementById('frontTitle');
+    const spineTitle = document.getElementById('spineTitle');
+    const backTitle = document.getElementById('backTitle');
+    const backTracklist = document.getElementById('backTracklist');
+    
+    const observer = new MutationObserver(function(mutations) {
+        syncTextTo3D();
+    });
+    
+    if(frontTitle) observer.observe(frontTitle, { childList: true, subtree: true, characterData: true });
+    if(spineTitle) observer.observe(spineTitle, { childList: true, subtree: true, characterData: true });
+    if(backTitle) observer.observe(backTitle, { childList: true, subtree: true, characterData: true });
+    if(backTracklist) observer.observe(backTracklist, { childList: true, subtree: true, characterData: true });
+    
+    // Sync posisi juga
+    setupPositionSync();
+});
+
+// Sync posisi dari transform-box ke 3D
+function setupPositionSync() {
+    const frontBox = document.querySelector('#albumArt .transform-box');
+    const frontText3D = document.getElementById('front-text-3d');
+    const frontText3DInner = document.getElementById('front-text-3d-inner');
+    
+    const spineBox = document.querySelector('.spine .transform-box');
+    const spineText3D = document.getElementById('spine-text-3d');
+    const spineText3DInner = document.getElementById('spine-text-3d-inner');
+    
+    const backBox = document.querySelector('#playlistSection .transform-box');
+    const backText3D = document.getElementById('back-text-3d');
+    const backText3DInner = document.getElementById('back-text-3d-inner');
+    
+    // Sync posisi front
+    if(frontBox && frontText3D) {
+        const updateFrontPos = () => {
+            const left = parseInt(frontBox.style.left) || 30;
+            const top = parseInt(frontBox.style.top) || 0;
+            frontText3D.style.left = left + 'px';
+            frontText3D.style.top = (50 + (top / 1020) * 100) + '%';
+            frontText3D.style.transform = `translateY(-50%)`;
+            
+            if(frontText3DInner) {
+                frontText3DInner.style.left = left + 'px';
+                frontText3DInner.style.top = (50 + (top / 1020) * 100) + '%';
+                frontText3DInner.style.transform = `translateY(-50%) scaleX(-1)`;
+            }
+        };
+        
+        const frontObserver = new MutationObserver(updateFrontPos);
+        frontObserver.observe(frontBox, { attributes: true, attributeFilter: ['style'] });
+        updateFrontPos();
+    }
+    
+    // Sync posisi spine
+    if(spineBox && spineText3D) {
+        const updateSpinePos = () => {
+            // Spine text selalu di tengah
+        };
+        
+        const spineObserver = new MutationObserver(updateSpinePos);
+        spineObserver.observe(spineBox, { attributes: true, attributeFilter: ['style'] });
+    }
+    
+    // Sync posisi back
+    if(backBox && backText3D) {
+        const updateBackPos = () => {
+            const left = parseInt(backBox.style.left) || 20;
+            const top = parseInt(backBox.style.top) || 40;
+            backText3D.style.left = left + 'px';
+            backText3D.style.top = top + 'px';
+            
+            if(backText3DInner) {
+                backText3DInner.style.left = left + 'px';
+                backText3DInner.style.top = top + 'px';
+            }
+        };
+        
+        const backObserver = new MutationObserver(updateBackPos);
+        backObserver.observe(backBox, { attributes: true, attributeFilter: ['style'] });
+        updateBackPos();
+    }
+}
 
 function handleUpload(input, target) {
     const file = input.files[0];
@@ -645,7 +868,7 @@ function handleUpload(input, target) {
             targetElement[target].style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D - DIPERBAIKI
+        // UPDATE TEKSTUR 3D
         const map3D = { 
             'front': '3d-front-outer', 
             'spine': '3d-spine-outer', 
@@ -667,6 +890,9 @@ function changeBackColor(){ document.documentElement.style.setProperty("--backCo
 function changeFontColor(){
     const color=document.getElementById("fontColor").value;
     document.querySelectorAll(".editable-content, .editable-content h3, .tracklist").forEach(el=>{el.style.color=color});
+    
+    // Update warna font di 3D juga
+    document.querySelectorAll(".text-3d-overlay, .text-3d-overlay h3, .tracklist-3d").forEach(el=>{el.style.color=color});
 }
 
 const canvas = document.getElementById('jcard-canvas');
@@ -800,7 +1026,7 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D UNTUK BAGIAN DALAM (FULL WRAP) - DIPERBAIKI
+        // UPDATE TEKSTUR 3D UNTUK BAGIAN DALAM (FULL WRAP)
         const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
         innerIds.forEach(id => {
             const el = document.getElementById(id);
@@ -841,7 +1067,7 @@ window.addEventListener("load", () => {
 });
 
 // ============================
-// JS DRAG & ROTATE 3D PREVIEW - DIPERBAIKI
+// JS DRAG & ROTATE 3D PREVIEW
 // ============================
 const scene3D = document.querySelector('.scene-3d');
 const jcardObj = document.getElementById('jcard-3d-object');
@@ -855,14 +1081,12 @@ function update3D() {
 }
 
 if(scene3D && jcardObj) {
-    // Cek apakah klik berasal dari transform-box atau tidak
     const isTransformBox = (target) => {
         return target.closest('.transform-box') !== null;
     };
 
-    // Mouse events
     scene3D.addEventListener('mousedown', (e) => {
-        if(isTransformBox(e.target)) return; // Jangan trigger 3D drag jika klik di transform-box
+        if(isTransformBox(e.target)) return;
         isDragging3D = true; 
         prevX = e.clientX; 
         prevY = e.clientY;
@@ -883,7 +1107,6 @@ if(scene3D && jcardObj) {
         update3D();
     });
 
-    // Touch events
     scene3D.addEventListener('touchstart', (e) => {
         if(isTransformBox(e.target)) return;
         isDragging3D = true; 
