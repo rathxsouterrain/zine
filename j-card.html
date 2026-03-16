@@ -509,7 +509,7 @@ nav.nav-show { transform: translateY(0); }
     .exporting-label .handle-move, .exporting-label .handle-resize { display: none !important; }
     .exporting-label { box-shadow: none !important; }
 
-    /* 3D Cassette Styles - SISI RAPAT & TUMPUL */
+    /* 3D Cassette Styles - SEMUA SISI LANCIP */
     .cassette-3d-scene { 
         width: 100%; 
         max-width: 500px; 
@@ -548,11 +548,11 @@ nav.nav-show { transform: translateY(0); }
         backface-visibility: hidden;
     }
     
-    /* Front dan Back */
+    /* Front dan Back - LANCIP */
     .cas-front { 
         width: 300px; 
         height: 190px; 
-        border-radius: 16px; 
+        border-radius: 0px; 
         transform: rotateY(0deg) translateZ(15px); 
         background: #2a2a2a;
         box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
@@ -561,13 +561,13 @@ nav.nav-show { transform: translateY(0); }
     .cas-back { 
         width: 300px; 
         height: 190px; 
-        border-radius: 16px; 
+        border-radius: 0px; 
         transform: rotateY(180deg) translateZ(15px); 
         background: #2a2a2a;
         box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
     }
     
-    /* Sisi kanan dan kiri - RAPAT & TUMPUL */
+    /* Sisi kanan dan kiri - LANCIP & RAPAT */
     .cas-right { 
         width: 30px; 
         height: 190px; 
@@ -575,7 +575,7 @@ nav.nav-show { transform: translateY(0); }
         top: 0; 
         transform: rotateY(90deg) translateZ(150px); 
         background: #1f1f1f;
-        border-radius: 16px;
+        border-radius: 0px;
     }
     
     .cas-left { 
@@ -585,10 +585,10 @@ nav.nav-show { transform: translateY(0); }
         top: 0; 
         transform: rotateY(-90deg) translateZ(150px); 
         background: #1f1f1f;
-        border-radius: 16px;
+        border-radius: 0px;
     }
     
-    /* Atas dan bawah - RAPAT & TUMPUL */
+    /* Atas dan bawah - LANCIP & RAPAT */
     .cas-top { 
         width: 300px; 
         height: 30px; 
@@ -596,7 +596,7 @@ nav.nav-show { transform: translateY(0); }
         left: 0; 
         transform: rotateX(90deg) translateZ(95px); 
         background: #1f1f1f;
-        border-radius: 16px;
+        border-radius: 0px;
     }
     
     .cas-bottom { 
@@ -606,7 +606,7 @@ nav.nav-show { transform: translateY(0); }
         left: 0; 
         transform: rotateX(-90deg) translateZ(95px); 
         background: #1f1f1f;
-        border-radius: 16px;
+        border-radius: 0px;
     }
 
     /* Window cassette */
@@ -658,7 +658,7 @@ nav.nav-show { transform: translateY(0); }
         width: 220px; 
         height: 115px; 
         background: #fff; 
-        border-radius: 4px; 
+        border-radius: 0px; 
         z-index: 5; 
         display: block; 
         overflow: hidden;
@@ -670,7 +670,7 @@ nav.nav-show { transform: translateY(0); }
         outline: none;
     }
     
-    /* Texture - ikut rounded parent */
+    /* Texture */
     .cas-texture { 
         position: absolute; 
         width:100%; 
@@ -702,6 +702,7 @@ nav.nav-show { transform: translateY(0); }
         outline: none !important;
         box-shadow: none !important;
     }
+
 
 
 </style>
