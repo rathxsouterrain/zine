@@ -412,19 +412,23 @@ nav.nav-show { transform: translateY(0); }
     background-position: center;
 }
 
-/* Background positioning untuk inner faces */
-#3d-front-inner { 
-    background-size: 1031px 1020px; 
-    background-position: left center; 
+/* Full wrap 3D - satu gambar utuh di semua sisi */
+#3d-front-inner,
+#3d-spine-inner,
+#3d-back-inner {
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
 }
-#3d-spine-inner { 
-    background-size: 1031px 1020px; 
-    background-position: -650px center; 
+
+/* Mirror untuk inner faces */
+#3d-front-inner,
+#3d-spine-inner,
+#3d-back-inner {
+    transform: scaleX(-1);
 }
-#3d-back-inner  { 
-    background-size: 1031px 1020px; 
-    background-position: right center; 
-}
+
+
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -1454,18 +1458,36 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D UNTUK BAGIAN DALAM (FULL WRAP)
+        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI (TANPA SPLIT)
         const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
+        const outerIds = ['3d-front-outer', '3d-spine-outer', '3d-back-outer'];
+        
+        // Apply ke semua inner faces (full image, sama persis)
         innerIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.style.backgroundImage = "url(" + e.target.result + ")";
-                el.style.backgroundSize = "1031px 1020px";
+                el.style.backgroundSize = "cover"; // Full cover, tidak terpotong
+                el.style.backgroundPosition = "center center";
+                el.style.transform = "scaleX(-1)"; // Mirror untuk bagian dalam
             }
         });
+        
+        // Jika ingin outer juga sama (opsional), uncomment:
+        /*
+        outerIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundSize = "cover";
+                el.style.backgroundPosition = "center center";
+            }
+        });
+        */
     };
     reader.readAsDataURL(file);
 }
+
 
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
