@@ -339,6 +339,7 @@ nav.nav-show { transform: translateY(0); }
 }
 .scene-3d:active { cursor: grabbing; }
 
+/* Posisi panel yang benar - semua sejajar sebagai sibling */
 .jcard-3d-wrapper {
     position: relative;
     width: 650px;
@@ -348,35 +349,29 @@ nav.nav-show { transform: translateY(0); }
     transition: transform 0.1s ease-out;
 }
 
-.panel {
-    position: absolute;
-    transform-style: preserve-3d;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-
+/* Front panel - di posisi 0 */
 .front-panel {
     width: 650px;
     height: 1020px;
-    transform-origin: left center;
+    transform: translateZ(0);
 }
 
+/* Spine panel - di kiri front, rotate 90 derajat */
 .spine-panel {
     width: 127px;
     height: 1020px;
-    left: -127px;
-    transform-origin: right center; 
-    transform: rotateY(-90deg); 
+    left: 0;
+    transform: translateX(-127px) rotateY(-90deg);
+    transform-origin: right center;
 }
 
+/* Back panel - di belakang spine, rotate 90 derajat lagi */
 .back-panel {
     width: 254px;
     height: 1020px;
-    left: -254px;
-    transform-origin: right center; 
-    transform: rotateY(-90deg); 
+    left: 0;
+    transform: translateX(-381px) rotateY(-90deg); /* -127 - 254 = -381 */
+    transform-origin: right center;
 }
 
 .face {
@@ -944,46 +939,48 @@ nav.nav-show { transform: translateY(0); }
         </div>
     </div>
 
-    <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
-    <div class="scene-3d">
-        <div class="jcard-3d-wrapper" id="jcard-3d-object">
-            <div class="panel front-panel">
-                <div class="face outer front-outer" id="3d-front-outer">
-                    <div class="text-3d-overlay" id="front-text-3d">Cover</div>
+    <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></<div class="scene-3d">
+    <div class="jcard-3d-wrapper" id="jcard-3d-object">
+        <!-- FRONT PANEL - Paling depan -->
+        <div class="panel front-panel">
+            <div class="face outer front-outer" id="3d-front-outer">
+                <div class="text-3d-overlay" id="front-text-3d">Cover</div>
+            </div>
+            <div class="face inner front-inner">
+                <div class="inner-texture" id="3d-front-inner"></div>
+                <div class="text-3d-overlay" id="front-text-3d-inner">Cover</div>
+            </div>
+        </div>
+        
+        <!-- SPINE PANEL - Di tengah -->
+        <div class="panel spine-panel">
+            <div class="face outer spine-outer" id="3d-spine-outer">
+                <div class="text-3d-overlay" id="spine-text-3d">band name</div>
+            </div>
+            <div class="face inner spine-inner">
+                <div class="inner-texture" id="3d-spine-inner"></div>
+                <div class="text-3d-overlay" id="spine-text-3d-inner">band name</div>
+            </div>
+        </div>
+        
+        <!-- BACK PANEL - Paling belakang -->
+        <div class="panel back-panel">
+            <div class="face outer back-outer" id="3d-back-outer">
+                <div class="text-3d-overlay" id="back-text-3d">
+                    <h3>playlist</h3>
+                    <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
                 </div>
-                <div class="face inner front-inner">
-                    <div class="inner-texture" id="3d-front-inner"></div>
-                    <div class="text-3d-overlay" id="front-text-3d-inner">Cover</div>
-                </div>
-                
-                <div class="panel spine-panel">
-                    <div class="face outer spine-outer" id="3d-spine-outer">
-                        <div class="text-3d-overlay" id="spine-text-3d">band name</div>
-                    </div>
-                    <div class="face inner spine-inner">
-                        <div class="inner-texture" id="3d-spine-inner"></div>
-                        <div class="text-3d-overlay" id="spine-text-3d-inner">band name</div>
-                    </div>
-                    
-                    <div class="panel back-panel">
-                        <div class="face outer back-outer" id="3d-back-outer">
-                            <div class="text-3d-overlay" id="back-text-3d">
-                                <h3>playlist</h3>
-                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
-                            </div>
-                        </div>
-                        <div class="face inner back-inner">
-                            <div class="inner-texture" id="3d-back-inner"></div>
-                            <div class="text-3d-overlay" id="back-text-3d-inner">
-                                <h3>playlist</h3>
-                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
-                            </div>
-                        </div>
-                     </div>
-                    </div>
+            </div>
+            <div class="face inner back-inner">
+                <div class="inner-texture" id="3d-back-inner"></div>
+                <div class="text-3d-overlay" id="back-text-3d-inner">
+                    <h3>playlist</h3>
+                    <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
     </div>
         <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
         <p>DOWNLOAD DESIGN COVER</p>
@@ -1458,35 +1455,22 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI (TANPA SPLIT)
+        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI INNER
         const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
-        const outerIds = ['3d-front-outer', '3d-spine-outer', '3d-back-outer'];
         
-        // Apply ke semua inner faces (full image, sama persis)
         innerIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.backgroundImage = "url(" + e.target.result + ")";
-                el.style.backgroundSize = "cover"; // Full cover, tidak terpotong
-                el.style.backgroundPosition = "center center";
-                el.style.transform = "scaleX(-1)"; // Mirror untuk bagian dalam
-            }
-        });
-        
-        // Jika ingin outer juga sama (opsional), uncomment:
-        /*
-        outerIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.style.backgroundImage = "url(" + e.target.result + ")";
                 el.style.backgroundSize = "cover";
                 el.style.backgroundPosition = "center center";
+                // Mirror dengan scaleX di CSS, bukan di sini
             }
         });
-        */
     };
     reader.readAsDataURL(file);
 }
+
 
 
 window.addEventListener("load", () => {
