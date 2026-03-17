@@ -1451,41 +1451,74 @@ function handleFullWrap(input) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+        const imageUrl = e.target.result;
+        
+        // Update canvas 2D
         const fullCanvas = document.getElementById("jcard-canvas-full");
         if (fullCanvas) {
-            fullCanvas.style.backgroundImage = "url(" + e.target.result + ")";
+            fullCanvas.style.backgroundImage = "url(" + imageUrl + ")";
             fullCanvas.style.backgroundSize = "cover";
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI (TANPA SPLIT)
-        const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
-        const outerIds = ['3d-front-outer', '3d-spine-outer', '3d-back-outer'];
-        
-        // Apply ke semua inner faces (full image, sama persis)
-        innerIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.backgroundImage = "url(" + e.target.result + ")";
-                el.style.backgroundSize = "cover"; // Full cover, tidak terpotong
-                el.style.backgroundPosition = "center center";
-                el.style.transform = "scaleX(-1)"; // Mirror untuk bagian dalam
-            }
-        });
-        
-        // Jika ingin outer juga sama (opsional), uncomment:
-        /*
-        outerIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.backgroundImage = "url(" + e.target.result + ")";
-                el.style.backgroundSize = "cover";
-                el.style.backgroundPosition = "center center";
-            }
-        });
-        */
+        // Update 3D dengan canvas slicing
+        applyFullWrapTo3D(imageUrl);
     };
     reader.readAsDataURL(file);
+}
+
+function applyFullWrapTo3D(imageUrl) {
+    const img = new Image();
+    img.onload = function() {
+        // Canvas utama 1031x1020 (ukuran exact J-Card)
+        const mainCanvas = document.createElement('canvas');
+        mainCanvas.width = 1031;
+        mainCanvas.height = 1020;
+        const ctx = mainCanvas.getContext('2d');
+        
+        // Draw gambar ke canvas dengan ukuran exact
+        ctx.drawImage(img, 0, 0, 1031, 1020);
+        
+        // SLICE 1: BACK COVER (0, 0, 254, 1020) - bagian kiri
+        const backCanvas = sliceCanvas(ctx, 0, 0, 254, 1020);
+        applyToFace('3d-back-outer', backCanvas);
+        applyToFace('3d-back-inner', backCanvas);
+        
+        // SLICE 2: SPINE (254, 0, 127, 1020) - bagian tengah  
+        const spineCanvas = sliceCanvas(ctx, 254, 0, 127, 1020);
+        applyToFace('3d-spine-outer', spineCanvas);
+        applyToFace('3d-spine-inner', spineCanvas);
+        
+        // SLICE 3: FRONT COVER (381, 0, 650, 1020) - bagian kanan
+        const frontCanvas = sliceCanvas(ctx, 381, 0, 650, 1020);
+        applyToFace('3d-front-outer', frontCanvas);
+        applyToFace('3d-front-inner', frontCanvas);
+    };
+    img.src = imageUrl;
+}
+
+function sliceCanvas(sourceCtx, x, y, width, height) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    
+    // Ambil pixel dari posisi yang ditentukan
+    const imgData = sourceCtx.getImageData(x, y, width, height);
+    ctx.putImageData(imgData, 0, 0);
+    
+    return canvas.toDataURL('image/png');
+}
+
+function applyToFace(elementId, dataUrl) {
+    const face = document.getElementById(elementId);
+    if(face) {
+        face.style.backgroundImage = "url(" + dataUrl + ")";
+        face.style.backgroundSize = "cover";
+        face.style.backgroundPosition = "center";
+        face.style.backgroundRepeat = "no-repeat";
+        face.style.backgroundColor = "white";
+    }
 }
 
 
