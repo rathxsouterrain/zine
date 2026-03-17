@@ -1655,62 +1655,65 @@ function uploadStickerLabel(input, side) {
 
 
     // SYNC LABEL TO 3D - DIPERBAIKI GAMBAR & TEXT
-function applyLogoTheme() {
-    const filterValue = document.getElementById('logoTheme').value;
-    const allLogos = document.querySelectorAll('.logo-img');
-    
-    allLogos.forEach(img => {
-        img.style.filter = filterValue;
+// Fungsi mengubah warna logo (Tanpa merusak script lain)
+function updateLogoColors(filterValue) {
+    const logos = document.querySelectorAll('.logo-img');
+    logos.forEach(logo => {
+        if (logo) logo.style.filter = filterValue;
     });
     
-    syncLabelTo3D(); // Langsung update ke 3D
+    // Panggil sinkronisasi ke 3D jika fungsinya ada
+    if (typeof syncLabelTo3D === "function") {
+        syncLabelTo3D();
+    }
 }
 
+// Fungsi Sinkronisasi yang diperbaiki agar tidak bentrok
 function syncLabelTo3D() {
-    ['sideA', 'sideB'].forEach(side => {
-        const sourceCanvas = document.getElementById(`canvas-${side}`);
-        const target3D = document.getElementById(`content-${side}`);
-        if (!sourceCanvas || !target3D) return;
-
-        // 1. Salin Background & Warna
-        target3D.innerHTML = ''; 
-        target3D.style.backgroundColor = document.getElementById('lblCanvasColor').value;
+    const sides = ['sideA', 'sideB'];
+    
+    sides.forEach(side => {
+        const source = document.getElementById(`canvas-${side}`);
+        const target = document.getElementById(`content-${side}`);
         
-        const bgSource = document.getElementById(`bg-${side}`);
-        if (bgSource.style.backgroundImage) {
-            target3D.style.backgroundImage = bgSource.style.backgroundImage;
-            target3D.style.backgroundSize = 'cover';
-        }
+        if (!source || !target) return; // Lewati jika elemen tidak ada
 
-        // 2. Salin Semua Elemen (Logo & Teks)
-        const boxes = sourceCanvas.querySelectorAll('.label-transform-box');
+        target.innerHTML = '';
+        
+        // Ambil warna kaset
+        const canvasColor = document.getElementById('lblCanvasColor')?.value || '#ffffff';
+        target.style.backgroundColor = canvasColor;
+
+        // Ambil semua box (Teks & Logo)
+        const boxes = source.querySelectorAll('.label-transform-box');
         boxes.forEach(box => {
             const clone = box.cloneNode(true);
             
-            // Hilangkan garis bantu dan handle resize di 3D
+            // Bersihkan handle pengatur agar tidak muncul di 3D
             const handles = clone.querySelectorAll('.handle-move, .handle-resize');
             handles.forEach(h => h.remove());
             clone.style.border = 'none';
 
-            // Sinkronkan Teks yang sedang diketik
-            const sourceText = box.querySelector('[contenteditable]');
-            if (sourceText) {
+            // Sinkronkan isi teks jika ada
+            const originalText = box.querySelector('[contenteditable]');
+            if (originalText) {
                 const cloneText = clone.querySelector('[contenteditable]');
-                cloneText.innerText = sourceText.innerText;
-                cloneText.style.color = document.getElementById('lblTextColor').value;
+                cloneText.innerText = originalText.innerText;
+                cloneText.style.color = document.getElementById('lblTextColor')?.value || '#000000';
             }
-
-            // Sinkronkan Warna Logo (Filter)
-            const sourceImg = box.querySelector('.logo-img');
-            if (sourceImg) {
+            
+            // Sinkronkan filter warna logo
+            const originalImg = box.querySelector('.logo-img');
+            if (originalImg) {
                 const cloneImg = clone.querySelector('.logo-img');
-                cloneImg.style.filter = sourceImg.style.filter;
+                cloneImg.style.filter = originalImg.style.filter;
             }
 
-            target3D.appendChild(clone);
+            target.appendChild(clone);
         });
     });
 }
+
 
 // Jalankan sync setiap kali ada perubahan warna teks atau kaset
 document.getElementById('lblTextColor').addEventListener('input', syncLabelTo3D);
