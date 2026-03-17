@@ -493,9 +493,34 @@ nav.nav-show { transform: translateY(0); }
     transform: translate(-50%, -50%) rotate(90deg) scaleX(-1);
 }
     .label-maker-section { margin-top: 60px; width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10;}
-    .label-canvas { width: 350px; height: 180px; background: #ffffff; position: relative; border-radius: 12px; overflow: hidden; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-    .label-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; }
-    
+/* Update pada label-canvas agar bagian tengahnya 'bolong' secara visual */
+.label-canvas {
+    width: 350px;
+    height: 180px;
+    background: #ffffff;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    /* Kita gunakan mask untuk memotong bagian tengah */
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 110px, black 111px); /* Ini cara kasarnya, tapi lebih akurat pakai clip-path di bawah */
+}
+
+/* Cara yang lebih presisi dengan clip-path untuk membuat lubang kotak tumpul */
+.label-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    /* Memotong bagian tengah (lubang jendela) */
+    clip-path: polygon(
+        0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 
+        18% 33%, 18% 67%, 82% 67%, 82% 33%, 18% 33%
+    );
+}    
     .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 25px; left: 120px; }
     .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
     .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
@@ -687,17 +712,20 @@ nav.nav-show { transform: translateY(0); }
     position: absolute; 
     width: 220px; 
     height: 115px; 
-    background: #fff; /* Latar belakang dasar putih jika gambar tidak menutupi penuh */
+    background: #fff; 
     border-radius: 5px; 
-    z-index: 5; /* Tempatkan di lapisan bawah agar cutout jendela terlihat di atasnya */
-    overflow: hidden; /* Pastikan gambar stiker tidak keluar dari batas label */
+    z-index: 5; 
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    display: flex; /* Aktifkan flexbox untuk perataan konten yang mudah */
-    align-items: center; /* Pusatkan konten secara vertikal */
-    justify-content: center; /* Pusatkan konten secara horizontal */
+    /* MEMOTONG TENGAH AGAR KOPONG */
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIwIiBoZWlnaHQ9IjExNSIgdmlld0JveD0iMCAwIDIyMCAxMTUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxMTUiIGZpbGw9ImJsYWNrIi8+PHJlY3QgeD0iNDAiIHk9IjM1IiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjQ1IiByeD0iMjIuNSIgZmlsbD0id2hpdGUiIHN0eWxlPSJtaXgtYmxlbmQtbW9kZTpkZXN0aW5hdGlvbi1vdXQiLz48L3N2Zz4=");
+    mask-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIwIiBoZWlnaHQ9IjExNSIgdmlld0JveD0iMCAwIDIyMCAxMTUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxMTUiIGZpbGw9ImJsYWNrIi8+PHJlY3QgeD0iNDAiIHk9IjM1IiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjQ1IiByeD0iMjIuNSIgZmlsbD0id2hpdGUiLz48L3N2Zz4=");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
 }
+
 
 
 /* Texture - TANPA BLUR */
