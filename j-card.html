@@ -813,6 +813,80 @@ nav.nav-show { transform: translateY(0); }
 .cas-back .cas-screw-bl { bottom: 12px; left: 12px; }
 .cas-back .cas-screw-br { bottom: 12px; right: 12px; }
 
+/* ============================================
+   KONTROL LIPATAN 3D
+   ============================================ */
+
+.fold-controls {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+.fold-controls label {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.fold-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.fold-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #00ff96;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
+    transition: transform 0.2s ease;
+}
+
+.fold-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.fold-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#foldValue {
+    font-weight: 700;
+    color: #00ff96;
+}
+
+/* ============================================
+   CSS 3D FOLDING TRANSITIONS
+   ============================================ */
+
+.spine-panel, .back-panel {
+    transition: transform 0.3s ease-out;
+}
+
 
 
 </style>
@@ -945,6 +1019,15 @@ nav.nav-show { transform: translateY(0); }
     </div>
 
     <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
+    <div class="fold-controls">
+    <label>Lipatan J-Card</label>
+    <input type="range" id="foldSlider" min="0" max="180" value="0" class="fold-slider">
+    <div class="fold-labels">
+        <span>Terbuka</span>
+        <span id="foldValue">0°</span>
+        <span>Terlipat</span>
+    </div>
+</div>
     <div class="scene-3d">
         <div class="jcard-3d-wrapper" id="jcard-3d-object">
             <div class="panel front-panel">
@@ -1959,6 +2042,86 @@ function uploadStickerLabel(input, side) {
             btn.disabled = false;
         }
     }
+    // ============================================
+// KONTROL LIPATAN J-CARD 3D
+// ============================================
+
+let currentFoldAngle = 0;
+
+// Setup slider saat DOM ready
+document.addEventListener("DOMContentLoaded", function() {
+    const foldSlider = document.getElementById('foldSlider');
+    const foldValue = document.getElementById('foldValue');
+    
+    if(foldSlider) {
+        foldSlider.addEventListener('input', function(e) {
+            currentFoldAngle = parseInt(e.target.value);
+            if(foldValue) foldValue.textContent = currentFoldAngle + '°';
+            updateFold(currentFoldAngle);
+        });
+    }
+});
+
+// Fungsi update lipatan utama
+function updateFold(angle) {
+    const wrapper = document.getElementById('jcard-3d-object');
+    if(!wrapper) return;
+    
+    // Hitung rotasi untuk spine dan back panel
+    // 0° = terbuka penuh, 180° = tertutup penuh
+    
+    const spineAngle = -90 + (angle / 2);  // -90° ke 0°
+    const backAngle = -90 + (angle / 2);   // -90° ke 0°
+    
+    const spinePanel = wrapper.querySelector('.spine-panel');
+    const backPanel = wrapper.querySelector('.back-panel');
+    
+    if(spinePanel) {
+        spinePanel.style.transform = `rotateY(${spineAngle}deg)`;
+    }
+    
+    if(backPanel) {
+        backPanel.style.transform = `rotateY(${backAngle}deg)`;
+    }
+}
+
+// Fungsi animasi lipat otomatis (opsional)
+function animateFold(targetAngle, duration = 500) {
+    const startAngle = currentFoldAngle;
+    const startTime = performance.now();
+    
+    function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        
+        const newAngle = startAngle + (targetAngle - startAngle) * easeProgress;
+        updateFold(newAngle);
+        
+        if(progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            currentFoldAngle = targetAngle;
+            const slider = document.getElementById('foldSlider');
+            const valueLabel = document.getElementById('foldValue');
+            if(slider) slider.value = targetAngle;
+            if(valueLabel) valueLabel.textContent = targetAngle + '°';
+        }
+    }
+    
+    requestAnimationFrame(animate);
+}
+
+// Preset tombol (jika ingin tambah tombol preset)
+function foldPreset(type) {
+    switch(type) {
+        case 'open': animateFold(0); break;
+        case 'half': animateFold(90); break;
+        case 'closed': animateFold(180); break;
+    }
+}
+
+
 </script>
 </body>
 </html>
