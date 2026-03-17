@@ -394,10 +394,19 @@ nav.nav-show { transform: translateY(0); }
     overflow: hidden;
 }
 
-.face.outer { 
-    transform: rotateY(0deg); 
-    z-index: 2;
+.full-inner-area {
+    position: absolute;
+    width: 1031px; /* Harus sama dengan lebar canvas editor */
+    height: 1020px;
+    top: 0;
+    left: 0;
+    /* Mirror agar posisi lipatan pas saat kaset diputar */
+    transform: rotateY(180deg) scaleX(-1);
+    transform-origin: left;
+    backface-visibility: hidden;
+    background-repeat: no-repeat;
 }
+
 
 .face.inner { 
     transform: rotateY(180deg); 
