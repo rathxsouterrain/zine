@@ -1452,17 +1452,25 @@ function handleFullWrap(input) {
     reader.onload = (e) => {
         const imageData = e.target.result;
 
-        // Update Canvas (Tampilan Utama)
-        document.getElementById("jcard-canvas-full").style.backgroundImage = `url(${imageData})`;
+        // 1. Sinkron ke Canvas Editor (Background utama)
+        const canvasFull = document.getElementById("jcard-canvas-full");
+        if (canvasFull) {
+            canvasFull.style.backgroundImage = `url(${imageData})`;
+            canvasFull.style.backgroundSize = "100% 100%";
+        }
 
-        // Update 3D Preview (Hanya satu elemen, gambar otomatis menyatu)
-        const innerMesh = document.getElementById("full-wrap-texture");
+        // 2. Sinkron ke 3D Preview (Satu bidang tunggal)
+        // Kita targetkan elemen yang luasnya 1031px (Seamless)
+        const innerMesh = document.getElementById("3d-inner-seamless");
         if (innerMesh) {
             innerMesh.style.backgroundImage = `url(${imageData})`;
+            innerMesh.style.backgroundSize = "100% 100%";
+            innerMesh.style.backgroundPosition = "center";
         }
     };
     reader.readAsDataURL(file);
 }
+
 
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
