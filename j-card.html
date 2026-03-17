@@ -496,7 +496,7 @@ nav.nav-show { transform: translateY(0); }
     .label-canvas { width: 350px; height: 180px; background: #ffffff; position: relative; border-radius: 12px; overflow: hidden; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
     .label-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; }
     
-    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 50px; left: 120px; }
+    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 25px; left: 175px; }
     .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
     .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
     .label-transform-box .handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #00ff96; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
@@ -979,7 +979,7 @@ nav.nav-show { transform: translateY(0); }
             <div id="canvas-sideA" class="label-canvas">
                 <div class="label-bg" id="bg-sideA"></div>
                 <div class="tape-cutout"></div>
-                <div class="label-transform-box" id="label-box-sideA" style="top: 50px; left: 120px;">
+                <div class="label-transform-box" id="label-box-sideA" style="top: 25px; left: 175px;">
                     <div class="handle-move">+</div>
                     <div class="label-text editable-content" id="text-sideA" contenteditable="true">SIDE A</div>
                     <div class="handle-resize"></div>
@@ -991,7 +991,7 @@ nav.nav-show { transform: translateY(0); }
             <div id="canvas-sideB" class="label-canvas">
                 <div class="label-bg" id="bg-sideB"></div>
                 <div class="tape-cutout"></div>
-                <div class="label-transform-box" id="label-box-sideB" style="top: 50px; left: 120px;">
+                <div class="label-transform-box" id="label-box-sideB" style="top: 25px; left: 175px;">
                     <div class="handle-move">+</div>
                     <div class="label-text editable-content" id="text-sideB" contenteditable="true">SIDE B</div>
                     <div class="handle-resize"></div>
@@ -1610,8 +1610,8 @@ function uploadStickerLabel(input, side) {
         
         // Sync Side A
         if(contentA && boxA && textA && bgA) {
-            const leftA = parseInt(boxA.style.left) || 120;
-            const topA = parseInt(boxA.style.top) || 50;
+            const leftA = parseInt(boxA.style.left) || 175;
+            const topA = parseInt(boxA.style.top) || 25;
             const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
             
             // Clear dan setup container
@@ -1655,7 +1655,7 @@ function uploadStickerLabel(input, side) {
             textDivA.style.whiteSpace = 'nowrap';
             textDivA.style.position = 'absolute';
             textDivA.style.left = leftA + 'px';
-            textDivA.style.top = topA + 'px';
+            textDivA.style.top = topA + '15';
             textDivA.style.zIndex = '10';
             textDivA.style.margin = '0';
             textDivA.style.padding = '0';
@@ -1664,8 +1664,8 @@ function uploadStickerLabel(input, side) {
         }
         // Sync Side B
         if(contentB && boxB && textB && bgB) {
-            const leftB = parseInt(boxB.style.left) || 120;
-            const topB = parseInt(boxB.style.top) || 50;
+            const leftB = parseInt(boxB.style.left) || 175;
+            const topB = parseInt(boxB.style.top) || 25;
             const fontSizeB = parseFloat(window.getComputedStyle(textB).fontSize) || 24;
             
             contentB.innerHTML = '';
@@ -1710,7 +1710,7 @@ function uploadStickerLabel(input, side) {
             textDivB.style.whiteSpace = 'nowrap';
             textDivB.style.position = 'absolute';
             textDivB.style.left = leftB + 'px';
-            textDivB.style.top = topB + 'px';
+            textDivB.style.top = topB + '15';
             textDivB.style.zIndex = '10';
             textDivB.style.margin = '0';
             textDivB.style.padding = '0';
