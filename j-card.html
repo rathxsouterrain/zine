@@ -412,58 +412,23 @@ nav.nav-show { transform: translateY(0); }
     background-position: center;
 }
 
-/* ============================================
-   FULL WRAP 3D - GAMBAR UTUH MENYATU
-   ============================================ */
-
-/* Reset semua face */
-#3d-front-outer, #3d-front-inner,
-#3d-spine-outer, #3d-spine-inner,
-#3d-back-outer, #3d-back-inner {
-    background-color: white !important;
-    background-repeat: no-repeat !important;
-    background-size: 1031px 1020px !important;
-}
-
-/* FRONT COVER (kanan) - offset 381px */
-#3d-front-outer {
-    background-position: -381px center !important;
-}
-#3d-front-inner {
-    background-position: -381px center !important;
-}
-
-/* SPINE (tengah) - offset 254px */
-/* Penting: spine di dalam front, jadi posisi relatif terhadap parent */
-#3d-spine-outer {
-    background-position: -254px center !important;
-}
-#3d-spine-inner {
-    background-position: -254px center !important;
-}
-
-/* BACK COVER (kiri) - offset 0px */
-/* Back di dalam spine yang di dalam front */
-#3d-back-outer {
-    background-position: left center !important;
-}
+/* Full wrap 3D - satu gambar utuh di semua sisi */
+#3d-front-inner,
+#3d-spine-inner,
 #3d-back-inner {
-    background-position: left center !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
 }
 
-/* Hapus mirror effect yang mengacaukan */
-.face.inner .inner-texture {
-    transform: none !important;
+/* Mirror untuk inner faces */
+#3d-front-inner,
+#3d-spine-inner,
+#3d-back-inner {
+    transform: scaleX(-1);
 }
 
-/* Pastikan panel tidak saling menutupi */
-.panel {
-    overflow: visible !important;
-}
-.face {
-    overflow: hidden !important;
-    backface-visibility: hidden !important;
-}
+
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -1486,92 +1451,43 @@ function handleFullWrap(input) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        const imageUrl = e.target.result;
-        
-        // Update canvas 2D
         const fullCanvas = document.getElementById("jcard-canvas-full");
         if (fullCanvas) {
-            fullCanvas.style.backgroundImage = "url(" + imageUrl + ")";
+            fullCanvas.style.backgroundImage = "url(" + e.target.result + ")";
             fullCanvas.style.backgroundSize = "cover";
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // Update 3D - pakai teknik background positioning
-        applyFullWrapTo3D(imageUrl);
+        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI (TANPA SPLIT)
+        const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
+        const outerIds = ['3d-front-outer', '3d-spine-outer', '3d-back-outer'];
+        
+        // Apply ke semua inner faces (full image, sama persis)
+        innerIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundSize = "cover"; // Full cover, tidak terpotong
+                el.style.backgroundPosition = "center center";
+                el.style.transform = "scaleX(-1)"; // Mirror untuk bagian dalam
+            }
+        });
+        
+        // Jika ingin outer juga sama (opsional), uncomment:
+        /*
+        outerIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundSize = "cover";
+                el.style.backgroundPosition = "center center";
+            }
+        });
+        */
     };
     reader.readAsDataURL(file);
 }
 
-function applyFullWrapTo3D(imageUrl) {
-    const img = new Image();
-    img.onload = function() {
-        // Buat canvas utama 1031x1020
-        const mainCanvas = document.createElement('canvas');
-        mainCanvas.width = 1031;
-        mainCanvas.height = 1020;
-        const ctx = mainCanvas.getContext('2d');
-        
-        // Draw gambar asli (resize ke 1031x1020)
-        ctx.drawImage(img, 0, 0, 1031, 1020);
-        
-        // Extract 3 bagian
-        // Back: 0-254px (kiri)
-        const backCanvas = extractSection(ctx, 0, 0, 254, 1020);
-        // Spine: 254-381px (tengah)  
-        const spineCanvas = extractSection(ctx, 254, 0, 127, 1020);
-        // Front: 381-1031px (kanan)
-        const frontCanvas = extractSection(ctx, 381, 0, 650, 1020);
-        
-        // Apply ke masing-masing face
-        applyToFace('3d-back-outer', backCanvas);
-        applyToFace('3d-back-inner', backCanvas);
-        applyToFace('3d-spine-outer', spineCanvas);
-        applyToFace('3d-spine-inner', spineCanvas);
-        applyToFace('3d-front-outer', frontCanvas);
-        applyToFace('3d-front-inner', frontCanvas);
-    };
-    img.src = imageUrl;
-}
-
-function extractSection(sourceCtx, x, y, w, h) {
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    
-    // Get image data dari source
-    const imgData = sourceCtx.getImageData(x, y, w, h);
-    ctx.putImageData(imgData, 0, 0);
-    
-    return canvas;
-}
-
-function applyToFace(elementId, sourceCanvas) {
-    const face = document.getElementById(elementId);
-    if(face) {
-        face.style.backgroundImage = "url(" + sourceCanvas.toDataURL() + ")";
-        face.style.backgroundSize = "cover";
-        face.style.backgroundPosition = "center";
-        face.style.backgroundRepeat = "no-repeat";
-    }
-}
-
-    
-    // FRONT COVER (bagian kanan: 381px - 1031px)
-    const frontOffset = backWidth + spineWidth; // 254 + 127 = 381
-    if(frontOuter) {
-        frontOuter.style.backgroundImage = "url(" + imageUrl + ")";
-        frontOuter.style.backgroundSize = totalWidth + "px 1020px";
-        frontOuter.style.backgroundPosition = "-" + frontOffset + "px center"; // -381px
-        frontOuter.style.backgroundRepeat = "no-repeat";
-    }
-    if(frontInner) {
-        frontInner.style.backgroundImage = "url(" + imageUrl + ")";
-        frontInner.style.backgroundSize = totalWidth + "px 1020px";
-        frontInner.style.backgroundPosition = "-" + frontOffset + "px center";
-        frontInner.style.backgroundRepeat = "no-repeat";
-    }
-}
 
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
