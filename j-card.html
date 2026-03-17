@@ -819,64 +819,82 @@ nav.nav-show { transform: translateY(0); }
 
 .fold-controls {
     width: 100%;
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
+    max-width: 400px;        /* Dari 500px → 400px */
+    margin: 10px auto;       /* Dari 20px → 10px */
+    padding: 12px 15px;      /* Dari 20px → 12px */
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;     /* Dari 20px → 12px */
     box-sizing: border-box;
 }
 
 .fold-controls label {
-    display: block;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-    color: white;
+    font-size: 11px;         /* Dari 14px → 11px */
+    margin-bottom: 8px;      /* Dari 15px → 8px */
+    letter-spacing: 1.5px;
 }
 
 .fold-slider {
-    width: 100%;
-    height: 8px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
+    height: 4px;             /* Dari 8px → 4px */
 }
 
 .fold-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #00ff96;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
-    transition: transform 0.2s ease;
-}
-
-.fold-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
+    width: 16px;             /* Dari 24px → 16px */
+    height: 16px;
 }
 
 .fold-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;         /* Dari 12px → 10px */
+    margin-top: 6px;         /* Dari 10px → 6px */
 }
 
 #foldValue {
+    font-size: 11px;
+}
+
+.fold-controls-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;        /* Lebih kecil lagi */
+    margin: 8px auto;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+.fold-controls-inline label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+}
+
+.fold-controls-inline .fold-slider {
+    flex: 1;
+    max-width: 150px;
+    height: 3px;
+}
+
+.fold-controls-inline .fold-slider::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+}
+
+.fold-controls-inline #foldValue {
+    font-size: 10px;
     font-weight: 700;
     color: #00ff96;
+    min-width: 25px;
+    text-align: center;
 }
 
 /* ============================================
@@ -1019,14 +1037,10 @@ nav.nav-show { transform: translateY(0); }
     </div>
 
     <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
-<div class="fold-controls">
-    <label>Lipatan J-Card</label>
+<div class="fold-controls-inline">
+    <label>Lipat</label>
     <input type="range" id="foldSlider" min="0" max="180" value="0" class="fold-slider">
-    <div class="fold-labels">
-        <span>Terbuka</span>
-        <span id="foldValue">0°</span>
-        <span>Terlipat</span>
-    </div>
+    <span id="foldValue">0°</span>
 </div>
     <div class="scene-3d">
         <div class="jcard-3d-wrapper" id="jcard-3d-object">
