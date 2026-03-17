@@ -526,7 +526,7 @@ nav.nav-show { transform: translateY(0); }
         18% 33%, 18% 67%, 82% 67%, 82% 33%, 18% 33%
     );
 }    
-    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 25px; left: 120px; }
+    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 20px; left: 100px; }
     .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
     .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
     .label-transform-box .handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #00ff96; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
@@ -1017,7 +1017,7 @@ nav.nav-show { transform: translateY(0); }
             <div id="canvas-sideA" class="label-canvas">
                 <div class="label-bg" id="bg-sideA"></div>
                 <div class="tape-cutout"></div>
-                <div class="label-transform-box" id="label-box-sideA" style="top: 25px; left: 120px;">
+                <div class="label-transform-box" id="label-box-sideA" style="top: 20px; left: 100px;">
                     <div class="handle-move">+</div>
                     <div class="label-text editable-content" id="text-sideA" contenteditable="true">BAND NAME</div>
                     <div class="handle-resize"></div>
@@ -1029,7 +1029,7 @@ nav.nav-show { transform: translateY(0); }
             <div id="canvas-sideB" class="label-canvas">
                 <div class="label-bg" id="bg-sideB"></div>
                 <div class="tape-cutout"></div>
-                <div class="label-transform-box" id="label-box-sideB" style="top: 25px; left: 120px;">
+                <div class="label-transform-box" id="label-box-sideB" style="top: 20px; left: 100px;">
                     <div class="handle-move">+</div>
                     <div class="label-text editable-content" id="text-sideB" contenteditable="true">BAND NAME</div>
                     <div class="handle-resize"></div>
@@ -1649,8 +1649,8 @@ function uploadStickerLabel(input, side) {
         
         // Sync Side A
         if(contentA && boxA && textA && bgA) {
-            const leftA = parseInt(boxA.style.left) || 120;
-            const topA = parseInt(boxA.style.top) || 25;
+            const leftA = parseInt(boxA.style.left) || 100;
+            const topA = parseInt(boxA.style.top) || 20;
             const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
             
             // Clear dan setup container
@@ -1703,8 +1703,8 @@ function uploadStickerLabel(input, side) {
         }
         // Sync Side B
         if(contentB && boxB && textB && bgB) {
-            const leftB = parseInt(boxB.style.left) || 120;
-            const topB = parseInt(boxB.style.top) || 25;
+            const leftB = parseInt(boxB.style.left) || 100;
+            const topB = parseInt(boxB.style.top) || 20;
             const fontSizeB = parseFloat(window.getComputedStyle(textB).fontSize) || 24;
             
             contentB.innerHTML = '';
