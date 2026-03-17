@@ -1009,53 +1009,31 @@ nav.nav-show { transform: translateY(0); }
 
         <label>Font Label</label>
         <select id="labelFontSelector" onchange="updateLabelFont()"></select>
-        <div class="control-item">
-    <label>Warna Logo & Elemen</label>
-    <select id="logoTheme" onchange="applyLogoTheme()">
-        <option value="none">Hitam (Default)</option>
-        <option value="invert(1) brightness(2)">Putih Bersinar</option>
-        <option value="sepia(1) saturate(5) hue-rotate(190deg)">Biru</option>
-    </select>
-</div>
     </div>
 
     <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; width: 100%; max-width: 800px;">
         <div>
             <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE A DESIGN</p>
             <div id="canvas-sideA" class="label-canvas">
-    <div id="bg-sideA" class="canvas-background"></div>
-    
-    <div class="label-transform-box" style="top: 45%; left: 10%; width: 40px;">
-        <img class="logo-img" src="https://img.icons8.com/ios-filled/50/000000/cassette.png" style="width:100%;">
-    </div>
-
-    <div class="label-transform-box" style="top: 15%; left: 50%; transform: translateX(-50%);">
-        <h2 contenteditable="true" style="font-family: sans-serif; font-weight: bold; letter-spacing: 2px;">SIDE A</h2>
-    </div>
-
-    <div class="label-transform-box" style="top: 75%; right: 10%; width: 80px;">
-        <img class="logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dolby_Stereo_logo.svg/2560px-Dolby_Stereo_logo.svg.png" style="width:100%;">
-    </div>
-</div>
+                <div class="label-bg" id="bg-sideA"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box" id="label-box-sideA" style="top: 25px; left: 120px;">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" id="text-sideA" contenteditable="true">SIDE A</div>
+                    <div class="handle-resize"></div>
+                </div>
             </div>
         </div>
         <div>
             <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE B DESIGN</p>
             <div id="canvas-sideB" class="label-canvas">
-    <div id="bg-sideB" class="canvas-background"></div>
-    
-    <div class="label-transform-box" style="top: 45%; left: 10%; width: 40px;">
-        <img class="logo-img" src="https://img.icons8.com/ios-filled/50/000000/cassette.png" style="width:100%;">
-    </div>
-
-    <div class="label-transform-box" style="top: 15%; left: 50%; transform: translateX(-50%);">
-        <h2 contenteditable="true" style="font-family: sans-serif; font-weight: bold; letter-spacing: 2px;">SIDE B</h2>
-    </div>
-
-    <div class="label-transform-box" style="top: 75%; right: 10%; width: 80px;">
-        <img class="logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dolby_Stereo_logo.svg/2560px-Dolby_Stereo_logo.svg.png" style="width:100%;">
-    </div>
-</div>
+                <div class="label-bg" id="bg-sideB"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box" id="label-box-sideB" style="top: 25px; left: 120px;">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" id="text-sideB" contenteditable="true">SIDE B</div>
+                    <div class="handle-resize"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1655,69 +1633,34 @@ function uploadStickerLabel(input, side) {
 
 
     // SYNC LABEL TO 3D - DIPERBAIKI GAMBAR & TEXT
-// Fungsi mengubah warna logo (Tanpa merusak script lain)
-function updateLogoColors(filterValue) {
-    const logos = document.querySelectorAll('.logo-img');
-    logos.forEach(logo => {
-        if (logo) logo.style.filter = filterValue;
-    });
-    
-    // Panggil sinkronisasi ke 3D jika fungsinya ada
-    if (typeof syncLabelTo3D === "function") {
-        syncLabelTo3D();
-    }
-}
-
-// Fungsi Sinkronisasi yang diperbaiki agar tidak bentrok
-function syncLabelTo3D() {
-    const sides = ['sideA', 'sideB'];
-    
-    sides.forEach(side => {
-        const source = document.getElementById(`canvas-${side}`);
-        const target = document.getElementById(`content-${side}`);
+    function syncLabelTo3D() {
+        const boxA = document.getElementById('label-box-sideA');
+        const boxB = document.getElementById('label-box-sideB');
+        const textA = document.getElementById('text-sideA');
+        const textB = document.getElementById('text-sideB');
+        const bgA = document.getElementById('bg-sideA');
+        const bgB = document.getElementById('bg-sideB');
+        const contentA = document.getElementById('content-sideA');
+        const contentB = document.getElementById('content-sideB');
         
-        if (!source || !target) return; // Lewati jika elemen tidak ada
-
-        target.innerHTML = '';
+        const canvasCol = document.getElementById('lblCanvasColor').value;
+        const textCol = document.getElementById('lblTextColor').value;
+        const font = document.getElementById('labelFontSelector').value || 'Orbitron';
         
-        // Ambil warna kaset
-        const canvasColor = document.getElementById('lblCanvasColor')?.value || '#ffffff';
-        target.style.backgroundColor = canvasColor;
-
-        // Ambil semua box (Teks & Logo)
-        const boxes = source.querySelectorAll('.label-transform-box');
-        boxes.forEach(box => {
-            const clone = box.cloneNode(true);
+        // Sync Side A
+        if(contentA && boxA && textA && bgA) {
+            const leftA = parseInt(boxA.style.left) || 120;
+            const topA = parseInt(boxA.style.top) || 25;
+            const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
             
-            // Bersihkan handle pengatur agar tidak muncul di 3D
-            const handles = clone.querySelectorAll('.handle-move, .handle-resize');
-            handles.forEach(h => h.remove());
-            clone.style.border = 'none';
-
-            // Sinkronkan isi teks jika ada
-            const originalText = box.querySelector('[contenteditable]');
-            if (originalText) {
-                const cloneText = clone.querySelector('[contenteditable]');
-                cloneText.innerText = originalText.innerText;
-                cloneText.style.color = document.getElementById('lblTextColor')?.value || '#000000';
-            }
-            
-            // Sinkronkan filter warna logo
-            const originalImg = box.querySelector('.logo-img');
-            if (originalImg) {
-                const cloneImg = clone.querySelector('.logo-img');
-                cloneImg.style.filter = originalImg.style.filter;
-            }
-
-            target.appendChild(clone);
-        });
-    });
-}
-
-
-// Jalankan sync setiap kali ada perubahan warna teks atau kaset
-document.getElementById('lblTextColor').addEventListener('input', syncLabelTo3D);
-document.getElementById('lblCanvasColor').addEventListener('input', syncLabelTo3D);
+            // Clear dan setup container
+            contentA.innerHTML = '';
+            contentA.style.width = '350px';
+            contentA.style.height = '180px';
+            contentA.style.position = 'absolute';
+            contentA.style.top = '0';
+            contentA.style.left = '0';
+            contentA.style.backgroundColor = 'transparent';
             
             // GAMBAR BACKGROUND - SYNC
             const bgImageA = bgA.style.backgroundImage;
