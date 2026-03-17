@@ -413,19 +413,27 @@ nav.nav-show { transform: translateY(0); }
     background-position: center;
 }
 
-/* Background positioning untuk inner faces */
-/* Background positioning untuk bagian dalam agar nyambung */
+/* Pastikan background-size diset ke total lebar J-Card (1031px) */
+#3d-front-inner, #3d-spine-inner, #3d-back-inner { 
+    background-size: 1031px 1020px !important; 
+    background-repeat: no-repeat;
+}
+
+/* Bagian DEPAN: Mulai dari koordinat 0 */
 #3d-front-inner { 
-    background-position: 0px center; 
+    background-position: 0px 0px !important; 
 }
+
+/* Bagian SPINE: Geser gambar ke kiri sebanyak lebar Front (650px) */
 #3d-spine-inner { 
-    /* Geser sebanyak lebar front cover (650px) */
-    background-position: -650px center; 
+    background-position: -650px 0px !important; 
 }
+
+/* Bagian BELAKANG (Back Flap): Geser sebanyak Front + Spine (650+127 = 777px) */
 #3d-back-inner  { 
-    /* Geser sebanyak lebar front + spine (650 + 127 = 777px) */
-    background-position: -777px center; 
+    background-position: -777px 0px !important; 
 }
+
 
 
 /* ============================
@@ -1449,30 +1457,27 @@ function handleFullWrap(input) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        const fullCanvas = document.getElementById("jcard-canvas-full");
         const imageData = e.target.result;
-
+        
+        // Update Canvas Preview
+        const fullCanvas = document.getElementById("jcard-canvas-full");
         if (fullCanvas) {
             fullCanvas.style.backgroundImage = "url(" + imageData + ")";
-            // Gunakan 100% 100% agar paksa mengikuti ukuran canvas
-            fullCanvas.style.backgroundSize = "100% 100%"; 
-            fullCanvas.style.backgroundPosition = "center";
+            fullCanvas.style.backgroundSize = "100% 100%"; // Paksa isi full area
         }
 
-        // UPDATE TEKSTUR 3D UNTUK BAGIAN DALAM (FULL WRAP)
+        // Update Semua Panel 3D Inner agar Menyambung
         const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
         innerIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.style.backgroundImage = "url(" + imageData + ")";
-                // PENTING: Gunakan 1031px (total lebar canvas) agar posisi background-position (negatif) bekerja tepat
-                el.style.backgroundSize = "1031px 1020px";
-                el.style.backgroundRepeat = "no-repeat";
             }
         });
     };
     reader.readAsDataURL(file);
 }
+
 
 
 window.addEventListener("load", () => {
