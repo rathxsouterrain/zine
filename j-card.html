@@ -399,38 +399,32 @@ nav.nav-show { transform: translateY(0); }
     z-index: 2;
 }
 
-/* --- PERBAIKAN 3D FULL WRAP --- */
-
-/* Container utama inner kaset */
-.face.inner { 
-    transform: rotateY(180deg); 
-    z-index: 1;
-    /* Memberikan efek mirror secara horizontal */
-    filter: flipH; 
-    -ms-filter: "FlipH";
-    transform: rotateY(180deg) scaleX(-1); 
+/* Menjadikan satu bidang besar yang menutupi seluruh area dalam */
+.full-wrap-inner-mesh {
+    position: absolute;
+    width: 1031px; /* Total lebar (650 + 127 + 254) */
+    height: 1020px;
+    /* Mirroring seluruh bidang */
+    transform: rotateY(180deg) scaleX(-1);
+    transform-origin: left;
+    backface-visibility: hidden;
 }
 
-.inner-texture {
+#full-wrap-texture {
     width: 100%;
     height: 100%;
-    background-size: 1031px 1020px !important; /* Ukuran total canvas */
-    background-repeat: no-repeat;
-    image-rendering: auto;
+    background-size: cover;
+    background-position: center;
+    /* Efek menyambung tanpa sekat */
+    border: none; 
+    outline: none;
 }
 
-/* Koordinat agar gambar menyambung mulus dari ujung ke ujung */
-#3d-front-inner { 
-    background-position: 0px 0px !important; 
+/* Pastikan tidak ada border atau gap antar lipatan secara visual */
+#jcard-mesh div {
+    box-shadow: none !important;
 }
 
-#3d-spine-inner { 
-    background-position: -650px 0px !important; 
-}
-
-#3d-back-inner  { 
-    background-position: -777px 0px !important; 
-}
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -948,44 +942,17 @@ nav.nav-show { transform: translateY(0); }
 
     <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
     <div class="scene-3d">
-        <div class="jcard-3d-wrapper" id="jcard-3d-object">
-            <div class="panel front-panel">
-                <div class="face outer front-outer" id="3d-front-outer">
-                    <div class="text-3d-overlay" id="front-text-3d">Cover</div>
-                </div>
-                <div class="face inner front-inner">
-                    <div class="inner-texture" id="3d-front-inner"></div>
-                    <div class="text-3d-overlay" id="front-text-3d-inner">Cover</div>
-                </div>
-                
-                <div class="panel spine-panel">
-                    <div class="face outer spine-outer" id="3d-spine-outer">
-                        <div class="text-3d-overlay" id="spine-text-3d">band name</div>
-                    </div>
-                    <div class="face inner spine-inner">
-                        <div class="inner-texture" id="3d-spine-inner"></div>
-                        <div class="text-3d-overlay" id="spine-text-3d-inner">band name</div>
-                    </div>
-                    
-                    <div class="panel back-panel">
-                        <div class="face outer back-outer" id="3d-back-outer">
-                            <div class="text-3d-overlay" id="back-text-3d">
-                                <h3>playlist</h3>
-                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
-                            </div>
-                        </div>
-                        <div class="face inner back-inner">
-                            <div class="inner-texture" id="3d-back-inner"></div>
-                            <div class="text-3d-overlay" id="back-text-3d-inner">
-                                <h3>playlist</h3>
-                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
-                            </div>
-                        </div>
-                     </div>
-                    </div>
-                </div>
-            </div>
+        <div id="jcard-3d-container">
+    <div id="jcard-mesh">
+        <div class="face front-outer"></div>
+        <div class="face spine-outer"></div>
+        <div class="face back-outer"></div>
+
+        <div class="face full-wrap-inner-mesh">
+            <div id="full-wrap-texture"></div>
         </div>
+    </div>
+</div>
     </div>
         <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
         <p>DOWNLOAD DESIGN COVER</p>
@@ -1455,26 +1422,18 @@ function handleFullWrap(input) {
     reader.onload = (e) => {
         const imageData = e.target.result;
 
-        // 1. Update Preview di Canvas (Tampilan Utuh)
-        const fullCanvas = document.getElementById("jcard-canvas-full");
-        if (fullCanvas) {
-            fullCanvas.style.backgroundImage = "url(" + imageData + ")";
-            fullCanvas.style.backgroundSize = "100% 100%";
-        }
+        // Update Canvas (Tampilan Utama)
+        document.getElementById("jcard-canvas-full").style.backgroundImage = `url(${imageData})`;
 
-        // 2. Update 3D Preview (Agar Menyambung & Mirror)
-        const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
-        innerIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.backgroundImage = "url(" + imageData + ")";
-                // Properti tambahan via JS untuk memastikan
-                el.style.backgroundSize = "1031px 1020px";
-            }
-        });
+        // Update 3D Preview (Hanya satu elemen, gambar otomatis menyatu)
+        const innerMesh = document.getElementById("full-wrap-texture");
+        if (innerMesh) {
+            innerMesh.style.backgroundImage = `url(${imageData})`;
+        }
     };
     reader.readAsDataURL(file);
 }
+
 
 
 window.addEventListener("load", () => {
