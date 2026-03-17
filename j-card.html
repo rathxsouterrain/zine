@@ -1503,81 +1503,59 @@ function handleFullWrap(input) {
 }
 
 function applyFullWrapTo3D(imageUrl) {
-    // Elemen target
-    const faces = [
-        '3d-front-outer', '3d-front-inner',
-        '3d-spine-outer', '3d-spine-inner', 
-        '3d-back-outer', '3d-back-inner'
-    ];
-    
-    // Set semua ke gambar yang sama dulu
-    faces.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) {
-            el.style.backgroundImage = "url(" + imageUrl + ")";
-        }
-    });
-    
-    // Setelah image load, pastikan positioning benar
     const img = new Image();
     img.onload = function() {
-        // Force repaint dengan trigger reflow
-        faces.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.display = 'none';
-                el.offsetHeight; // Trigger reflow
-                el.style.display = '';
-            }
-        });
+        // Buat canvas utama 1031x1020
+        const mainCanvas = document.createElement('canvas');
+        mainCanvas.width = 1031;
+        mainCanvas.height = 1020;
+        const ctx = mainCanvas.getContext('2d');
+        
+        // Draw gambar asli (resize ke 1031x1020)
+        ctx.drawImage(img, 0, 0, 1031, 1020);
+        
+        // Extract 3 bagian
+        // Back: 0-254px (kiri)
+        const backCanvas = extractSection(ctx, 0, 0, 254, 1020);
+        // Spine: 254-381px (tengah)  
+        const spineCanvas = extractSection(ctx, 254, 0, 127, 1020);
+        // Front: 381-1031px (kanan)
+        const frontCanvas = extractSection(ctx, 381, 0, 650, 1020);
+        
+        // Apply ke masing-masing face
+        applyToFace('3d-back-outer', backCanvas);
+        applyToFace('3d-back-inner', backCanvas);
+        applyToFace('3d-spine-outer', spineCanvas);
+        applyToFace('3d-spine-inner', spineCanvas);
+        applyToFace('3d-front-outer', frontCanvas);
+        applyToFace('3d-front-inner', frontCanvas);
     };
     img.src = imageUrl;
 }
 
-// FUNGSI BARU: Apply gambar full wrap ke 3D sebagai satu kesatuan utuh
-function applyFullWrapTo3D(imageUrl) {
-    // Dimensi J-Card: Back(254) + Spine(127) + Front(650) = 1031px total width, height 1020px
+function extractSection(sourceCtx, x, y, w, h) {
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
     
-    const totalWidth = 1031;
-    const backWidth = 254;
-    const spineWidth = 127;
-    // const frontWidth = 650; // tidak terpakai langsung
+    // Get image data dari source
+    const imgData = sourceCtx.getImageData(x, y, w, h);
+    ctx.putImageData(imgData, 0, 0);
     
-    // Get elements
-    const frontOuter = document.getElementById('3d-front-outer');
-    const spineOuter = document.getElementById('3d-spine-outer');
-    const backOuter = document.getElementById('3d-back-outer');
-    const frontInner = document.getElementById('3d-front-inner');
-    const spineInner = document.getElementById('3d-spine-inner');
-    const backInner = document.getElementById('3d-back-inner');
-    
-    // BACK COVER (bagian kiri gambar: 0-254px)
-    if(backOuter) {
-        backOuter.style.backgroundImage = "url(" + imageUrl + ")";
-        backOuter.style.backgroundSize = totalWidth + "px 1020px";
-        backOuter.style.backgroundPosition = "left center";
-        backOuter.style.backgroundRepeat = "no-repeat";
+    return canvas;
+}
+
+function applyToFace(elementId, sourceCanvas) {
+    const face = document.getElementById(elementId);
+    if(face) {
+        face.style.backgroundImage = "url(" + sourceCanvas.toDataURL() + ")";
+        face.style.backgroundSize = "cover";
+        face.style.backgroundPosition = "center";
+        face.style.backgroundRepeat = "no-repeat";
     }
-    if(backInner) {
-        backInner.style.backgroundImage = "url(" + imageUrl + ")";
-        backInner.style.backgroundSize = totalWidth + "px 1020px";
-        backInner.style.backgroundPosition = "left center";
-        backInner.style.backgroundRepeat = "no-repeat";
-    }
-    
-    // SPINE (bagian tengah: 254px - 381px)
-    if(spineOuter) {
-        spineOuter.style.backgroundImage = "url(" + imageUrl + ")";
-        spineOuter.style.backgroundSize = totalWidth + "px 1020px";
-        spineOuter.style.backgroundPosition = "-" + backWidth + "px center"; // -254px
-        spineOuter.style.backgroundRepeat = "no-repeat";
-    }
-    if(spineInner) {
-        spineInner.style.backgroundImage = "url(" + imageUrl + ")";
-        spineInner.style.backgroundSize = totalWidth + "px 1020px";
-        spineInner.style.backgroundPosition = "-" + backWidth + "px center";
-        spineInner.style.backgroundRepeat = "no-repeat";
-    }
+}
+
     
     // FRONT COVER (bagian kanan: 381px - 1031px)
     const frontOffset = backWidth + spineWidth; // 254 + 127 = 381
