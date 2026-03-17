@@ -1019,19 +1019,14 @@ nav.nav-show { transform: translateY(0); }
     </div>
 
     <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
-<div style="margin-bottom: 20px; padding: 10px;">
-    <h3 style="font-size: 14px; margin-bottom: 10px;">LIPATAN J-CARD</h3>
-    <input type="range" id="fold-slider" min="0" max="180" value="180" style="width: 80%;">
-    <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto; font-size: 12px;">
+<div class="fold-controls">
+    <label>Lipatan J-Card</label>
+    <input type="range" id="foldSlider" min="0" max="180" value="0" class="fold-slider">
+    <div class="fold-labels">
         <span>Terbuka</span>
-        <span style="color: #00ff88; font-weight: bold;">180°</span>
+        <span id="foldValue">0°</span>
         <span>Terlipat</span>
     </div>
-</div>
-
-<div class="viewport">
-    <div id="jcard-container">
-        </div>
 </div>
     <div class="scene-3d">
         <div class="jcard-3d-wrapper" id="jcard-3d-object">
