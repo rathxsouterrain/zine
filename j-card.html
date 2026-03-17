@@ -634,41 +634,39 @@ nav.nav-show { transform: translateY(0); }
 }
 
 /* Window cassette - TANPA BLUR */
+/* Window cassette - SEKARANG TRANSPARAN */
 .cas-window-3d { 
     position: absolute; 
     width: 140px; 
     height: 45px; 
-    background: rgba(0,0,0,0.3); 
+    background: transparent; /* Diubah dari rgba(0,0,0,0.3) */
     border-radius: 22px; 
     z-index: 10; 
-    border: 2px solid #333;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.3),
-        0 0 10px rgba(255,255,255,0.1);
+    border: 3px solid rgba(0,0,0,0.2);
+    /* Efek bayangan dalam agar terlihat seperti lubang */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
-/* Reel/Spool */
+/* Reel/Spool - SEKARANG BULAT SEMPURNA */
 .cas-wheel-l, .cas-wheel-r { 
     position: absolute; 
-    width: 35px; 
-    height: 35px; 
+    width: 38px; 
+    height: 38px; 
+    border-radius: 50%; /* Menambah ini agar jadi bulat */
     background: conic-gradient(from 0deg, 
-        rgba(200,200,200,0.9) 0deg, 
-        rgba(255,255,255,0.9) 90deg, 
-        rgba(200,200,200,0.9) 180deg, 
-        rgba(150,150,150,0.9) 270deg, 
-        rgba(200,200,200,0.9) 360deg);
-    z-index: 11; 
+        #eee 0deg, #ccc 90deg, #eee 180deg, #999 270deg, #eee 360deg);
+    z-index: 9; /* Di bawah window */
     top: 50%; 
     transform: translateY(-50%); 
-    box-shadow: 0 0 8px rgba(255,255,255,0.3),
-        inset 0 0 5px rgba(0,0,0,0.1);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
 }
 
 .cas-wheel-l { left: 85px; } 
 .cas-wheel-r { right: 85px; }
+
 
 .cas-wheel-l::after, .cas-wheel-r::after {
     content: '';
@@ -684,6 +682,7 @@ nav.nav-show { transform: translateY(0); }
 }
 
 /* Label area */
+/* Label area - Diperketat agar tidak ada gap */
 .cas-label-3d { 
     position: absolute; 
     width: 220px; 
@@ -691,11 +690,13 @@ nav.nav-show { transform: translateY(0); }
     background: #fff; 
     border-radius: 5px; 
     z-index: 5; 
-    display: block; 
-    overflow: hidden;
+    overflow: hidden; /* Memastikan gambar tidak keluar jalur */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    display: flex; /* Tambahkan ini */
+    align-items: center; /* Tambahkan ini */
+    justify-content: center; /* Tambahkan ini */
 }
 
 /* Texture - TANPA BLUR */
@@ -711,7 +712,7 @@ nav.nav-show { transform: translateY(0); }
     z-index: 20;
 }
 
-/* Container konten label */
+/* Container konten label - Scaling diperbaiki */
 .cas-label-content { 
     position: absolute; 
     top: 0; 
@@ -719,7 +720,8 @@ nav.nav-show { transform: translateY(0); }
     width: 350px; 
     height: 180px; 
     transform-origin: top left;
-    transform: scale(0.628571);
+    /* Pastikan scale menutupi area 220x115 dengan pas */
+    transform: scale(0.63); 
 }
 /* ============================
    BAUT/SCREWS UNTUK CASSETTE 3D
