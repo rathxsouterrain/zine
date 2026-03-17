@@ -682,22 +682,23 @@ nav.nav-show { transform: translateY(0); }
 }
 
 /* Label area */
-/* Label area - Diperketat agar tidak ada gap */
+/* Area Label - Diperketat agar tidak ada celah putih */
 .cas-label-3d { 
     position: absolute; 
     width: 220px; 
     height: 115px; 
-    background: #fff; 
+    background: #fff; /* Latar belakang dasar putih jika gambar tidak menutupi penuh */
     border-radius: 5px; 
-    z-index: 5; 
-    overflow: hidden; /* Memastikan gambar tidak keluar jalur */
+    z-index: 5; /* Tempatkan di lapisan bawah agar cutout jendela terlihat di atasnya */
+    overflow: hidden; /* Pastikan gambar stiker tidak keluar dari batas label */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    display: flex; /* Tambahkan ini */
-    align-items: center; /* Tambahkan ini */
-    justify-content: center; /* Tambahkan ini */
+    display: flex; /* Aktifkan flexbox untuk perataan konten yang mudah */
+    align-items: center; /* Pusatkan konten secara vertikal */
+    justify-content: center; /* Pusatkan konten secara horizontal */
 }
+
 
 /* Texture - TANPA BLUR */
 .cas-texture { 
@@ -712,15 +713,15 @@ nav.nav-show { transform: translateY(0); }
     z-index: 20;
 }
 
-/* Container konten label - Scaling diperbaiki */
+/* Container Konten Label - Skala Diperbaiki */
 .cas-label-content { 
     position: absolute; 
     top: 0; 
     left: 0; 
-    width: 350px; 
-    height: 180px; 
+    width: 350px; /* Lebar asli container konten */
+    height: 180px; /* Tinggi asli container konten */
     transform-origin: top left;
-    /* Pastikan scale menutupi area 220x115 dengan pas */
+    /* Pastikan skala menutupi area 220x115 dengan pas tanpa celah */
     transform: scale(0.63); 
 }
 /* ============================
