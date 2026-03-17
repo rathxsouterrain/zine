@@ -399,42 +399,38 @@ nav.nav-show { transform: translateY(0); }
     z-index: 2;
 }
 
+/* --- PERBAIKAN 3D FULL WRAP --- */
+
+/* Container utama inner kaset */
 .face.inner { 
     transform: rotateY(180deg); 
     z-index: 1;
+    /* Memberikan efek mirror secara horizontal */
+    filter: flipH; 
+    -ms-filter: "FlipH";
+    transform: rotateY(180deg) scaleX(-1); 
 }
 
 .inner-texture {
     width: 100%;
     height: 100%;
-    background-color: #f4f4f4;
+    background-size: 1031px 1020px !important; /* Ukuran total canvas */
     background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+    image-rendering: auto;
 }
 
-/* Pastikan background-size diset ke total lebar J-Card (1031px) */
-#3d-front-inner, #3d-spine-inner, #3d-back-inner { 
-    background-size: 1031px 1020px !important; 
-    background-repeat: no-repeat;
-}
-
-/* Bagian DEPAN: Mulai dari koordinat 0 */
+/* Koordinat agar gambar menyambung mulus dari ujung ke ujung */
 #3d-front-inner { 
     background-position: 0px 0px !important; 
 }
 
-/* Bagian SPINE: Geser gambar ke kiri sebanyak lebar Front (650px) */
 #3d-spine-inner { 
     background-position: -650px 0px !important; 
 }
 
-/* Bagian BELAKANG (Back Flap): Geser sebanyak Front + Spine (650+127 = 777px) */
 #3d-back-inner  { 
     background-position: -777px 0px !important; 
 }
-
-
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -1458,26 +1454,27 @@ function handleFullWrap(input) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageData = e.target.result;
-        
-        // Update Canvas Preview
+
+        // 1. Update Preview di Canvas (Tampilan Utuh)
         const fullCanvas = document.getElementById("jcard-canvas-full");
         if (fullCanvas) {
             fullCanvas.style.backgroundImage = "url(" + imageData + ")";
-            fullCanvas.style.backgroundSize = "100% 100%"; // Paksa isi full area
+            fullCanvas.style.backgroundSize = "100% 100%";
         }
 
-        // Update Semua Panel 3D Inner agar Menyambung
+        // 2. Update 3D Preview (Agar Menyambung & Mirror)
         const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
         innerIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.style.backgroundImage = "url(" + imageData + ")";
+                // Properti tambahan via JS untuk memastikan
+                el.style.backgroundSize = "1031px 1020px";
             }
         });
     };
     reader.readAsDataURL(file);
 }
-
 
 
 window.addEventListener("load", () => {
