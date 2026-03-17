@@ -865,11 +865,13 @@ nav.nav-show { transform: translateY(0); }
     margin-top: -7px;          /* Center di track */
 }
 
-.fold-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
+.fold-slider::-webkit-slider-thumb {
+    width: 40px;               /* 40px */
+    height: 40px;              /* 40px */
+    margin-top: -15px;         /* Center: (40-10)/2 = 15 */
     box-shadow: 
-        0 4px 12px rgba(0, 255, 150, 0.5),
-        0 0 0 6px rgba(0, 255, 150, 0.15);
+        0 4px 16px rgba(0, 255, 150, 0.5),
+        0 0 0 8px rgba(0, 255, 150, 0.15);
 }
 
 .fold-slider::-webkit-slider-thumb:active {
