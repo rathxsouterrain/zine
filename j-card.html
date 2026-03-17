@@ -730,6 +730,130 @@ nav.nav-show { transform: translateY(0); }
         transform-origin: top left;
         transform: scale(0.628571); /* 220/350 = 0.628571 */
     }
+    /* ============================================
+   EFEK KACA REALISTIS - TAMBAHAN BARU
+   ============================================ */
+
+/* Base glass effect untuk semua faces */
+.cas-face {
+    background: linear-gradient(135deg, 
+        rgba(255,255,255,0.4) 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        rgba(255,255,255,0.3) 100%) !important;
+    backdrop-filter: blur(0px) !important;
+    -webkit-backdrop-filter: blur(0px) !important;
+    box-shadow: 
+        inset 0 0 30px rgba(255,255,255,0.6),
+        inset 2px 2px 15px rgba(255,255,255,0.4),
+        inset -2px -2px 15px rgba(0,0,0,0.1),
+        0 0 20px rgba(255,255,255,0.3),
+        0 0 40px rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+}
+
+/* Front face - kaca paling bening */
+.cas-front {
+    background: linear-gradient(135deg, 
+        rgba(255,255,255,0.5) 0%, 
+        rgba(255,255,255,0.2) 40%, 
+        rgba(255,255,255,0.1) 60%,
+        rgba(255,255,255,0.4) 100%) !important;
+    box-shadow: 
+        inset 0 0 40px rgba(255,255,255,0.8),
+        inset 3px 3px 20px rgba(255,255,255,0.5),
+        inset -3px -3px 20px rgba(0,0,0,0.15),
+        0 0 30px rgba(255,255,255,0.4),
+        0 0 60px rgba(255,255,255,0.2) !important;
+}
+
+/* Back face */
+.cas-back {
+    background: linear-gradient(225deg, 
+        rgba(255,255,255,0.45) 0%, 
+        rgba(255,255,255,0.15) 50%, 
+        rgba(255,255,255,0.35) 100%) !important;
+}
+
+/* Side faces - efek kaca tipis */
+.cas-right, .cas-left {
+    background: linear-gradient(to right, 
+        rgba(255,255,255,0.3) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.25) 100%) !important;
+    box-shadow: 
+        inset -10px 0 30px rgba(255,255,255,0.4),
+        0 0 15px rgba(255,255255,255,0.2) !important;
+}
+
+.cas-left {
+    background: linear-gradient(to left, 
+        rgba(255,255,255,0.3) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.25) 100%) !important;
+    box-shadow: 
+        inset 10px 0 30px rgba(255,255,255,0.4),
+        0 0 15px rgba(255,255,255,0.2) !important;
+}
+
+/* Top dan Bottom */
+.cas-top, .cas-bottom {
+    background: linear-gradient(to top, 
+        rgba(255,255,255,0.25) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.2) 100%) !important;
+    box-shadow: 
+        inset 0 -10px 30px rgba(255,255,255,0.4),
+        0 0 15px rgba(255,255,255,0.2) !important;
+}
+
+.cas-bottom {
+    background: linear-gradient(to bottom, 
+        rgba(255,255,255,0.25) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.2) 100%) !important;
+    box-shadow: 
+        inset 0 10px 30px rgba(255,255,255,0.4),
+        0 0 15px rgba(255,255,255,0.2) !important;
+}
+
+/* Inner glow untuk depth */
+.cas-face::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        ellipse at 30% 20%,
+        rgba(255,255,255,0.4) 0%,
+        transparent 50%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Tambahan reflection */
+.cas-face::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255,255,255,0.3) 45%,
+        rgba(255,255,255,0.5) 50%,
+        rgba(255,255,255,0.3) 55%,
+        transparent 60%
+    );
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.6;
+}
+
 </style>
 </head>
 <body>
@@ -1836,6 +1960,77 @@ function uploadStickerLabel(input, side) {
             btn.disabled = false;
         }
     }
+    // ============================================
+// EFEK KACA INTERAKTIF - REFLECTION DYNAMIC
+// ============================================
+
+(function initGlassEffect() {
+    const casWrapper = document.getElementById('cas-object');
+    const casFaces = document.querySelectorAll('.cas-face');
+    
+    if (!casWrapper || casFaces.length === 0) return;
+    
+    // Update reflection berdasarkan rotasi
+    function updateGlassReflection() {
+        const style = window.getComputedStyle(casWrapper);
+        const matrix = new WebKitCSSMatrix(style.transform);
+        
+        // Extract rotation Y dari matrix
+        const rotateY = Math.atan2(matrix.m13, matrix.m11) * (180 / Math.PI);
+        const rotateX = Math.atan2(-matrix.m23, Math.sqrt(matrix.m21 * matrix.m21 + matrix.m22 * matrix.m22)) * (180 / Math.PI);
+        
+        // Update gradient reflection pada setiap face
+        casFaces.forEach((face, index) => {
+            const intensity = Math.abs(rotateY % 360) / 360;
+            const shine = 0.3 + (intensity * 0.4);
+            
+            // Dynamic shine effect
+            face.style.setProperty('--shine-opacity', shine);
+            
+            // Subtle color shift berdasarkan angle
+            const hue = 200 + (intensity * 20); // Blue-ish tint
+            face.style.filter = `hue-rotate(${intensity * 10}deg)`;
+        });
+    }
+    
+    // Observer untuk rotasi
+    const observer = new MutationObserver(updateGlassReflection);
+    observer.observe(casWrapper, { 
+        attributes: true, 
+        attributeFilter: ['style'] 
+    });
+    
+    // Update saat drag
+    let ticking = false;
+    casWrapper.addEventListener('transitionend', updateGlassReflection);
+    
+    // Initial update
+    updateGlassReflection();
+    
+    // Tambahan: Mouse move untuk efek parallax reflection
+    const casScene = document.getElementById('cas-scene');
+    if (casScene) {
+        casScene.addEventListener('mousemove', (e) => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const rect = casScene.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    
+                    casFaces.forEach(face => {
+                        const moveX = (x - 0.5) * 20;
+                        const moveY = (y - 0.5) * 20;
+                        face.style.backgroundPosition = `${50 + moveX}% ${50 + moveY}%`;
+                    });
+                    
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    }
+})();
+
 </script>
 </body>
 </html>
