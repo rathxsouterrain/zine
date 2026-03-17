@@ -819,38 +819,84 @@ nav.nav-show { transform: translateY(0); }
 
 .fold-controls {
     width: 100%;
-    max-width: 400px;        /* Dari 500px → 400px */
-    margin: 10px auto;       /* Dari 20px → 10px */
-    padding: 12px 15px;      /* Dari 20px → 12px */
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;     /* Dari 20px → 12px */
+    max-width: 450px;        /* Lebar cukup */
+    margin: 15px auto;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
     box-sizing: border-box;
+    user-select: none;       /* Mencegah text selection saat drag */
+    -webkit-user-select: none;
 }
 
 .fold-controls label {
-    font-size: 11px;         /* Dari 14px → 11px */
-    margin-bottom: 8px;      /* Dari 15px → 8px */
+    font-size: 12px;
+    margin-bottom: 12px;
     letter-spacing: 1.5px;
 }
 
+/* ⭐ TRACK - cukup tinggi untuk mudah di-tap */
 .fold-slider {
-    height: 4px;             /* Dari 8px → 4px */
+    width: 100%;
+    height: 8px;               /* Dari 4px → 8px */
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
 }
 
+/* ⭐ THUMB - cukup besar untuk mudah di-drag */
 .fold-slider::-webkit-slider-thumb {
-    width: 16px;             /* Dari 24px → 16px */
-    height: 16px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;               /* Dari 16px → 22px */
+    height: 22px;              /* Dari 16px → 22px */
+    border-radius: 50%;
+    background: #00ff96;
+    cursor: grab;              /* Cursor grab */
+    box-shadow: 
+        0 2px 8px rgba(0, 255, 150, 0.4),
+        0 0 0 4px rgba(0, 255, 150, 0.1);  /* Ring glow */
+    transition: transform 0.15s ease;
+    margin-top: -7px;          /* Center di track */
+}
+
+.fold-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 
+        0 4px 12px rgba(0, 255, 150, 0.5),
+        0 0 0 6px rgba(0, 255, 150, 0.15);
+}
+
+.fold-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+/* Firefox */
+.fold-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #00ff96;
+    cursor: grab;
+    border: none;
+    box-shadow: 
+        0 2px 8px rgba(0, 255, 150, 0.4),
+        0 0 0 4px rgba(0, 255, 150, 0.1);
 }
 
 .fold-labels {
-    font-size: 10px;         /* Dari 12px → 10px */
-    margin-top: 6px;         /* Dari 10px → 6px */
+    font-size: 11px;
+    margin-top: 10px;
 }
 
 #foldValue {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .fold-controls-inline {
