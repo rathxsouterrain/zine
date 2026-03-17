@@ -1544,63 +1544,42 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // 2. UPDATE TEKSTUR 3D (MEMBUATNYA SEAMLESS / MENYATU)
+        // 2. UPDATE TEKSTUR 3D KHUSUS BAGIAN DALAM (INNER) AGAR SEAMLESS
         // Total Lebar: Back(254) + Spine(127) + Front(650) = 1031px
         const bgSize = "1031px 1020px";
         
-        // FRONT COVER (Letaknya di paling kanan setelah Back dan Spine)
-        const frontOuter = document.getElementById('3d-front-outer');
-        if(frontOuter) {
-            frontOuter.style.backgroundImage = imgUrl;
-            frontOuter.style.backgroundSize = bgSize;
-            frontOuter.style.backgroundPosition = "-381px 0"; // Geser X sejauh 254 + 127 = 381px
-        }
-
-        // SPINE COVER (Letaknya di tengah setelah Back)
-        const spineOuter = document.getElementById('3d-spine-outer');
-        if(spineOuter) {
-            spineOuter.style.backgroundImage = imgUrl;
-            spineOuter.style.backgroundSize = bgSize;
-            spineOuter.style.backgroundPosition = "-254px 0"; // Geser X sejauh 254px
-        }
-
-        // BACK COVER (Letaknya di paling kiri, tidak ada pergeseran)
-        const backOuter = document.getElementById('3d-back-outer');
-        if(backOuter) {
-            backOuter.style.backgroundImage = imgUrl;
-            backOuter.style.backgroundSize = bgSize;
-            backOuter.style.backgroundPosition = "0px 0px"; 
-        }
-
-        // 3. UPDATE INNER FACES (Bagian dalam kaset)
+        // Front Inner (Sisi kanan dari gambar fullwrap)
         const frontInner = document.getElementById('3d-front-inner');
         if(frontInner) {
             frontInner.style.backgroundImage = imgUrl;
             frontInner.style.backgroundSize = bgSize;
-            frontInner.style.backgroundPosition = "-381px 0";
-            frontInner.style.transform = "scaleX(-1)"; // Mirror
+            frontInner.style.backgroundPosition = "-381px 0"; // Digeser 254 (Back) + 127 (Spine)
+            frontInner.style.transform = "scaleX(-1)"; // Mirror dipertahankan
         }
         
+        // Spine Inner (Bagian tengah dari gambar fullwrap)
         const spineInner = document.getElementById('3d-spine-inner');
         if(spineInner) {
             spineInner.style.backgroundImage = imgUrl;
             spineInner.style.backgroundSize = bgSize;
-            spineInner.style.backgroundPosition = "-254px 0";
-            spineInner.style.transform = "scaleX(-1)"; // Mirror
+            spineInner.style.backgroundPosition = "-254px 0"; // Digeser 254 (Back)
+            spineInner.style.transform = "scaleX(-1)";
         }
         
+        // Back Inner (Sisi kiri dari gambar fullwrap)
         const backInner = document.getElementById('3d-back-inner');
         if(backInner) {
             backInner.style.backgroundImage = imgUrl;
             backInner.style.backgroundSize = bgSize;
-            backInner.style.backgroundPosition = "0px 0px";
-            backInner.style.transform = "scaleX(-1)"; // Mirror
+            backInner.style.backgroundPosition = "0px 0px"; // Paling kiri, tidak digeser
+            backInner.style.transform = "scaleX(-1)";
         }
+
+        // Catatan: Bagian OUTER sama sekali tidak disentuh di sini 
+        // agar fitur upload satu-satu tetap berfungsi normal.
     };
     reader.readAsDataURL(file);
 }
-
-
 
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
