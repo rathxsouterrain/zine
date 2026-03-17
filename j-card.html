@@ -787,6 +787,71 @@ nav.nav-show { transform: translateY(0); }
 }
 
 
+/* ============================================
+   OVERRIDE KACA TRANSPARAN WARNA - MINIMAL
+   ============================================ */
+
+/* CSS Variables untuk warna kaca */
+:root {
+    --glassR: 255;
+    --glassG: 255;
+    --glassB: 255;
+}
+
+/* Semua face kaca - transparan dengan tint warna */
+.cas-front {
+    background: linear-gradient(135deg, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.5) 0%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.2) 50%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.3) 100%) !important;
+}
+
+.cas-back {
+    background: linear-gradient(225deg, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.4) 0%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.15) 50%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.35) 100%) !important;
+}
+
+.cas-right {
+    background: linear-gradient(to right, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.25) 0%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.08) 50%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.2) 100%) !important;
+}
+
+.cas-left {
+    background: linear-gradient(to left, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.25) 0%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.08) 50%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.2) 100%) !important;
+}
+
+.cas-top {
+    background: linear-gradient(to top, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.2) 0%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.05) 50%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.15) 100%) !important;
+}
+
+.cas-bottom {
+    background: linear-gradient(to bottom, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.2) 0%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.05) 50%, 
+        rgba(var(--glassR), var(--glassG), var(--glassB), 0.15) 100%) !important;
+}
+
+/* Hapus backdrop filter dari semua face */
+.cas-face,
+.cas-front,
+.cas-back,
+.cas-right,
+.cas-left,
+.cas-top,
+.cas-bottom {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
 
 
 </style>
@@ -1551,22 +1616,24 @@ function updateLabelFont() {
     const canvasCol = document.getElementById('lblCanvasColor').value;
     const textCol = document.getElementById('lblTextColor').value;
 
-    // Convert hex ke RGB
+    // Convert hex ke RGB untuk kaca
     const r = parseInt(shellCol.slice(1,3), 16);
     const g = parseInt(shellCol.slice(3,5), 16);
     const b = parseInt(shellCol.slice(5,7), 16);
     
-    // Update CSS variable untuk tint kaca - TETAP TRANSPARAN
-    document.documentElement.style.setProperty('--glassTint', `${r}, ${g}, ${b}`);
-    // Opacity tetap sama (tidak berubah), jadi tetap transparan
+    // Update CSS variables - kaca tetap transparan
+    document.documentElement.style.setProperty('--glassR', r);
+    document.documentElement.style.setProperty('--glassG', g);
+    document.documentElement.style.setProperty('--glassB', b);
     
-    // Update label canvas (ini solid, bukan kaca)
+    // Label canvas (solid)
     document.getElementById('canvas-sideA').style.backgroundColor = canvasCol;
     document.getElementById('canvas-sideB').style.backgroundColor = canvasCol;
     document.querySelectorAll('.label-text').forEach(el => el.style.color = textCol);
 
     syncLabelTo3D();
 }
+
 
     function darkenColor(color, percent) {
         const num = parseInt(color.replace("#",""), 16),
