@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -380,14 +379,28 @@ nav.nav-show { transform: translateY(0); }
     transform: rotateY(-90deg); 
 }
 
-/* Bagian Inner yang harus menampung FULL WARP */
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background-color: #ffffff;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.face.outer { 
+    transform: rotateY(0deg); 
+    z-index: 2;
+}
+
 .face.inner { 
     transform: rotateY(180deg); 
     z-index: 1;
-    /* Jika ini adalah bagian dalam J-Card yang dibuka full */
-    width: 1031px; 
-    height: 1020px;
-    left: 0; /* Sesuaikan posisi anchor-nya */
 }
 
 .inner-texture {
@@ -395,17 +408,22 @@ nav.nav-show { transform: translateY(0); }
     height: 100%;
     background-color: #f4f4f4;
     background-repeat: no-repeat;
-    /* Ganti COVER menjadi 100% 100% agar tidak terpotong */
-    background-size: 100% 100%; 
+    background-size: cover;
     background-position: center;
 }
 
-/* Pastikan container utama jcard-3d-object punya dimensi dasar */
-#jcard-3d-object {
-    width: 442px; /* Contoh lebar Front saja */
-    height: 1020px;
-    position: relative;
-    transform-style: preserve-3d;
+/* Background positioning untuk inner faces */
+#3d-front-inner { 
+    background-size: 1031px 1020px; 
+    background-position: left center; 
+}
+#3d-spine-inner { 
+    background-size: 1031px 1020px; 
+    background-position: -650px center; 
+}
+#3d-back-inner  { 
+    background-size: 1031px 1020px; 
+    background-position: right center; 
 }
 
 /* ============================
@@ -924,7 +942,6 @@ nav.nav-show { transform: translateY(0); }
 
     <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
     <div class="scene-3d">
-        <div id="jcard-3d-container">
         <div class="jcard-3d-wrapper" id="jcard-3d-object">
             <div class="panel front-panel">
                 <div class="face outer front-outer" id="3d-front-outer">
@@ -1430,24 +1447,22 @@ function handleFullWrap(input) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        const imageData = e.target.result;
-
-        // 1. Sinkron ke Canvas Editor
-        const canvasFull = document.getElementById("jcard-canvas-full");
-        if (canvasFull) {
-            canvasFull.style.backgroundImage = `url(${imageData})`;
-            canvasFull.style.backgroundSize = "100% 100%";
+        const fullCanvas = document.getElementById("jcard-canvas-full");
+        if (fullCanvas) {
+            fullCanvas.style.backgroundImage = "url(" + e.target.result + ")";
+            fullCanvas.style.backgroundSize = "cover";
+            fullCanvas.style.backgroundPosition = "center";
         }
 
-        // 2. Sinkron ke 3D Preview (Gunakan querySelector ke class CSS Anda)
-        const innerTexture = document.querySelector('.face.inner .inner-texture');
-        if (innerTexture) {
-            innerTexture.style.backgroundImage = `url(${imageData})`;
-            innerTexture.style.backgroundSize = "100% 100%"; // WAJIB 100% agar pas
-            innerTexture.style.backgroundPosition = "center";
-        } else {
-            console.error("Elemen .inner-texture tidak ditemukan!");
-        }
+        // UPDATE TEKSTUR 3D UNTUK BAGIAN DALAM (FULL WRAP)
+        const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
+        innerIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundSize = "1031px 1020px";
+            }
+        });
     };
     reader.readAsDataURL(file);
 }
