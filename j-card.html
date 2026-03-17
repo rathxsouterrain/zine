@@ -414,18 +414,19 @@ nav.nav-show { transform: translateY(0); }
 }
 
 /* Background positioning untuk inner faces */
+/* Background positioning untuk bagian dalam agar nyambung */
 #3d-front-inner { 
-    background-size: 1031px 1020px; 
-    background-position: left center; 
+    background-position: 0px center; 
 }
 #3d-spine-inner { 
-    background-size: 1031px 1020px; 
+    /* Geser sebanyak lebar front cover (650px) */
     background-position: -650px center; 
 }
 #3d-back-inner  { 
-    background-size: 1031px 1020px; 
-    background-position: right center; 
+    /* Geser sebanyak lebar front + spine (650 + 127 = 777px) */
+    background-position: -777px center; 
 }
+
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -1449,9 +1450,12 @@ function handleFullWrap(input) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const fullCanvas = document.getElementById("jcard-canvas-full");
+        const imageData = e.target.result;
+
         if (fullCanvas) {
-            fullCanvas.style.backgroundImage = "url(" + e.target.result + ")";
-            fullCanvas.style.backgroundSize = "cover";
+            fullCanvas.style.backgroundImage = "url(" + imageData + ")";
+            // Gunakan 100% 100% agar paksa mengikuti ukuran canvas
+            fullCanvas.style.backgroundSize = "100% 100%"; 
             fullCanvas.style.backgroundPosition = "center";
         }
 
@@ -1460,13 +1464,16 @@ function handleFullWrap(input) {
         innerIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
-                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundImage = "url(" + imageData + ")";
+                // PENTING: Gunakan 1031px (total lebar canvas) agar posisi background-position (negatif) bekerja tepat
                 el.style.backgroundSize = "1031px 1020px";
+                el.style.backgroundRepeat = "no-repeat";
             }
         });
     };
     reader.readAsDataURL(file);
 }
+
 
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
