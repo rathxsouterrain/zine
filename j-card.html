@@ -412,21 +412,58 @@ nav.nav-show { transform: translateY(0); }
     background-position: center;
 }
 
-/* Full wrap 3D - satu gambar menyatu */
+/* ============================================
+   FULL WRAP 3D - GAMBAR UTUH MENYATU
+   ============================================ */
+
+/* Reset semua face */
 #3d-front-outer, #3d-front-inner,
-#3d-spine-outer, #3d-spine-inner, 
+#3d-spine-outer, #3d-spine-inner,
 #3d-back-outer, #3d-back-inner {
-    background-size: 1031px 1020px !important;
+    background-color: white !important;
     background-repeat: no-repeat !important;
-    background-color: white;
+    background-size: 1031px 1020px !important;
 }
 
-/* Hapus transform scaleX(-1) default, biarkan gambar utuh */
+/* FRONT COVER (kanan) - offset 381px */
+#3d-front-outer {
+    background-position: -381px center !important;
+}
+#3d-front-inner {
+    background-position: -381px center !important;
+}
+
+/* SPINE (tengah) - offset 254px */
+/* Penting: spine di dalam front, jadi posisi relatif terhadap parent */
+#3d-spine-outer {
+    background-position: -254px center !important;
+}
+#3d-spine-inner {
+    background-position: -254px center !important;
+}
+
+/* BACK COVER (kiri) - offset 0px */
+/* Back di dalam spine yang di dalam front */
+#3d-back-outer {
+    background-position: left center !important;
+}
+#3d-back-inner {
+    background-position: left center !important;
+}
+
+/* Hapus mirror effect yang mengacaukan */
 .face.inner .inner-texture {
-    /* transform: scaleX(-1); */ /* DIHAPUS - biarkan gambar normal */
+    transform: none !important;
 }
 
-
+/* Pastikan panel tidak saling menutupi */
+.panel {
+    overflow: visible !important;
+}
+.face {
+    overflow: hidden !important;
+    backface-visibility: hidden !important;
+}
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -1451,7 +1488,7 @@ function handleFullWrap(input) {
     reader.onload = (e) => {
         const imageUrl = e.target.result;
         
-        // 1. Update canvas 2D full wrap
+        // Update canvas 2D
         const fullCanvas = document.getElementById("jcard-canvas-full");
         if (fullCanvas) {
             fullCanvas.style.backgroundImage = "url(" + imageUrl + ")";
@@ -1459,10 +1496,42 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // 2. Update 3D Preview - SATU GAMBAR UTUH YANG MENYELURUH
+        // Update 3D - pakai teknik background positioning
         applyFullWrapTo3D(imageUrl);
     };
     reader.readAsDataURL(file);
+}
+
+function applyFullWrapTo3D(imageUrl) {
+    // Elemen target
+    const faces = [
+        '3d-front-outer', '3d-front-inner',
+        '3d-spine-outer', '3d-spine-inner', 
+        '3d-back-outer', '3d-back-inner'
+    ];
+    
+    // Set semua ke gambar yang sama dulu
+    faces.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.style.backgroundImage = "url(" + imageUrl + ")";
+        }
+    });
+    
+    // Setelah image load, pastikan positioning benar
+    const img = new Image();
+    img.onload = function() {
+        // Force repaint dengan trigger reflow
+        faces.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.display = 'none';
+                el.offsetHeight; // Trigger reflow
+                el.style.display = '';
+            }
+        });
+    };
+    img.src = imageUrl;
 }
 
 // FUNGSI BARU: Apply gambar full wrap ke 3D sebagai satu kesatuan utuh
