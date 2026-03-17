@@ -412,22 +412,13 @@ nav.nav-show { transform: translateY(0); }
     background-position: center;
 }
 
-/* Full wrap 3D - satu gambar utuh di semua sisi */
-#3d-front-inner,
-#3d-spine-inner,
-#3d-back-inner {
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
+/* Reset semua background - HAPUS !important */
+#3d-front-outer, #3d-front-inner,
+#3d-spine-outer, #3d-spine-inner,
+#3d-back-outer, #3d-back-inner {
+    background-color: white;
+    /* Biarkan JavaScript handle background-size, position, repeat */
 }
-
-/* Mirror untuk inner faces */
-#3d-front-inner,
-#3d-spine-inner,
-#3d-back-inner {
-}
-
-
 
 /* ============================
    TEXT 3D STYLES - BARU
@@ -1465,7 +1456,6 @@ function handleFullWrap(input) {
     };
     reader.readAsDataURL(file);
 }
-
 function applyFullWrapTo3D(imageUrl) {
     const img = new Image();
     img.onload = function() {
@@ -1475,26 +1465,49 @@ function applyFullWrapTo3D(imageUrl) {
         mainCanvas.height = 1020;
         const ctx = mainCanvas.getContext('2d');
         
-        // Draw gambar ke canvas dengan ukuran exact
+        // Draw gambar ke canvas
         ctx.drawImage(img, 0, 0, 1031, 1020);
         
         // SLICE 1: BACK COVER (0, 0, 254, 1020) - bagian kiri
-        const backCanvas = sliceCanvas(ctx, 0, 0, 254, 1020);
-        applyToFace('3d-back-outer', backCanvas);
-        applyToFace('3d-back-inner', backCanvas);
+        const backCanvas = document.createElement('canvas');
+        backCanvas.width = 254;
+        backCanvas.height = 1020;
+        backCanvas.getContext('2d').drawImage(mainCanvas, 0, 0, 254, 1020, 0, 0, 254, 1020);
         
-        // SLICE 2: SPINE (254, 0, 127, 1020) - bagian tengah  
-        const spineCanvas = sliceCanvas(ctx, 254, 0, 127, 1020);
-        applyToFace('3d-spine-outer', spineCanvas);
-        applyToFace('3d-spine-inner', spineCanvas);
+        // SLICE 2: SPINE (254, 0, 127, 1020) - bagian tengah
+        const spineCanvas = document.createElement('canvas');
+        spineCanvas.width = 127;
+        spineCanvas.height = 1020;
+        spineCanvas.getContext('2d').drawImage(mainCanvas, 254, 0, 127, 1020, 0, 0, 127, 1020);
         
         // SLICE 3: FRONT COVER (381, 0, 650, 1020) - bagian kanan
-        const frontCanvas = sliceCanvas(ctx, 381, 0, 650, 1020);
-        applyToFace('3d-front-outer', frontCanvas);
-        applyToFace('3d-front-inner', frontCanvas);
+        const frontCanvas = document.createElement('canvas');
+        frontCanvas.width = 650;
+        frontCanvas.height = 1020;
+        frontCanvas.getContext('2d').drawImage(mainCanvas, 381, 0, 650, 1020, 0, 0, 650, 1020);
+        
+        // Apply ke faces
+        applyToFace('3d-back-outer', backCanvas.toDataURL());
+        applyToFace('3d-back-inner', backCanvas.toDataURL());
+        applyToFace('3d-spine-outer', spineCanvas.toDataURL());
+        applyToFace('3d-spine-inner', spineCanvas.toDataURL());
+        applyToFace('3d-front-outer', frontCanvas.toDataURL());
+        applyToFace('3d-front-inner', frontCanvas.toDataURL());
     };
     img.src = imageUrl;
 }
+
+function applyToFace(elementId, dataUrl) {
+    const face = document.getElementById(elementId);
+    if(face) {
+        face.style.backgroundImage = "url(" + dataUrl + ")";
+        face.style.backgroundSize = "cover";
+        face.style.backgroundPosition = "center";
+        face.style.backgroundRepeat = "no-repeat";
+        face.style.backgroundColor = "white";
+    }
+}
+
 
 function sliceCanvas(sourceCtx, x, y, width, height) {
     const canvas = document.createElement('canvas');
