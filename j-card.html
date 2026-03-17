@@ -1534,42 +1534,72 @@ function handleFullWrap(input) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+        const imgUrl = "url(" + e.target.result + ")";
+        
+        // 1. UPDATE CANVAS 2D FULL WRAP
         const fullCanvas = document.getElementById("jcard-canvas-full");
         if (fullCanvas) {
-            fullCanvas.style.backgroundImage = "url(" + e.target.result + ")";
+            fullCanvas.style.backgroundImage = imgUrl;
             fullCanvas.style.backgroundSize = "cover";
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI (TANPA SPLIT)
-        const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
-        const outerIds = ['3d-front-outer', '3d-spine-outer', '3d-back-outer'];
+        // 2. UPDATE TEKSTUR 3D (MEMBUATNYA SEAMLESS / MENYATU)
+        // Total Lebar: Back(254) + Spine(127) + Front(650) = 1031px
+        const bgSize = "1031px 1020px";
         
-        // Apply ke semua inner faces (full image, sama persis)
-        innerIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.backgroundImage = "url(" + e.target.result + ")";
-                el.style.backgroundSize = "cover"; // Full cover, tidak terpotong
-                el.style.backgroundPosition = "center center";
-                el.style.transform = "scaleX(-1)"; // Mirror untuk bagian dalam
-            }
-        });
+        // FRONT COVER (Letaknya di paling kanan setelah Back dan Spine)
+        const frontOuter = document.getElementById('3d-front-outer');
+        if(frontOuter) {
+            frontOuter.style.backgroundImage = imgUrl;
+            frontOuter.style.backgroundSize = bgSize;
+            frontOuter.style.backgroundPosition = "-381px 0"; // Geser X sejauh 254 + 127 = 381px
+        }
+
+        // SPINE COVER (Letaknya di tengah setelah Back)
+        const spineOuter = document.getElementById('3d-spine-outer');
+        if(spineOuter) {
+            spineOuter.style.backgroundImage = imgUrl;
+            spineOuter.style.backgroundSize = bgSize;
+            spineOuter.style.backgroundPosition = "-254px 0"; // Geser X sejauh 254px
+        }
+
+        // BACK COVER (Letaknya di paling kiri, tidak ada pergeseran)
+        const backOuter = document.getElementById('3d-back-outer');
+        if(backOuter) {
+            backOuter.style.backgroundImage = imgUrl;
+            backOuter.style.backgroundSize = bgSize;
+            backOuter.style.backgroundPosition = "0px 0px"; 
+        }
+
+        // 3. UPDATE INNER FACES (Bagian dalam kaset)
+        const frontInner = document.getElementById('3d-front-inner');
+        if(frontInner) {
+            frontInner.style.backgroundImage = imgUrl;
+            frontInner.style.backgroundSize = bgSize;
+            frontInner.style.backgroundPosition = "-381px 0";
+            frontInner.style.transform = "scaleX(-1)"; // Mirror
+        }
         
-        // Jika ingin outer juga sama (opsional), uncomment:
-        /*
-        outerIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.backgroundImage = "url(" + e.target.result + ")";
-                el.style.backgroundSize = "cover";
-                el.style.backgroundPosition = "center center";
-            }
-        });
-        */
+        const spineInner = document.getElementById('3d-spine-inner');
+        if(spineInner) {
+            spineInner.style.backgroundImage = imgUrl;
+            spineInner.style.backgroundSize = bgSize;
+            spineInner.style.backgroundPosition = "-254px 0";
+            spineInner.style.transform = "scaleX(-1)"; // Mirror
+        }
+        
+        const backInner = document.getElementById('3d-back-inner');
+        if(backInner) {
+            backInner.style.backgroundImage = imgUrl;
+            backInner.style.backgroundSize = bgSize;
+            backInner.style.backgroundPosition = "0px 0px";
+            backInner.style.transform = "scaleX(-1)"; // Mirror
+        }
     };
     reader.readAsDataURL(file);
 }
+
 
 
 window.addEventListener("load", () => {
