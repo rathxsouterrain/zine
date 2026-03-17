@@ -339,16 +339,6 @@ nav.nav-show { transform: translateY(0); }
 }
 .scene-3d:active { cursor: grabbing; }
 
-.panel {
-    position: absolute;
-    transform-style: preserve-3d;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-
-/* Posisi panel yang benar - semua sejajar sebagai sibling */
 .jcard-3d-wrapper {
     position: relative;
     width: 650px;
@@ -358,31 +348,36 @@ nav.nav-show { transform: translateY(0); }
     transition: transform 0.1s ease-out;
 }
 
-/* Front panel - di posisi 0 */
+.panel {
+    position: absolute;
+    transform-style: preserve-3d;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
 .front-panel {
     width: 650px;
     height: 1020px;
-    transform: translateZ(0);
+    transform-origin: left center;
 }
 
-/* Spine panel - di kiri front, rotate 90 derajat */
 .spine-panel {
     width: 127px;
     height: 1020px;
-    left: 0;
-    transform: translateX(-127px) rotateY(-90deg);
-    transform-origin: right center;
+    left: -127px;
+    transform-origin: right center; 
+    transform: rotateY(-90deg); 
 }
 
-/* Back panel - di belakang spine, rotate 90 derajat lagi */
 .back-panel {
     width: 254px;
     height: 1020px;
-    left: 0;
-    transform: translateX(-381px) rotateY(-90deg); /* -127 - 254 = -381 */
-    transform-origin: right center;
+    left: -254px;
+    transform-origin: right center; 
+    transform: rotateY(-90deg); 
 }
-
 
 .face {
     position: absolute;
@@ -1463,21 +1458,36 @@ function handleFullWrap(input) {
             fullCanvas.style.backgroundPosition = "center";
         }
 
-        // UPDATE TEKSTUR 3D - SATU GAMBAR FULL DI SEMUA INNER FACES
+        // UPDATE TEKSTUR 3D - FULL IMAGE DI SEMUA SISI (TANPA SPLIT)
         const innerIds = ['3d-front-inner', '3d-spine-inner', '3d-back-inner'];
+        const outerIds = ['3d-front-outer', '3d-spine-outer', '3d-back-outer'];
         
+        // Apply ke semua inner faces (full image, sama persis)
         innerIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.backgroundImage = "url(" + e.target.result + ")";
+                el.style.backgroundSize = "cover"; // Full cover, tidak terpotong
+                el.style.backgroundPosition = "center center";
+                el.style.transform = "scaleX(-1)"; // Mirror untuk bagian dalam
+            }
+        });
+        
+        // Jika ingin outer juga sama (opsional), uncomment:
+        /*
+        outerIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.style.backgroundImage = "url(" + e.target.result + ")";
                 el.style.backgroundSize = "cover";
                 el.style.backgroundPosition = "center center";
-                // Mirror dengan CSS, bukan di sini
             }
         });
+        */
     };
     reader.readAsDataURL(file);
 }
+
 
 window.addEventListener("load", () => {
     const nav = document.querySelector("nav");
