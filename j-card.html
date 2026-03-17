@@ -399,30 +399,32 @@ nav.nav-show { transform: translateY(0); }
     z-index: 2;
 }
 
-/* Menjadikan satu bidang besar yang menutupi seluruh area dalam */
-.full-wrap-inner-mesh {
-    position: absolute;
-    width: 1031px; /* Total lebar (650 + 127 + 254) */
-    height: 1020px;
-    /* Mirroring seluruh bidang */
-    transform: rotateY(180deg) scaleX(-1);
-    transform-origin: left;
-    backface-visibility: hidden;
+.face.inner { 
+    transform: rotateY(180deg); 
+    z-index: 1;
 }
 
-#full-wrap-texture {
+.inner-texture {
     width: 100%;
     height: 100%;
+    background-color: #f4f4f4;
+    background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    /* Efek menyambung tanpa sekat */
-    border: none; 
-    outline: none;
 }
 
-/* Pastikan tidak ada border atau gap antar lipatan secara visual */
-#jcard-mesh div {
-    box-shadow: none !important;
+/* Background positioning untuk inner faces */
+#3d-front-inner { 
+    background-size: 1031px 1020px; 
+    background-position: left center; 
+}
+#3d-spine-inner { 
+    background-size: 1031px 1020px; 
+    background-position: -650px center; 
+}
+#3d-back-inner  { 
+    background-size: 1031px 1020px; 
+    background-position: right center; 
 }
 
 
