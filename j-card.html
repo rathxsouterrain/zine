@@ -982,6 +982,21 @@ nav.nav-show { transform: translateY(0); }
             </div>
         </div>
     </div>
+        <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
+        <p>DOWNLOAD DESIGN COVER</p>
+        <div class="button-group">
+            <button onclick="saveDesign('manual', 'jpg')">JPG</button>
+            <button onclick="saveDesign('manual', 'pdf')">PDF</button>
+        </div>
+
+        <p style="margin-top: 15px;">DOWNLOAD DESIGN BACK (FULL WRAP)</p>
+        <div class="button-group">
+            <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
+            <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
+        </div>
+
+        <button onclick="location.reload()" class="btn-reset" style="margin-top: 15px; width: 100%;">RESET DESIGN</button>
+    </div>
 <div class="label-maker-section">
     <div class="app-header"><h3>CASSETTE LABEL MAKER</h3></div>
     
@@ -1093,22 +1108,6 @@ nav.nav-show { transform: translateY(0); }
         </div>
     </div>
 </div>
-    <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
-        <p>DOWNLOAD DESIGN COVER</p>
-        <div class="button-group">
-            <button onclick="saveDesign('manual', 'jpg')">JPG</button>
-            <button onclick="saveDesign('manual', 'pdf')">PDF</button>
-        </div>
-
-        <p style="margin-top: 15px;">DOWNLOAD DESIGN BACK (FULL WRAP)</p>
-        <div class="button-group">
-            <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
-            <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
-        </div>
-
-        <button onclick="location.reload()" class="btn-reset" style="margin-top: 15px; width: 100%;">RESET DESIGN</button>
-    </div>
-
 <script>
 const fontList = [
     "Archivo Black", "Bebas Neue", "Anton", "Orbitron", "Russo One", "Kanit", "Montserrat", "Oswald", "Teko", "Rajdhani",
