@@ -380,17 +380,37 @@ nav.nav-show { transform: translateY(0); }
     transform: rotateY(-90deg); 
 }
 
-.full-inner-area {
+.face {
     position: absolute;
-    width: 1031px; /* Harus sama dengan lebar canvas editor */
-    height: 1020px;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background-color: #ffffff;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(0,0,0,0.1);
     top: 0;
     left: 0;
-    /* Mirror agar posisi lipatan pas saat kaset diputar */
-    transform: rotateY(180deg) scaleX(-1);
-    transform-origin: left;
-    backface-visibility: hidden;
+    overflow: hidden;
+}
+
+.face.outer { 
+    transform: rotateY(0deg); 
+    z-index: 2;
+}
+
+.face.inner { 
+    transform: rotateY(180deg); 
+    z-index: 1;
+}
+
+.inner-texture {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
     background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 .inner-texture {
     width: 100%;
