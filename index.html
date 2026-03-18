@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta timestamp="2026-03-18 03:56" />
+    <title>belumtidur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 40px;
+            max-width: 600px;
+        }
+        
+        h1 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-bottom: 8px;
+        }
+        
+        .meta {
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #333;
+            background: transparent;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: #fff;
+            color: #000;
+        }
+        
+        .footer {
+            margin-top: 60px;
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 40px;
+        }
+        
+        /* AUDIO PLAYER */
+        .audio-section {
+            border-top: 1px solid #555;
+            padding-top: 30px;
+        }
+        
+        .audio-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 16px;
+            text-transform: lowercase;
+        }
+        
+        .audio-player {
+            width: 100%;
+            background: #222;
+            border: 1px solid #666;
+            padding: 20px;
+        }
+        
+        audio {
+            width: 100%;
+            height: 40px;
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background: #222;
+        }
+        
+        audio::-webkit-media-controls-play-button {
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display {
+            color: #fff;
+        }
+        
+        .now-playing {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>WEDGE TOMB</h1>
+    <div class="meta"> archive / est. 2024</div>
+    
+    <button class="btn" onclick="location.href='#zine'">read zine</button>
+    <button class="btn" onclick="location.href='#jcard'">j-card</button>
+    
+    <div class="footer">03:56 AM</div>
+    
+    <div class="audio-section">
+        <div class="audio-label">// recording_03-56.mp3</div>
+        <div class="audio-player">
+            <audio controls autoplay loop>
+                <source src="recording.mp3" type="audio/mpeg">
+                browser tidak support audio
+            </audio>
+            <div class="now-playing">▶ now playing</div>
+        </div>
+    </div>
+
+</body>
+</html>
