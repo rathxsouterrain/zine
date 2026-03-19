@@ -674,6 +674,28 @@ transform:scale(0.95);
     justify-content: center;
     perspective: 1000px; /* Persiapan untuk efek fisik */
 }
+.viewer-background {
+    background-color: #1a2a23; /* Hijau Deep Cutting Mat */
+    background-image: 
+        /* Garis Grid Kecil (5mm) */
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+        /* Garis Grid Besar (25mm) */
+        linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+    background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+    background-position: center;
+    
+    /* Tambahkan bayangan lembut di bawah zine agar terlihat mengambang */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.zine-image {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Efek kedalaman fisik */
+    border: 1px solid rgba(255,255,255,0.1);
+}
 
 </style>
 </head>
