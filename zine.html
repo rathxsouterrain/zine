@@ -28,6 +28,11 @@ background:#000;
 color:white;
 font-family:Arial, sans-serif;
 }
+    -webkit-user-select: none;  /* Safari */
+    -ms-user-select: none;      /* IE 10 dan Edge */
+    user-select: none;          /* Standard (Chrome, Firefox, Opera) */
+}
+
 
 /* NAVBAR */
 nav{
@@ -660,6 +665,7 @@ var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
 var bg = images[Math.floor(Math.random()*images.length)];
 document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </script>
+<body oncontextmenu="return false;">
 <div id="intro">
   <h id="introText">ZINE FLIPBOOK</h>
   <p id="introSub">digital underground archive</p>
