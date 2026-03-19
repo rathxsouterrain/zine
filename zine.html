@@ -659,6 +659,22 @@ border:none;
 transform:scale(0.95);
 
 }
+/* Container Utama Viewer */
+.viewer-container {
+    background-color: #1a2a23; /* Hijau tua khas cutting mat */
+    background-image: 
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90px, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.1) 2px, transparent 2px),
+        linear-gradient(90px, rgba(255,255,255,.1) 2px, transparent 2px);
+    background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+    /* Grid 10mm dan 50mm untuk kesan presisi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px; /* Persiapan untuk efek fisik */
+}
+
 </style>
 </head>
 <body>
@@ -1436,6 +1452,7 @@ const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
 document.getElementById("bgimg").src = randomBg;
 
 });
+
 
 </script>
 </body>
