@@ -188,44 +188,42 @@ transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 
 
 /* CONTAINER UTAMA - Background Meja Kerja Profesional */
+/* CONTAINER - Pake Absolute buat posisiin zine biar gak lari */
 #flipbook-container {
     display: none;
     position: fixed;
     inset: 0;
-    z-index: 99999 !important; /* Paksa paling depan */
-    background-color: #111 !important;
+    z-index: 9999 !important;
+    background-color: #0a0a0a !important;
     background-image: 
         radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 80%),
         url('https://www.transparenttextures.com/patterns/carbon-fibre.png') !important;
     background-blend-mode: overlay;
-    overflow: hidden;
-    touch-action: none;
 }
 
-/* FLIPBOOK - Efek Bayangan Tebal */
+/* FLIPBOOK - Jangan pake margin auto di sini, biarin turn.js yang ngatur */
 #flipbook {
-    margin: auto;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.9);
-    transform: perspective(2000px);
+    position: relative;
+    margin: 50px auto !important; /* Kasih jarak atas biar gak mentok */
+    box-shadow: 0 50px 100px rgba(0,0,0,0.9);
 }
 
-/* TOMBOL CLOSE - Harus Bisa Di-Klik */
+/* TOMBOL CLOSE - Harus di luar jangkauan klik turn.js */
 .close-btn {
     position: fixed !important;
-    bottom: 110px !important; /* Naikkan biar gak tabrakan sama navigasi */
+    bottom: 120px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 100000 !important; /* Lebih tinggi dari container */
-    padding: 12px 30px !important;
-    background: rgba(255, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 0, 0, 0.4) !important;
+    z-index: 10001 !important; /* Satu tingkat di atas panah */
+    padding: 10px 30px !important;
+    background: rgba(150, 0, 0, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     color: white !important;
-    font-size: 12px !important;
-    letter-spacing: 2px;
-    border-radius: 30px;
+    border-radius: 50px;
     cursor: pointer !important;
-    pointer-events: auto !important; /* WAJIB ADA agar bisa diklik */
-    backdrop-filter: blur(10px);
+    pointer-events: auto !important; /* INI KUNCINYA biar bisa diklik */
+    font-size: 11px;
+    letter-spacing: 2px;
 }
 
 .close-btn:hover {
@@ -1067,7 +1065,7 @@ async function openFlipbook(pdfUrl){
   const session = ++currentSession;
 
   const container = document.getElementById("flipbook-container");
-  container.style.display = "flex"; // Gunakan flex agar zine otomatis di tengah
+  container.style.display = "block"; // Gunakan flex agar zine otomatis di tengah
   container.style.alignItems = "center";
   container.style.justifyContent = "center";
 
