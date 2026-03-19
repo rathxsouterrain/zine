@@ -33,6 +33,13 @@ body {
     background-repeat: no-repeat;
     z-index: -1;
 }
+.profile-photo img {
+    /* ... kode yang sudah ada ... */
+    pointer-events: none;       /* Gambar tidak bisa di-klik/sentuh */
+    user-select: none;          /* Gambar tidak bisa di-select */
+    -webkit-user-drag: none;    /* Mencegah gambar ditarik (drag) */
+    touch-action: none;         /* Mematikan interaksi sentuh di mobile */
+}
 
 .gif-bg::after {
     content: "";
@@ -972,8 +979,8 @@ nav.nav-show { transform: translateY(0); }
     </nav>
     
     <div class="profile-photo">
-        <img src="profile2.png" alt="Profile" id="profileImg">
-    </div>
+    <img src="profile2.png" alt="Profile" id="profileImg" draggable="false">
+</div>
     
     <div class="gif-bg"></div>
     <div class="app-header"><h1>J-CARD MAKER</h1></div>
