@@ -187,55 +187,29 @@ transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 
-/* CONTAINER UTAMA - Background Meja Kerja Profesional */
-/* CONTAINER - Pake Absolute buat posisiin zine biar gak lari */
-#flipbook-container {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999 !important;
-    background-color: #0a0a0a !important;
-    background-image: 
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 80%),
-        url('https://www.transparenttextures.com/patterns/carbon-fibre.png') !important;
-    background-blend-mode: overlay;
+/* FLIPBOOK */
+#flipbook-container{
+display:none;
+position:fixed;
+inset:0;
+background:#000;
+z-index:2000;
 }
 
-/* FLIPBOOK - Jangan pake margin auto di sini, biarin turn.js yang ngatur */
-#flipbook {
-    position: relative;
-    margin: 50px auto !important; /* Kasih jarak atas biar gak mentok */
-    box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+#flipbook{ margin:auto; }
+
+#flipbook .page{
+background:#111;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-/* TOMBOL CLOSE - Harus di luar jangkauan klik turn.js */
-.close-btn {
-    position: fixed !important;
-    bottom: 120px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 10001 !important; /* Satu tingkat di atas panah */
-    padding: 10px 30px !important;
-    background: rgba(150, 0, 0, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: white !important;
-    border-radius: 50px;
-    cursor: pointer !important;
-    pointer-events: auto !important; /* INI KUNCINYA biar bisa diklik */
-    font-size: 11px;
-    letter-spacing: 2px;
+#flipbook canvas{
+  max-width:100%;
+  max-height:100%;
+  pointer-events: none;
 }
-
-.close-btn:hover {
-    background: rgba(255, 0, 0, 0.5) !important;
-}
-
-/* Navigasi Panah */
-.nav-arrows {
-    z-index: 100000 !important;
-}
-
-
 
 /* ===== READER UI ===== */
 .glass-ui{
@@ -685,6 +659,30 @@ border:none;
 transform:scale(0.95);
 
 }
+/* Tumpuk di bagian container utama zine lo */
+.viewer-container, [id*="viewer"], body {
+    background-color: #1a1a1a !important; /* Item-nya kita bikin bertekstur */
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 80%), /* Spot cahaya tengah */
+        url('https://www.transparenttextures.com/patterns/dark-matter.png') !important; /* Tekstur aspal/kertas kasar */
+    background-blend-mode: overlay !important;
+}
+
+/* Biar Zine lo gak nempel kaku kayak stiker murahan */
+.zine-image-wrapper img, img[class*="zine"] {
+    transform: rotateX(5deg) rotateY(-5deg) rotateZ(1deg) !important; /* Efek miring 3D */
+    box-shadow: 
+        -15px 15px 40px rgba(0,0,0,0.9), 
+        0 0 10px rgba(255,255,255,0.05) !important; /* Bayangan tebel biar ada dimensi */
+    border-radius: 2px !important;
+    transition: transform 0.3s ease !important;
+}
+
+/* Pas disentuh/hover, zine-nya "angkat" dikit */
+.zine-image-wrapper img:hover {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.02) !important;
+}
+
 
 </style>
 </head>
@@ -1061,107 +1059,124 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 }
 
   let currentSession = 0;
-let currentSession = 0;
+async function openFlipbook(pdfUrl){
 
-async function openFlipbook(pdfUrl) {
-  const session = ++currentSession;
-  
-  // Ambil elemen yang dibutuhkan
-  const container = document.getElementById("flipbook-container");
+  const session = ++currentSession; // 🔥 buat session baru
+
   const loading = document.getElementById("zine-loading");
-  const flipbookArea = document.getElementById("flipbook");
-
-  // Tampilkan loading & container
   loading.style.display = "flex";
+
+  const container = document.getElementById("flipbook-container");
   container.style.display = "block";
 
-  // Reset isi flipbook lama agar tidak menumpuk
-  if ($(flipbookArea).data("turn")) {
-    $(flipbookArea).turn("destroy");
-  }
-  flipbookArea.innerHTML = ''; 
+  const oldFlipbook = document.getElementById("flipbook");
 
-  // Musik Logic
-  const music = document.getElementById("bg-music");
+  if($(oldFlipbook).data("turn")){
+    $(oldFlipbook).turn("destroy");
+  }
+
+  const newFlipbook = document.createElement("div");
+  newFlipbook.id = "flipbook";
+  oldFlipbook.parentNode.replaceChild(newFlipbook, oldFlipbook);
+
+const music = document.getElementById("bg-music");
+  
   music.pause();
-  if(pdfUrl === "zine5.pdf") music.src = "music-zine5.mp3";
-  else if(pdfUrl === "zine6.pdf") music.src = "music-zine6.mp3";
-  else music.src = "music.mp3";
+  
+  if(pdfUrl === "zine5.pdf"){
+    music.src = "music-zine5.mp3";
+  }
+  else if(pdfUrl === "zine6.pdf"){
+    music.src = "music-zine6.mp3";
+  }
+  else{
+    music.src = "music.mp3"; // musik default untuk zine lain
+  }
   
   music.volume = 0.5;
-  music.play().catch(() => {});
+  music.currentTime = 0;
+  music.play().catch(()=>{});
 
-  try {
+  try{
+
     const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-    if (session !== currentSession) return;
+
+    // 🔥 kalau sudah bukan session aktif, hentikan
+    if(session !== currentSession) return;
 
     const total = pdf.numPages;
 
-    // Render setiap halaman PDF ke Canvas
-    for (let i = 1; i <= total; i++) {
-      if (session !== currentSession) return;
+    for(let i = 1; i <= total; i++){
+
+      if(session !== currentSession) return; // 🔥 stop kalau sudah close
 
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 2 });
 
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
+
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
 
       const div = document.createElement("div");
       div.className = "page";
       div.appendChild(canvas);
-      flipbookArea.appendChild(div);
+
+      newFlipbook.appendChild(div);
     }
 
-    // Setup Turn.js
     let isMobile = window.innerWidth <= 768;
+    let ratio = 1.414;
     let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
-    let pageHeight = pageWidth * 1.414;
+    let pageHeight = pageWidth * ratio;
 
-    $(flipbookArea).turn({
+    $(newFlipbook).turn({
       width: isMobile ? pageWidth : pageWidth * 2,
       height: pageHeight,
       autoCenter: true,
       display: isMobile ? "single" : "double",
-      duration: 1000
+      duration: 1200
     });
 
-    // Navigasi
-    document.getElementById("nextBtn").onclick = () => $(flipbookArea).turn("next");
-    document.getElementById("prevBtn").onclick = () => $(flipbookArea).turn("previous");
+    document.getElementById("nextBtn").onclick = () => {
+      $(newFlipbook).turn("next");
+    };
 
-    // Hilangkan loading setelah semua siap
-    loading.style.display = "none";
+    document.getElementById("prevBtn").onclick = () => {
+      $(newFlipbook).turn("previous");
+    };
 
-  } catch (err) {
-    console.error("Gagal buka PDF:", err);
+  }catch(err){
+    console.error(err);
+  }
+
+  if(session === currentSession){
     loading.style.display = "none";
   }
 }
 
-function closeFlipbook() {
-  currentSession++; // Stop proses render yang berjalan
-  
-  const container = document.getElementById("flipbook-container");
-  const loading = document.getElementById("zine-loading");
-  const music = document.getElementById("bg-music");
-  const flip = document.getElementById("flipbook");
+function closeFlipbook(){
 
+  currentSession++; // 🔥 batalkan semua proses lama
+
+  const music = document.getElementById("bg-music");
   music.pause();
   music.currentTime = 0;
 
-  if ($(flip).data("turn")) {
+  const flip = document.getElementById("flipbook");
+  if($(flip).data("turn")){
     $(flip).turn("destroy");
   }
-  
-  container.style.display = "none";
-  loading.style.display = "none";
-}
 
+  document.getElementById("flipbook-container").style.display="none";
+  document.getElementById("zine-loading").style.display="none";
+}
 function searchZine(){
   const input = document.getElementById("zineSearch").value.toLowerCase();
   const items = document.querySelectorAll(".zine-item");
