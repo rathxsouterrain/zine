@@ -659,11 +659,334 @@ border:none;
 transform:scale(0.95);
 
 }
+/* ===== BACKGROUND MEJA CUTTING MAT ===== */
+.desk-bg {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 45%;
+  background: 
+    /* Grid cutting mat pattern */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      rgba(255,255,255,0.03) 19px,
+      rgba(255,255,255,0.03) 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 19px,
+      rgba(255,255,255,0.03) 19px,
+      rgba(255,255,255,0.03) 20px
+    ),
+    /* Base cutting mat color - dark green */
+    linear-gradient(135deg, #1a2f1a 0%, #0f1f0f 100%);
+  z-index: 1999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Cutting mat border */
+.desk-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.1) 20%, 
+    rgba(255,255,255,0.2) 50%, 
+    rgba(255,255,255,0.1) 80%, 
+    transparent 100%
+  );
+}
+
+/* Random scattered items */
+.scattered-item {
+  position: absolute;
+  opacity: 0.15;
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
+/* Coffee cup stain */
+.coffee-stain {
+  width: 80px;
+  height: 80px;
+  border: 3px solid rgba(139, 90, 43, 0.2);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 15%;
+  left: 8%;
+}
+
+.coffee-stain::before {
+  content: "";
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(139, 90, 43, 0.15);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Pencil */
+.pencil {
+  width: 120px;
+  height: 8px;
+  background: linear-gradient(90deg, 
+    #f4d03f 0%, 
+    #f4d03f 70%, 
+    #e8e8e8 70%, 
+    #e8e8e8 85%, 
+    #333 85%
+  );
+  border-radius: 2px;
+  position: absolute;
+  bottom: 25%;
+  right: 15%;
+  transform: rotate(-25deg);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Eraser */
+.eraser {
+  width: 40px;
+  height: 20px;
+  background: linear-gradient(180deg, #ff6b6b 0%, #ee5a5a 100%);
+  border-radius: 3px;
+  position: absolute;
+  bottom: 35%;
+  left: 25%;
+  transform: rotate(15deg);
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Paper scraps */
+.paper-scrap {
+  width: 60px;
+  height: 80px;
+  background: rgba(255,255,255,0.08);
+  position: absolute;
+  bottom: 20%;
+  left: 60%;
+  transform: rotate(-10deg);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.paper-scrap::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  background: rgba(255,255,255,0.05);
+  top: -30px;
+  left: 20px;
+  transform: rotate(25deg);
+}
+
+/* Ruler */
+.ruler {
+  width: 200px;
+  height: 25px;
+  background: linear-gradient(180deg, 
+    rgba(200,200,200,0.15) 0%, 
+    rgba(180,180,180,0.1) 100%
+  );
+  border: 1px solid rgba(255,255,255,0.1);
+  position: absolute;
+  bottom: 10%;
+  right: 30%;
+  transform: rotate(5deg);
+}
+
+.ruler::before {
+  content: "|||||||||||||||||||||||||";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 8px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 6px;
+}
+
+/* Sticky notes */
+.sticky-note {
+  width: 50px;
+  height: 50px;
+  background: rgba(255,235,59,0.12);
+  position: absolute;
+  bottom: 40%;
+  right: 8%;
+  transform: rotate(8deg);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.sticky-note.yellow {
+  background: rgba(255,235,59,0.12);
+  bottom: 30%;
+  left: 45%;
+  transform: rotate(-5deg);
+}
+
+.sticky-note.pink {
+  background: rgba(233,30,99,0.1);
+  bottom: 15%;
+  right: 45%;
+  transform: rotate(12deg);
+}
+
+/* Pen/marker */
+.marker {
+  width: 100px;
+  height: 10px;
+  background: linear-gradient(90deg, 
+    #333 0%, 
+    #333 20%, 
+    #4ecdc4 20%, 
+    #4ecdc4 80%, 
+    #333 80%
+  );
+  border-radius: 5px;
+  position: absolute;
+  bottom: 28%;
+  left: 12%;
+  transform: rotate(35deg);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Paper clip */
+.paper-clip {
+  width: 30px;
+  height: 60px;
+  border: 3px solid rgba(192,192,192,0.2);
+  border-radius: 0 0 15px 15px;
+  border-top: none;
+  position: absolute;
+  bottom: 22%;
+  right: 22%;
+  transform: rotate(-15deg);
+}
+
+.paper-clip::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 30px;
+  border: 3px solid rgba(192,192,192,0.2);
+  border-radius: 0 0 10px 10px;
+  border-top: none;
+  top: 0;
+  left: 6px;
+}
+
+/* Wasabi tape roll */
+.washi-tape {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle at 30% 30%, transparent 30%, rgba(255,182,193,0.15) 30%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,182,193,0.1) 0px,
+      rgba(255,182,193,0.1) 5px,
+      rgba(255,255,255,0.05) 5px,
+      rgba(255,255,255,0.05) 10px
+    );
+  position: absolute;
+  bottom: 38%;
+  right: 38%;
+  transform: rotate(20deg);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* X-Acto knife */
+.xacto {
+  width: 80px;
+  height: 6px;
+  background: linear-gradient(90deg, 
+    #c0c0c0 0%, 
+    #c0c0c0 60%, 
+    #ff6b35 60%, 
+    #ff6b35 100%
+  );
+  border-radius: 3px;
+  position: absolute;
+  bottom: 18%;
+  left: 35%;
+  transform: rotate(-8deg);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Crumpled paper ball */
+.paper-ball {
+  width: 35px;
+  height: 35px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 32%;
+  left: 70%;
+  box-shadow: 
+    inset -5px -5px 10px rgba(0,0,0,0.2),
+    2px 2px 4px rgba(0,0,0,0.2);
+  transform: rotate(45deg);
+}
+
+/* Flipbook container adjustment */
+#flipbook-container {
+  background: transparent !important;
+}
+
+/* Gradient overlay to blend with desk */
+.desk-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.7) 30%,
+    rgba(0,0,0,0.3) 60%,
+    transparent 100%
+  );
+  z-index: 2000;
+  pointer-events: none;
+}
 
 
 </style>
 </head>
 <body>
+<!-- ===== DESK BACKGROUND FOR FLIPBOOK ===== -->
+<div id="desk-background" style="display:none;">
+  <div class="desk-bg">
+    <!-- Scattered items -->
+    <div class="scattered-item coffee-stain"></div>
+    <div class="scattered-item pencil"></div>
+    <div class="scattered-item eraser"></div>
+    <div class="scattered-item paper-scrap"></div>
+    <div class="scattered-item ruler"></div>
+    <div class="scattered-item sticky-note yellow"></div>
+    <div class="scattered-item sticky-note pink"></div>
+    <div class="scattered-item marker"></div>
+    <div class="scattered-item paper-clip"></div>
+    <div class="scattered-item washi-tape"></div>
+    <div class="scattered-item xacto"></div>
+    <div class="scattered-item paper-ball"></div>
+  </div>
+  <div class="desk-overlay"></div>
+</div>
 <div class="gif-bg"></div>
 <script>
 var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
@@ -1039,6 +1362,9 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 async function openFlipbook(pdfUrl){
 
   const session = ++currentSession; // 🔥 buat session baru
+// Tampilkan background meja
+document.getElementById("desk-background").style.display = "block";
+
 
   const loading = document.getElementById("zine-loading");
   loading.style.display = "flex";
@@ -1141,6 +1467,9 @@ const music = document.getElementById("bg-music");
 function closeFlipbook(){
 
   currentSession++; // 🔥 batalkan semua proses lama
+// Sembunyikan background meja
+document.getElementById("desk-background").style.display = "none";
+
 
   const music = document.getElementById("bg-music");
   music.pause();
