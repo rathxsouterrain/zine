@@ -187,72 +187,56 @@ transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 
-/* --- PAKET VISUAL READER (GANTI SEMUA YG LAMA) --- */
+/* CONTAINER UTAMA - Background Meja Kerja Profesional */
 #flipbook-container {
     display: none;
     position: fixed;
     inset: 0;
-    z-index: 2000;
-    /* Efek Meja Studio */
-    background-color: #0d0d0d !important;
+    z-index: 99999 !important; /* Paksa paling depan */
+    background-color: #111 !important;
     background-image: 
-        radial-gradient(circle at 50% 45%, rgba(255,255,255,0.08) 0%, transparent 70%),
-        url('https://www.transparenttextures.com/patterns/dark-matter.png') !important;
-    background-blend-mode: overlay !important;
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 80%),
+        url('https://www.transparenttextures.com/patterns/carbon-fibre.png') !important;
+    background-blend-mode: overlay;
     overflow: hidden;
+    touch-action: none;
 }
 
+/* FLIPBOOK - Efek Bayangan Tebal */
 #flipbook {
     margin: auto;
-    /* Efek Bayangan & Dimensi */
-    box-shadow: 0 50px 100px rgba(0,0,0,0.9) !important;
-    transform: perspective(2000px) rotateX(2deg) !important;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+    transform: perspective(2000px);
 }
 
-#flipbook canvas {
-    max-width: 100% !important;
-    max-height: 100% !important;
-    /* Tekstur Kertas */
-    filter: contrast(1.05) brightness(1.02) sepia(0.05) !important;
-}
-
-.nav-arrows {
+/* TOMBOL CLOSE - Harus Bisa Di-Klik */
+.close-btn {
     position: fixed !important;
-    bottom: 40px !important;
+    bottom: 110px !important; /* Naikkan biar gak tabrakan sama navigasi */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    display: flex !important;
-    gap: 150px !important; /* Jarak lebar biar estetik */
-    z-index: 9999 !important;
-}
-
-.arrow {
-    width: 55px !important;
-    height: 55px !important;
-    background: rgba(255,255,255,0.03) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    backdrop-filter: blur(10px) !important;
-    color: rgba(255,255,255,0.3) !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer !important;
-    transition: 0.3s !important;
-}
-
-.arrow:hover {
-    background: rgba(255,255,255,0.1) !important;
+    z-index: 100000 !important; /* Lebih tinggi dari container */
+    padding: 12px 30px !important;
+    background: rgba(255, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 0, 0, 0.4) !important;
     color: white !important;
-    transform: scale(1.1) !important;
+    font-size: 12px !important;
+    letter-spacing: 2px;
+    border-radius: 30px;
+    cursor: pointer !important;
+    pointer-events: auto !important; /* WAJIB ADA agar bisa diklik */
+    backdrop-filter: blur(10px);
 }
 
-.close-btn {
-    bottom: 45px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #ff4444 !important; /* Warna merah dikit biar kontras */
+.close-btn:hover {
+    background: rgba(255, 0, 0, 0.5) !important;
 }
+
+/* Navigasi Panah */
+.nav-arrows {
+    z-index: 100000 !important;
+}
+
 
 
 /* ===== READER UI ===== */
@@ -1080,20 +1064,12 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 
   let currentSession = 0;
 async function openFlipbook(pdfUrl){
-
-  const session = ++currentSession; // 🔥 buat session baru
-
-  const loading = document.getElementById("zine-loading");
-  loading.style.display = "flex";
+  const session = ++currentSession;
 
   const container = document.getElementById("flipbook-container");
-  container.style.display = "block";
-
-  const oldFlipbook = document.getElementById("flipbook");
-
-  if($(oldFlipbook).data("turn")){
-    $(oldFlipbook).turn("destroy");
-  }
+  container.style.display = "flex"; // Gunakan flex agar zine otomatis di tengah
+  container.style.alignItems = "center";
+  container.style.justifyContent = "center";
 
   const newFlipbook = document.createElement("div");
   newFlipbook.id = "flipbook";
