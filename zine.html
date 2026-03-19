@@ -659,43 +659,30 @@ border:none;
 transform:scale(0.95);
 
 }
-/* Container Utama Viewer */
-.viewer-container {
-    background-color: #1a2a23; /* Hijau tua khas cutting mat */
+/* Tumpuk di bagian container utama zine lo */
+.viewer-container, [id*="viewer"], body {
+    background-color: #1a1a1a !important; /* Item-nya kita bikin bertekstur */
     background-image: 
-        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-        linear-gradient(90px, rgba(255,255,255,.05) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,.1) 2px, transparent 2px),
-        linear-gradient(90px, rgba(255,255,255,.1) 2px, transparent 2px);
-    background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
-    /* Grid 10mm dan 50mm untuk kesan presisi */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1000px; /* Persiapan untuk efek fisik */
-}
-.viewer-background {
-    background-color: #1a2a23; /* Hijau Deep Cutting Mat */
-    background-image: 
-        /* Garis Grid Kecil (5mm) */
-        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
-        /* Garis Grid Besar (25mm) */
-        linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
-    background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
-    background-position: center;
-    
-    /* Tambahkan bayangan lembut di bawah zine agar terlihat mengambang */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 80%), /* Spot cahaya tengah */
+        url('https://www.transparenttextures.com/patterns/dark-matter.png') !important; /* Tekstur aspal/kertas kasar */
+    background-blend-mode: overlay !important;
 }
 
-.zine-image {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Efek kedalaman fisik */
-    border: 1px solid rgba(255,255,255,0.1);
+/* Biar Zine lo gak nempel kaku kayak stiker murahan */
+.zine-image-wrapper img, img[class*="zine"] {
+    transform: rotateX(5deg) rotateY(-5deg) rotateZ(1deg) !important; /* Efek miring 3D */
+    box-shadow: 
+        -15px 15px 40px rgba(0,0,0,0.9), 
+        0 0 10px rgba(255,255,255,0.05) !important; /* Bayangan tebel biar ada dimensi */
+    border-radius: 2px !important;
+    transition: transform 0.3s ease !important;
 }
+
+/* Pas disentuh/hover, zine-nya "angkat" dikit */
+.zine-image-wrapper img:hover {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.02) !important;
+}
+
 
 </style>
 </head>
