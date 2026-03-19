@@ -181,7 +181,22 @@ font-size:13px;
 margin-top:15px;
 letter-spacing:2px;
 opacity:0.7;
+will-change: transform;
+transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
+.zine-card {
+    position: relative;
+    overflow: hidden; /* Penting untuk efek parallax di dalam */
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Saat disentuh: Gambar nge-zoom dikit, bukan kartunya yang goyang lebay */
+.zine-card:active img {
+    transform: scale(1.15);
+}
+
 
 /* FLIPBOOK */
 #flipbook-container{
@@ -1432,6 +1447,45 @@ const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
 document.getElementById("bgimg").src = randomBg;
 
 });
+/* --- KINETIC GRID ENGINE --- */
+let current = 0;
+let target = 0;
+let ease = 0.075;
+
+function lerp(start, end, t) {
+    return start * (1 - t) + end * t;
+}
+
+function updateKinetic() {
+    target = window.pageYOffset;
+    current = lerp(current, target, ease);
+
+    const cards = document.querySelectorAll('.zine-card');
+    
+    cards.forEach(card => {
+        const img = card.querySelector('img');
+        const rect = card.getBoundingClientRect();
+        
+        // Cek apakah kartu ada di layar
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            // Hitung posisi relatif kartu di layar (-1 sampai 1)
+            const range = (rect.top + rect.height/2 - window.innerHeight/2) / (window.innerHeight/2);
+            
+            // Gerakan gambar di dalam bingkai (Parallax)
+            // Nilai 15px sudah cukup untuk bikin efek "mahal"
+            const move = range * 15; 
+            
+            if (img) {
+                img.style.transform = `scale(1.1) translateY(${move}px)`;
+            }
+        }
+    });
+
+    requestAnimationFrame(updateKinetic);
+}
+
+updateKinetic();
+
 
 
 </script>
