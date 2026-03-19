@@ -1061,116 +1061,107 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 }
 
   let currentSession = 0;
-async function openFlipbook(pdfUrl){
+let currentSession = 0;
+
+async function openFlipbook(pdfUrl) {
   const session = ++currentSession;
-
+  
+  // Ambil elemen yang dibutuhkan
   const container = document.getElementById("flipbook-container");
-  container.style.display = "block"; // Gunakan flex agar zine otomatis di tengah
-  container.style.alignItems = "center";
-  container.style.justifyContent = "center";
+  const loading = document.getElementById("zine-loading");
+  const flipbookArea = document.getElementById("flipbook");
 
-  const newFlipbook = document.createElement("div");
-  newFlipbook.id = "flipbook";
-  oldFlipbook.parentNode.replaceChild(newFlipbook, oldFlipbook);
+  // Tampilkan loading & container
+  loading.style.display = "flex";
+  container.style.display = "block";
 
-const music = document.getElementById("bg-music");
-  
+  // Reset isi flipbook lama agar tidak menumpuk
+  if ($(flipbookArea).data("turn")) {
+    $(flipbookArea).turn("destroy");
+  }
+  flipbookArea.innerHTML = ''; 
+
+  // Musik Logic
+  const music = document.getElementById("bg-music");
   music.pause();
-  
-  if(pdfUrl === "zine5.pdf"){
-    music.src = "music-zine5.mp3";
-  }
-  else if(pdfUrl === "zine6.pdf"){
-    music.src = "music-zine6.mp3";
-  }
-  else{
-    music.src = "music.mp3"; // musik default untuk zine lain
-  }
+  if(pdfUrl === "zine5.pdf") music.src = "music-zine5.mp3";
+  else if(pdfUrl === "zine6.pdf") music.src = "music-zine6.mp3";
+  else music.src = "music.mp3";
   
   music.volume = 0.5;
-  music.currentTime = 0;
-  music.play().catch(()=>{});
+  music.play().catch(() => {});
 
-  try{
-
+  try {
     const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-
-    // 🔥 kalau sudah bukan session aktif, hentikan
-    if(session !== currentSession) return;
+    if (session !== currentSession) return;
 
     const total = pdf.numPages;
 
-    for(let i = 1; i <= total; i++){
-
-      if(session !== currentSession) return; // 🔥 stop kalau sudah close
+    // Render setiap halaman PDF ke Canvas
+    for (let i = 1; i <= total; i++) {
+      if (session !== currentSession) return;
 
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 2 });
 
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
-
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
-      await page.render({
-        canvasContext: context,
-        viewport: viewport
-      }).promise;
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
 
       const div = document.createElement("div");
       div.className = "page";
       div.appendChild(canvas);
-
-      newFlipbook.appendChild(div);
+      flipbookArea.appendChild(div);
     }
 
+    // Setup Turn.js
     let isMobile = window.innerWidth <= 768;
-    let ratio = 1.414;
     let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
-    let pageHeight = pageWidth * ratio;
+    let pageHeight = pageWidth * 1.414;
 
-    $(newFlipbook).turn({
+    $(flipbookArea).turn({
       width: isMobile ? pageWidth : pageWidth * 2,
       height: pageHeight,
       autoCenter: true,
       display: isMobile ? "single" : "double",
-      duration: 1200
+      duration: 1000
     });
 
-    document.getElementById("nextBtn").onclick = () => {
-      $(newFlipbook).turn("next");
-    };
+    // Navigasi
+    document.getElementById("nextBtn").onclick = () => $(flipbookArea).turn("next");
+    document.getElementById("prevBtn").onclick = () => $(flipbookArea).turn("previous");
 
-    document.getElementById("prevBtn").onclick = () => {
-      $(newFlipbook).turn("previous");
-    };
+    // Hilangkan loading setelah semua siap
+    loading.style.display = "none";
 
-  }catch(err){
-    console.error(err);
-  }
-
-  if(session === currentSession){
+  } catch (err) {
+    console.error("Gagal buka PDF:", err);
     loading.style.display = "none";
   }
 }
 
-function closeFlipbook(){
-
-  currentSession++; // 🔥 batalkan semua proses lama
-
+function closeFlipbook() {
+  currentSession++; // Stop proses render yang berjalan
+  
+  const container = document.getElementById("flipbook-container");
+  const loading = document.getElementById("zine-loading");
   const music = document.getElementById("bg-music");
+  const flip = document.getElementById("flipbook");
+
   music.pause();
   music.currentTime = 0;
 
-  const flip = document.getElementById("flipbook");
-  if($(flip).data("turn")){
+  if ($(flip).data("turn")) {
     $(flip).turn("destroy");
   }
-
-  document.getElementById("flipbook-container").style.display="none";
-  document.getElementById("zine-loading").style.display="none";
+  
+  container.style.display = "none";
+  loading.style.display = "none";
 }
+
 function searchZine(){
   const input = document.getElementById("zineSearch").value.toLowerCase();
   const items = document.querySelectorAll(".zine-item");
