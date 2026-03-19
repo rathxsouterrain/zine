@@ -20,7 +20,11 @@ body {
     font-family: 'Inter', sans-serif;
     color: white;
     background: #000;
+    -webkit-user-select: none;  /* Safari */
+    -ms-user-select: none;      /* IE 10 dan Edge */
+    user-select: none;          /* Standard (Chrome, Firefox, Opera) */
 }
+
 
 .gif-bg {
     position: fixed;
@@ -965,6 +969,7 @@ nav.nav-show { transform: translateY(0); }
 </style>
 </head>
 <body>
+    <body oncontextmenu="return false;">
     <nav class="nav-hidden">
         <div class="nav-container">
             <div class="brand">
