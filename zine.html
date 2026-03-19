@@ -380,6 +380,13 @@ cursor:pointer;
 background:white;
 color:black;
 }
+.profile-photo img {
+    /* ... kode yang sudah ada ... */
+    pointer-events: none;       /* Gambar tidak bisa di-klik/sentuh */
+    user-select: none;          /* Gambar tidak bisa di-select */
+    -webkit-user-drag: none;    /* Mencegah gambar ditarik (drag) */
+    touch-action: none;         /* Mematikan interaksi sentuh di mobile */
+}
 
 .loader-text{
 color:white;
@@ -679,8 +686,8 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 
 <div class="hero">
   <div class="profile-photo">
-    <img src="profile.png" alt="Profile">
-  </div>
+    <img src="profile.png" alt="Profile" id="profileImg" draggable="false">
+</div>
   <h1>ZINE FLIPBOOK</h1>
 </div>
 
