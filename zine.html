@@ -188,27 +188,55 @@ transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 
 
 /* FLIPBOOK */
-#flipbook-container{
-display:none;
-position:fixed;
-inset:0;
-background:#000;
-z-index:2000;
+/* Tampilan Container Utama saat Zine dibuka */
+#flipbook-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    /* GANTI background #000 lo jadi ini: */
+    background-color: #0a0a0a !important; 
+    background-image: 
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,0.07) 0%, transparent 70%),
+        url('https://www.transparenttextures.com/patterns/carbon-fibre.png') !important;
+    background-blend-mode: overlay;
+    overflow: hidden;
 }
 
-#flipbook{ margin:auto; }
-
-#flipbook .page{
-background:#111;
-display:flex;
-align-items:center;
-justify-content:center;
+/* Efek "Meja Kerja" di bawah Flipbook */
+#flipbook {
+    margin: auto;
+    /* Kasih bayangan raksasa biar zine lo keliatan "ngambang" di atas meja */
+    box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 15px 30px rgba(0,0,0,0.5);
+    /* Sedikit kemiringan perspektif agar tidak kaku flat */
+    transform: perspective(2000px) rotateX(2deg);
+    transition: transform 0.5s ease;
 }
 
-#flipbook canvas{
-  max-width:100%;
-  max-height:100%;
-  pointer-events: none;
+/* Canvas Halaman Zine */
+#flipbook canvas {
+    max-width: 100%;
+    max-height: 100%;
+    pointer-events: none;
+    /* Beri tekstur kertas halus di atas setiap halaman */
+    filter: contrast(1.05) brightness(1.02);
+}
+
+/* Navigasi panah biar lebih menyatu */
+.nav-arrows {
+    bottom: 40px !important;
+    gap: 120px !important; /* Luaskan gap biar gak numpuk di tengah */
+}
+
+.arrow {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.4) !important;
+}
+
+.arrow:hover {
+    background: rgba(255,255,255,0.15) !important;
+    color: white !important;
 }
 
 /* ===== READER UI ===== */
@@ -673,43 +701,6 @@ transform:scale(0.95);
     background-blend-mode: overlay;
     overflow: hidden;
 }
-
-/* Efek "Meja Kerja" di bawah Flipbook */
-#flipbook {
-    margin: auto;
-    /* Kasih bayangan raksasa biar zine lo keliatan "ngambang" di atas meja */
-    box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 15px 30px rgba(0,0,0,0.5);
-    /* Sedikit kemiringan perspektif agar tidak kaku flat */
-    transform: perspective(2000px) rotateX(2deg);
-    transition: transform 0.5s ease;
-}
-
-/* Canvas Halaman Zine */
-#flipbook canvas {
-    max-width: 100%;
-    max-height: 100%;
-    pointer-events: none;
-    /* Beri tekstur kertas halus di atas setiap halaman */
-    filter: contrast(1.05) brightness(1.02);
-}
-
-/* Navigasi panah biar lebih menyatu */
-.nav-arrows {
-    bottom: 40px !important;
-    gap: 120px !important; /* Luaskan gap biar gak numpuk di tengah */
-}
-
-.arrow {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    color: rgba(255,255,255,0.4) !important;
-}
-
-.arrow:hover {
-    background: rgba(255,255,255,0.15) !important;
-    color: white !important;
-}
-
 
 
 </style>
