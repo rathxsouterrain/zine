@@ -1415,58 +1415,6 @@ window.addEventListener("load", () => {
     });
   });
 });
-/* --- ULTRA SUHU 2.0: CYLINDER SCROLL --- */
-const zineContainer = document.querySelector('#zine');
-let scrollY = 0;
-let lastScrollY = 0;
-let speed = 0;
-
-function updateUltraSuhu() {
-    scrollY = window.pageYOffset;
-    speed = scrollY - lastScrollY;
-    lastScrollY = scrollY;
-
-    const cards = document.querySelectorAll('.zine-card');
-    const winH = window.innerHeight;
-
-    cards.forEach((card) => {
-        const rect = card.getBoundingClientRect();
-        const center = rect.top + rect.height / 2;
-        
-        // Cek posisi kartu terhadap tengah layar (-1 sampe 1)
-        const diff = (center - winH / 2) / (winH / 2);
-        
-        // 1. ROTASI SILINDER: Miring berdasarkan posisi di layar
-        const rotation = diff * 35; 
-        
-        // 2. KINETIC SKEW: Miring berdasarkan KECEPATAN scroll
-        const skew = speed * 0.2; 
-        
-        // 3. Z-DEPTH: Kartu di pinggir layar menjauh ke belakang
-        const zDepth = Math.abs(diff) * -200;
-
-        card.style.transform = `
-            translateZ(${zDepth}px) 
-            rotateX(${-rotation}deg) 
-            rotateY(${skew}deg)
-        `;
-        
-        // 4. DYNAMIC BLUR: Kartu yang jauh jadi agak blur (Depth of Field)
-        const blur = Math.abs(diff) * 2;
-        card.style.filter = `blur(${blur}px) brightness(${1 - Math.abs(diff) * 0.3})`;
-    });
-
-    requestAnimationFrame(updateUltraSuhu);
-}
-
-// Aktifkan Engine
-window.addEventListener('scroll', () => {
-    // Pakai requestAnimationFrame biar gak bentrok sama event scroll bawaan
-    requestAnimationFrame(updateUltraSuhu);
-});
-
-// Inisialisasi awal
-updateUltraSuhu();
 
 
 document.addEventListener("DOMContentLoaded", function(){
