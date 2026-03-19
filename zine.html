@@ -659,29 +659,57 @@ border:none;
 transform:scale(0.95);
 
 }
-/* Tumpuk di bagian container utama zine lo */
-.viewer-container, [id*="viewer"], body {
-    background-color: #1a1a1a !important; /* Item-nya kita bikin bertekstur */
+/* Tampilan Container Utama saat Zine dibuka */
+#flipbook-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    /* GANTI background #000 lo jadi ini: */
+    background-color: #0a0a0a !important; 
     background-image: 
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 80%), /* Spot cahaya tengah */
-        url('https://www.transparenttextures.com/patterns/dark-matter.png') !important; /* Tekstur aspal/kertas kasar */
-    background-blend-mode: overlay !important;
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,0.07) 0%, transparent 70%),
+        url('https://www.transparenttextures.com/patterns/carbon-fibre.png') !important;
+    background-blend-mode: overlay;
+    overflow: hidden;
 }
 
-/* Biar Zine lo gak nempel kaku kayak stiker murahan */
-.zine-image-wrapper img, img[class*="zine"] {
-    transform: rotateX(5deg) rotateY(-5deg) rotateZ(1deg) !important; /* Efek miring 3D */
-    box-shadow: 
-        -15px 15px 40px rgba(0,0,0,0.9), 
-        0 0 10px rgba(255,255,255,0.05) !important; /* Bayangan tebel biar ada dimensi */
-    border-radius: 2px !important;
-    transition: transform 0.3s ease !important;
+/* Efek "Meja Kerja" di bawah Flipbook */
+#flipbook {
+    margin: auto;
+    /* Kasih bayangan raksasa biar zine lo keliatan "ngambang" di atas meja */
+    box-shadow: 0 50px 100px rgba(0,0,0,0.8), 0 15px 30px rgba(0,0,0,0.5);
+    /* Sedikit kemiringan perspektif agar tidak kaku flat */
+    transform: perspective(2000px) rotateX(2deg);
+    transition: transform 0.5s ease;
 }
 
-/* Pas disentuh/hover, zine-nya "angkat" dikit */
-.zine-image-wrapper img:hover {
-    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.02) !important;
+/* Canvas Halaman Zine */
+#flipbook canvas {
+    max-width: 100%;
+    max-height: 100%;
+    pointer-events: none;
+    /* Beri tekstur kertas halus di atas setiap halaman */
+    filter: contrast(1.05) brightness(1.02);
 }
+
+/* Navigasi panah biar lebih menyatu */
+.nav-arrows {
+    bottom: 40px !important;
+    gap: 120px !important; /* Luaskan gap biar gak numpuk di tengah */
+}
+
+.arrow {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.4) !important;
+}
+
+.arrow:hover {
+    background: rgba(255,255,255,0.15) !important;
+    color: white !important;
+}
+
 
 
 </style>
