@@ -291,6 +291,12 @@ letter-spacing:2px;
 cursor:pointer;
 transition:0.3s;
 }
+/* Class untuk mematikan scroll */
+.no-scroll {
+    overflow: hidden !important;
+    height: 100%;
+}
+
 
 .read-btn:hover{
 transform:scale(1.05);
@@ -1037,6 +1043,7 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 
   let currentSession = 0;
 async function openFlipbook(pdfUrl){
+document.body.classList.add("no-scroll"); 
 
   const session = ++currentSession; // 🔥 buat session baru
 
@@ -1139,6 +1146,7 @@ const music = document.getElementById("bg-music");
 }
 
 function closeFlipbook(){
+    document.body.classList.remove("no-scroll");
 
   currentSession++; // 🔥 batalkan semua proses lama
 
