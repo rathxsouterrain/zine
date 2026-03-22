@@ -294,8 +294,12 @@ transition:0.3s;
 /* Class untuk mematikan scroll */
 .no-scroll {
     overflow: hidden !important;
+    position: fixed; /* Mengunci posisi body agar tidak bisa ditarik */
+    width: 100%;
     height: 100%;
+    touch-action: none; /* Mematikan interaksi scroll sentuh */
 }
+
 
 
 .read-btn:hover{
@@ -1043,7 +1047,15 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 
   let currentSession = 0;
 async function openFlipbook(pdfUrl){
-document.body.classList.add("no-scroll"); 
+  // 1. Tambahkan class lock
+  document.body.classList.add("no-scroll");
+ 
+  // 2. Paksa scroll ke atas agar posisi 'fixed' tidak mengacak tampilan
+  window.scrollTo(0, 0);
+
+  // 3. Tambahkan listener untuk mematikan gerakan sentuh
+  document.addEventListener('touchmove', preventDefault, { passive: false });
+document.addEventListener('touchmove', preventDefault, { passive: false });
 
   const session = ++currentSession; // 🔥 buat session baru
 
@@ -1147,6 +1159,10 @@ const music = document.getElementById("bg-music");
 
 function closeFlipbook(){
     document.body.classList.remove("no-scroll");
+
+  // 2. Hapus listener agar web bisa di-scroll lagi
+  document.removeEventListener('touchmove', preventDefault);
+
 
   currentSession++; // 🔥 batalkan semua proses lama
 
