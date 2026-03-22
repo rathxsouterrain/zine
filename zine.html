@@ -1462,7 +1462,9 @@ const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
 document.getElementById("bgimg").src = randomBg;
 
 });
-
+function preventDefault(e) {
+  e.preventDefault();
+}
 
 </script>
 </body>
