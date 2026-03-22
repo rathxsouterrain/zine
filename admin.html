@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Zine Upload</title>
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  
+  <!-- PDF.js untuk generate cover -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@400;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      background: #000;
+      color: white;
+      font-family: 'Poppins', Arial, sans-serif;
+      min-height: 100vh;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    .gif-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: -1;
+    }
+    
+    .gif-bg::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.70);
+    }
+    
+    /* Glass card styling - sama seperti zine utama */
+    .glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      padding: 32px;
+      margin: 40px auto;
+      width: 92%;
+      max-width: 500px;
+      animation: fadeUp 0.8s ease;
+    }
+    
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    h1 {
+      text-align: center;
+      font-family: 'Stack Sans Text', sans-serif;
+      font-size: 24px;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 2px;
+      opacity: 0.6;
+      margin-bottom: 30px;
+    }
+    
+    h3 {
+      font-family: 'Stack Sans Text', sans-serif;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    /* Form styling */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    
+    input[type="text"],
+    input[type="password"],
+    input[type="file"] {
+      width: 100%;
+      padding: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      color: white;
+      font-size: 13px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: 0.3s;
+    }
+    
+    input[type="file"] {
+      padding: 12px;
+      cursor: pointer;
+    }
+    
+    input:focus {
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.08);
+    }
+    
+    input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    
+    /* Custom file input */
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .file-input-label {
+      display: block;
+      padding: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    
+    .file-input-label:hover {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.08);
+    }
+    
+    .file-input-label.has-file {
+      border-color: rgba(0,255,0,0.3);
+      background: rgba(0,255,0,0.05);
+      color: #66ff66;
+    }
+    
+    /* Preview cover */
+    .preview-section {
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+    
+    .preview-section.active {
+      display: block;
+      animation: fadeUp 0.5s ease;
+    }
+    
+    #coverPreview {
+      width: 180px;
+      height: auto;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .preview-label {
+      font-size: 10px;
+      letter-spacing: 1px;
+      opacity: 0.5;
+      margin-top: 10px;
+    }
+    
+    /* Tombol */
+    button {
+      width: 100%;
+      padding: 14px 25px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 25px;
+      font-family: 'Stack Sans Text', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+    
+    button:hover:not(:disabled) {
+      transform: scale(1.02);
+      background: rgba(255,255,255,0.9);
+    }
+    
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    button.secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    button.secondary:hover:not(:disabled) {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    button.danger {
+      background: rgba(255,0,0,0.15);
+      color: #ff6666;
+      border: 1px solid rgba(255,0,0,0.3);
+    }
+    
+    button.danger:hover:not(:disabled) {
+      background: rgba(255,0,0,0.25);
+    }
+    
+    /* Progress & status */
+    .status-area {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    #progressStatus {
+      font-size: 11px;
+      letter-spacing: 1px;
+      opacity: 0.8;
+      min-height: 20px;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+      display: none;
+    }
+    
+    .progress-bar.active {
+      display: block;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: white;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    
+    /* Message */
+    .message {
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+      display: none;
+      animation: fadeUp 0.3s ease;
+    }
+    
+    .message.active {
+      display: block;
+    }
+    
+    .message.error {
+      background: rgba(255,0,0,0.1);
+      border: 1px solid rgba(255,0,0,0.3);
+      color: #ff8888;
+    }
+    
+    .message.success {
+      background: rgba(0,255,0,0.1);
+      border: 1px solid rgba(0,255,0,0.3);
+      color: #88ff88;
+    }
+    
+    .message.info {
+      background: rgba(255,255,0,0.05);
+      border: 1px solid rgba(255,255,0,0.2);
+      color: #ffff88;
+    }
+    
+    /* Login section */
+    #loginSection {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .lock-icon {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+    
+    /* Upload section */
+    #uploadSection {
+      display: none;
+      padding: 100px 20px 40px;
+    }
+    
+    /* Navbar */
+    nav {
+      position: fixed;
+      top: 10px;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .nav-container {
+      width: 92%;
+      max-width: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      font-family: 'Stack Sans Text', sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+    
+    .nav-bubble {
+      font-family: 'Stack Sans Text', sans-serif;
+      font-weight: 500;
+      font-size: 10px;
+      padding: 8px 14px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+      transition: 0.2s;
+      border: none;
+    }
+    
+    .nav-bubble:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Zine list */
+    .zine-list {
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+    
+    .zine-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    .zine-list::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 2px;
+    }
+    
+    .zine-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+    }
+    
+    .zine-item-admin {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: 0.3s;
+    }
+    
+    .zine-item-admin:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.1);
+    }
+    
+    .zine-item-admin img {
+      width: 50px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .zine-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .zine-info p {
+      margin: 0;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .zine-info .title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+    
+    .zine-info .meta {
+      opacity: 0.5;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }
+    
+    .zine-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .zine-actions button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 9px;
+      margin: 0;
+      border-radius: 20px;
+    }
+    
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-box {
+      text-align: center;
+      padding: 15px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    
+    .stat-label {
+      font-size: 9px;
+      letter-spacing: 1px;
+      opacity: 0.5;
+      margin-top: 5px;
+      text-transform: uppercase;
+    }
+    
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      opacity: 0.4;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: skeleton 1.5s infinite;
+      border-radius: 8px;
+    }
+    
+    @keyframes skeleton {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Back link */
+    .back-link {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 11px;
+      opacity: 0.5;
+      letter-spacing: 1px;
+    }
+    
+    .back-link a {
+      color: white;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    
+    .back-link a:hover {
+      opacity: 1;
+    }
+    
+    /* Drag drop zone */
+    .drop-zone {
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+    
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.03);
+    }
+    
+    .drop-zone-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    .drop-zone-text {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+    
+    .drop-zone-hint {
+      font-size: 10px;
+      opacity: 0.4;
+    }
+    
+    /* Section divider */
+    .section-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+      margin: 30px 0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      .glass {
+        padding: 24px;
+        margin: 20px auto;
+      }
+      
+      h1 {
+        font-size: 20px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gif-bg" id="bgElement"></div>
+  
+  <!-- LOGIN SECTION -->
+  <div id="loginSection">
+    <div class="glass" style="max-width: 400px;">
+      <div class="lock-icon">🔒</div>
+      <h1>ADMIN PANEL</h1>
+      <p class="subtitle">Zine Flipbook Management</p>
+      
+      <div class="message error" id="loginError">Password salah!</div>
+      
+      <div class="form-group">
+        <label>Password Admin</label>
+        <input type="password" id="adminPassword" placeholder="Masukkan password..." onkeypress="if(event.key==='Enter')login()">
+      </div>
+      
+      <button onclick="login()">MASUK</button>
+      
+      <div class="back-link">
+        <a href="index.html">← Kembali ke Website</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- UPLOAD SECTION (Hidden by default) -->
+  <div id="uploadSection">
+    <!-- Navbar -->
+    <nav>
+      <div class="nav-container">
+        <div class="brand">⚡ ADMIN</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="nav-bubble secondary" onclick="logout()">LOGOUT</button>
+          <a href="index.html" class="nav-bubble" style="text-decoration: none;">VIEW SITE</a>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Stats Overview -->
+    <div class="glass" style="margin-top: 80px;">
+      <h3>📊 STATISTICS</h3>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-number" id="totalZines">0</div>
+          <div class="stat-label">Total Zines</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="totalViews">0</div>
+          <div class="stat-label">Total Views</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="lastUpload">-</div>
+          <div class="stat-label">Last Upload</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Upload Form -->
+    <div class="glass">
+      <h3>📤 UPLOAD ZINE BARU</h3>
+      
+      <div class="message success" id="uploadSuccess">✓ Zine berhasil diupload!</div>
+      <div class="message error" id="uploadError"></div>
+      
+      <!-- Drag & Drop Zone -->
+      <div class="form-group">
+        <label>File PDF</label>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('pdfInput').click()">
+          <div class="drop-zone-icon">📄</div>
+          <div class="drop-zone-text" id="dropText">Klik atau drag & drop PDF di sini</div>
+          <div class="drop-zone-hint">Maksimal 50MB • Halaman 1 akan jadi cover</div>
+        </div>
+        <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handleFileSelect(this.files[0])">
+      </div>
+      
+      <!-- Preview -->
+      <div class="preview-section" id="previewSection">
+        <img id="coverPreview" alt="Cover preview">
+        <p class="preview-label">Auto-generated cover</p>
+      </div>
+      
+      <div class="form-group">
+        <label>Judul Zine *</label>
+        <input type="text" id="zineTitle" placeholder="Contoh: LYCHNOBITE THEORY">
+      </div>
+      
+      <div class="form-group">
+        <label>Music Credit <span style="opacity:0.5;">(opsional)</span></label>
+        <input type="text" id="zineMusic" placeholder="Contoh: TITLE FIGHT - Head in the Ceiling Fan">
+      </div>
+      
+      <div class="status-area">
+        <div id="progressStatus">Siap upload</div>
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      
+      <button onclick="uploadZine()" id="uploadBtn" disabled>UPLOAD ZINE</button>
+      <button onclick="resetForm()" class="secondary" style="margin-top: 10px;">RESET FORM</button>
+    </div>
+    
+    <!-- Zine List -->
+    <div class="glass">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">📚 ZINE TERDAFTAR</h3>
+        <button class="nav-bubble secondary" onclick="loadZineList()" style="font-size: 9px; padding: 6px 12px;">↻ REFRESH</button>
+      </div>
+      
+      <div class="zine-list" id="zineList">
+        <div class="empty-state">
+          <div class="skeleton" style="height: 70px; margin-bottom: 10px;"></div>
+          <div class="skeleton" style="height: 70px; margin-bottom: 10px;"></div>
+          <div class="skeleton" style="height: 70px;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Danger Zone -->
+    <div class="glass" style="border-color: rgba(255,0,0,0.1);">
+      <h3 style="color: #ff6666;">⚠️ DANGER ZONE</h3>
+      <p style="font-size: 11px; opacity: 0.6; margin-bottom: 15px;">Tindakan ini tidak bisa dibatalkan.</p>
+      <button class="danger" onclick="confirmDeleteAll()">HAPUS SEMUA ZINE</button>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    
+    // 🔴 GANTI PASSWORD INI!
+    const ADMIN_PASSWORD = "Ulin123";
+    
+    // Firebase Config (sama dengan index.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAw66sRfrCj_3oyu2vPKKaxnwsqX_QuYV0",
+      authDomain: "zine-flipbook.firebaseapp.com",
+      projectId: "zine-flipbook",
+      storageBucket: "zine-flipbook.firebasestorage.app",
+      messagingSenderId: "622704887061",
+      appId: "1:622704887061:web:28d1d9c4ad8763e0cc151c",
+      measurementId: "G-J4748E8EZJ"
+    };
+    
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    
+    let selectedPDF = null;
+    let generatedCoverBlob = null;
+    let isUploading = false;
+    
+    // Random background
+    const images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
+    const randomBg = images[Math.floor(Math.random() * images.length)];
+    document.getElementById("bgElement").style.backgroundImage = "url('" + randomBg + "')";
+    
+    // ==========================================
+    // AUTHENTICATION
+    // ==========================================
+    
+    function login() {
+      const input = document.getElementById("adminPassword").value;
+      const errorDiv = document.getElementById("loginError");
+      
+      if (input === ADMIN_PASSWORD) {
+        // Success
+        errorDiv.classList.remove("active");
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("uploadSection").style.display = "block";
+        
+        // Load data
+        loadStats();
+        loadZineList();
+        
+        // Setup drag drop
+        setupDragDrop();
+      } else {
+        // Failed
+        errorDiv.classList.add("active");
+        document.getElementById("adminPassword").value = "";
+        
+        setTimeout(() => {
+          errorDiv.classList.remove("active");
+        }, 3000);
+      }
+    }
+    
+    function logout() {
+      document.getElementById("uploadSection").style.display = "none";
+      document.getElementById("loginSection").style.display = "flex";
+      document.getElementById("adminPassword").value = "";
+      resetForm();
+    }
+    
+    // ==========================================
+    // FILE HANDLING & PREVIEW
+    // ==========================================
+    
+    function setupDragDrop() {
+      const dropZone = document.getElementById("dropZone");
+      
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+      
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+      });
+      
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type === "application/pdf") {
+          handleFileSelect(file);
+        } else {
+          showMessage("uploadError", "File harus PDF!");
+        }
+      });
+    }
+    
+    async function handleFileSelect(file) {
+      if (!file) return;
+      
+      if (file.type !== "application/pdf") {
+        showMessage("uploadError", "File harus berformat PDF!");
+        return;
+      }
+      
+      if (file.size > 50 * 1024 * 1024) {
+        showMessage("uploadError", "File terlalu besar! Maksimal 50MB");
+        return;
+      }
+      
+      selectedPDF = file;
+      
+      // Update UI
+      const dropText = document.getElementById("dropText");
+      dropText.innerHTML = `📄 <br><span style="font-size:10px;opacity:0.6;">${(file.size/1024/1024).toFixed(2)} MB</span>`;
+      document.getElementById("dropZone").classList.add("has-file");
+      
+      updateStatus("Generating cover preview...", 10);
+      
+      try {
+        // Generate cover dari halaman 1
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        
+        // Render dengan kualitas tinggi
+        const scale = 2;
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        
+        // Tampilkan preview
+        const previewImg = document.getElementById("coverPreview");
+        const previewUrl = canvas.toDataURL("image/jpeg", 0.9);
+        previewImg.src = previewUrl;
+        document.getElementById("previewSection").classList.add("active");
+        
+        // Simpan blob untuk upload
+        generatedCoverBlob = await new Promise(resolve => {
+          canvas.toBlob(resolve, "image/jpeg", 0.85);
+        });
+        
+        // Auto-fill judul dari filename
+        const fileName = file.name.replace(".pdf", "").replace(/[-_]/g, " ");
+        const titleInput = document.getElementById("zineTitle");
+        if (!titleInput.value) {
+          titleInput.value = toTitleCase(fileName);
+        }
+        
+        updateStatus("Cover ready ✓", 30);
+        document.getElementById("uploadBtn").disabled = false;
+        
+      } catch (err) {
+        console.error(err);
+        updateStatus("Error generating cover", 0);
+        showMessage("uploadError", "Gagal generate cover: " + err.message);
+      }
+    }
+    
+    function toTitleCase(str) {
+      return str.replace(/\w\S*/g, txt => 
+        txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+      );
+    }
+    
+    // ==========================================
+    // UPLOAD PROCESS
+    // ==========================================
+    
+    async function uploadZine() {
+      if (!selectedPDF || !generatedCoverBlob || isUploading) return;
+      
+      const title = document.getElementById("zineTitle").value.trim();
+      const music = document.getElementById("zineMusic").value.trim();
+      
+      if (!title) {
+        showMessage("uploadError", "Judul wajib diisi!");
+        return;
+      }
+      
+      isUploading = true;
+      const btn = document.getElementById("uploadBtn");
+      btn.disabled = true;
+      
+      hideMessage("uploadSuccess");
+      hideMessage("uploadError");
+      
+      try {
+        // Generate ID unik
+        const timestamp = Date.now();
+        const zineId = "zine" + timestamp;
+        
+        // 1. Upload PDF (30-60%)
+        updateStatus("Uploading PDF...", 30);
+        const pdfRef = storage.ref(`zines/.pdf`);
+        
+        const pdfUploadTask = pdfRef.put(selectedPDF);
+        
+        pdfUploadTask.on("state_changed", 
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 30 + 30;
+            updateProgress(progress);
+          },
+          (err) => { throw err; }
+        );
+        
+        await pdfUploadTask;
+        const pdfUrl = await pdfRef.getDownloadURL();
+        
+        // 2. Upload Cover (60-90%)
+        updateStatus("Uploading cover...", 60);
+        const coverRef = storage.ref(`covers/.jpg`);
+        await coverRef.put(generatedCoverBlob);
+        const coverUrl = await coverRef.getDownloadURL();
+        
+        // 3. Save metadata (90-100%)
+        updateStatus("Saving to database...", 90);
+        await db.collection("zines").doc(zineId).set({
+          title: title,
+          music: music,
+          pdfUrl: pdfUrl,
+          coverUrl: coverUrl,
+          views: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Complete
+        updateStatus("Upload complete! ✓", 100);
+        showMessage("uploadSuccess", "Zine berhasil diupload dan akan muncul di website!");
+        
+        // Reset after delay
+        setTimeout(() => {
+          resetForm();
+          loadZineList();
+          loadStats();
+        }, 2000);
+        
+      } catch (err) {
+        console.error("Upload error:", err);
+        updateStatus("Upload failed", 0);
+        showMessage("uploadError", "Error: " + err.message);
+        btn.disabled = false;
+      } finally {
+        isUploading = false;
+      }
+    }
+    
+    function resetForm() {
+      selectedPDF = null;
+      generatedCoverBlob = null;
+      isUploading = false;
+      
+      document.getElementById("pdfInput").value = "";
+      document.getElementById("zineTitle").value = "";
+      document.getElementById("zineMusic").value = "";
+      document.getElementById("dropText").innerText = "Klik atau drag & drop PDF di sini";
+      document.getElementById("dropZone").classList.remove("has-file");
+      document.getElementById("previewSection").classList.remove("active");
+      document.getElementById("coverPreview").src = "";
+      document.getElementById("uploadBtn").disabled = true;
+      
+      updateStatus("Siap upload", 0);
+      hideMessage("uploadSuccess");
+      hideMessage("uploadError");
+    }
+    
+    // ==========================================
+    // STATISTICS
+    // ==========================================
+    
+    async function loadStats() {
+      try {
+        const snapshot = await db.collection("zines").get();
+        const totalZines = snapshot.size;
+        
+        let totalViews = 0;
+        let lastDate = null;
+        
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          totalViews += data.views || 0;
+          
+          if (data.createdAt) {
+            const date = data.createdAt.toDate();
+            if (!lastDate || date > lastDate) {
+              lastDate = date;
+            }
+          }
+        });
+        
+        document.getElementById("totalZines").innerText = totalZines;
+        document.getElementById("totalViews").innerText = totalViews.toLocaleString();
+        document.getElementById("lastUpload").innerText = lastDate 
+          ? lastDate.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
+          : "-";
+          
+      } catch (err) {
+        console.error("Error loading stats:", err);
+      }
+    }
+    
+    // ==========================================
+    // ZINE LIST MANAGEMENT
+    // ==========================================
+    
+    async function loadZineList() {
+      const container = document.getElementById("zineList");
+      
+      // Loading skeleton
+      container.innerHTML = `
+        <div class="zine-item-admin"><div class="skeleton" style="width:50px;height:70px;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:10px;width:40%;"></div></div></div>
+        <div class="zine-item-admin"><div class="skeleton" style="width:50px;height:70px;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:10px;width:40%;"></div></div></div>
+        <div class="zine-item-admin"><div class="skeleton" style="width:50px;height:70px;"></div><div style="flex:1;"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:10px;width:40%;"></div></div></div>
+      `;
+      
+      try {
+        const snapshot = await db.collection("zines")
+          .orderBy("createdAt", "desc")
+          .get();
+        
+        if (snapshot.empty) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <div style="font-size:12px;letter-spacing:1px;">Belum ada zine</div>
+            </div>
+          `;
+          return;
+        }
+        
+        let html = "";
+        snapshot.forEach(doc => {
+          const zine = doc.data();
+          const date = zine.createdAt?.toDate();
+          const dateStr = date 
+            ? date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "2-digit" })
+            : "-";
+          
+          html += `
+            <div class="zine-item-admin">
+              <img src="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2270%22><rect width=%2250%22 height=%2270%22 fill=%22%23333%22/></svg>'">
+              <div class="zine-info">
+                <p class="title"></p>
+                <p class="meta"> views • </p>
+              </div>
+              <div class="zine-actions">
+                <button class="secondary" onclick="viewZine('')" title="View">👁</button>
+                <button class="danger" onclick="deleteZine('', '')" title="Delete">🗑</button>
+              </div>
+            </div>
+          `;
+        });
+        
+        container.innerHTML = html;
+        
+      } catch (err) {
+        container.innerHTML = `<div class="empty-state" style="color:#ff6666;">Error: </div>`;
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function viewZine(url) {
+      window.open(url, "_blank");
+    }
+    
+    async function deleteZine(id, title) {
+      if (!confirm(`Hapus zine ""?\n\nTindakan ini tidak bisa dibatalkan.`)) return;
+      
+      try {
+        // Hapus dari Firestore
+        await db.collection("zines").doc(id).delete();
+        
+        // Hapus file dari Storage (opsional - bisa di-skip jika mau keep file)
+        try {
+          await storage.ref(`zines/.pdf`).delete();
+          await storage.ref(`covers/.jpg`).delete();
+        } catch (e) {
+          console.log("File mungkin sudah tidak ada");
+        }
+        
+        // Refresh
+        loadZineList();
+        loadStats();
+        
+      } catch (err) {
+        alert("Error menghapus: " + err.message);
+      }
+    }
+    
+    async function confirmDeleteAll() {
+      if (!confirm("⚠️ HAPUS SEMUA ZINE?\n\nIni akan menghapus SEMUA data dari database. File PDF dan cover tetap tersimpan di storage.\n\nLanjutkan?")) return;
+      
+      if (!confirm("Konfirmasi terakhir: Anda YAKIN ingin menghapus semua zine?")) return;
+      
+      try {
+        const batch = db.batch();
+        const snapshot = await db.collection("zines").get();
+        
+        snapshot.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        
+        await batch.commit();
+        
+        loadZineList();
+        loadStats();
+        alert("Semua zine telah dihapus dari database.");
+        
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+    
+    // ==========================================
+    // UI HELPERS
+    // ==========================================
+    
+    function updateStatus(text, percent) {
+      document.getElementById("progressStatus").innerText = text;
+      updateProgress(percent);
+    }
+    
+    function updateProgress(percent) {
+      const bar = document.getElementById("progressBar");
+      const fill = document.getElementById("progressFill");
+      
+      if (percent > 0) {
+        bar.classList.add("active");
+        fill.style.width = percent + "%";
+      } else {
+        bar.classList.remove("active");
+        fill.style.width = "0%";
+      }
+    }
+    
+    function showMessage(id, text) {
+      const el = document.getElementById(id);
+      el.innerText = text;
+      el.classList.add("active");
+    }
+    
+    function hideMessage(id) {
+      document.getElementById(id).classList.remove("active");
+    }
+    
+    // ==========================================
+    // KEYBOARD SHORTCUTS
+    // ==========================================
+    
+    document.addEventListener("keydown", (e) => {
+      // Escape untuk reset form
+      if (e.key === "Escape" && document.getElementById("uploadSection").style.display === "block") {
+        if (!isUploading) resetForm();
+      }
+    });
+  </script>
+</body>
+</html>
