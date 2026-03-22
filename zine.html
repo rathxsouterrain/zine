@@ -1,56 +1,296 @@
 <!DOCTYPE html>
-<html lang="id" translate="no">
+<html lang="id">
 <head>
-    
-<link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-<meta name="google" content="notranslate">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
-<title>zinexflipbook</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script>
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cassette J-Card Mobile + 3D Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Abel&family=Abril+Fatface&family=Alegreya+Sans+SC:wght@800&family=Alfa+Slab+One&family=Alumni+Sans+Collegiate+One&family=Amatic+SC:wght@700&family=Anton&family=Archivo+Black&family=Bangers&family=Barlow+Condensed:wght@900&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Shade&family=Cabin+Sketch:wght@700&family=Cinzel:wght@900&family=Comfortaa:wght@700&family=Creepster&family=DM+Serif+Display&family=Faster+One&family=Fativa&family=Fredoka+One&family=Graduate&family=Gravitas+One&family=Gruppo&family=Iceberg&family=Inter:wght@400;900&family=JetBrains+Mono:wght@800&family=Jura:wght@700&family=Kanit:wght@900&family=Koulen&family=Lobster&family=Londrina+Solid:wght@900&family=Major+Mono+Display&family=Michroma&family=Monoton&family=Montserrat:wght@900&family=Nova+Mono&family=Orbitron:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Press+Start+2P&family=Quantico:wght@700&family=Rajdhani:wght@700&family=Righteous&family=Russo+One&family=Silkscreen&family=Special+Elite&family=Staatliches&family=Syncopate:wght@700&family=Teko:wght@700&family=Unica+One&family=Vampiro+One&family=VT323&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-html{ scroll-behavior:smooth; }
-
-body{
-margin:0;
-background:#000;
-color:white;
-font-family:Arial, sans-serif;
-    -webkit-user-select: none;  /* Safari */
-    -ms-user-select: none;      /* IE 10 dan Edge */
-    user-select: none;          /* Standard (Chrome, Firefox, Opera) */
+:root{ --glass: rgba(255,255,255,0.1); --glass-border: rgba(255,255,255,0.2); --backColor:white; }
+body {
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    background: #000;
 }
 
-
-/* NAVBAR */
-nav{
-position:fixed;
-top:10px;
-left:0;
-width:100%;
-z-index:1000;
-
-display:flex;
-justify-content:center;
+.gif-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
 }
+
+.gif-bg::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.60);
+}
+
+.controls, .web-info-tab, .action-buttons {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.app-header{ text-align:center; margin-bottom:10px; }
+.controls{ background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--glass-border); padding:6px; border-radius:15px; width:100%; max-width:500px; display:flex; flex-direction:column; gap:10px; margin-bottom:15px; }
+input,select{ background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); padding:10px; color:white; border-radius:8px; }
+
+button, .btn-save, .btn-reset, .btn-upload-full {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
+    padding: 12px 20px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 13px;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-reset {
+    background: rgba(255, 68, 68, 0.1) !important;
+    color: #ff4444 !important;
+    border-color: rgba(255, 68, 68, 0.2) !important;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto 50px auto;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    padding: 20px;
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+.action-buttons p {
+    width: 100%;
+    text-align: center !important;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin: 5px 0;
+    text-transform: uppercase;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+.button-group button {
+    flex: 1;
+    max-width: 150px;
+}
+
+.canvas-viewport {
+    width: 100%;
+    height: 380px; 
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 600px) { .canvas-viewport { height: 620px; } }
+@media (min-width: 1100px) { .canvas-viewport { height: 1050px; } }
+
+#jcard-canvas {
+    width: 1031px;
+    height: 1020px;
+    background: white;
+    display: flex;
+    color: black;
+    transform-origin: top left;
+    transform: scale(0.35);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.section { 
+    height: 100%; 
+    box-sizing: border-box; 
+    border-right: 2px dashed #444; 
+    position: relative; 
+    background: var(--backColor);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+.exporting .section { border-right: 1px solid #cccccc !important; }
+.exporting .section:last-child { border-right: none !important; }
+.exporting .front-cover { border-right: none !important; }
+
+.back-flap{ width:254px; padding:40px 20px; }
+.spine{ width:127px; display:flex; justify-content:center; align-items:center; }
+.front-cover{ width:650px; background-size:cover; background-position:center; display:flex; align-items:center; padding-left:30px; }
+
+.transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; }
+.transform-box.active { border-color: #007bff; background: rgba(0, 123, 255, 0.05); }
+.handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #007bff; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
+.handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #007bff; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
+.transform-box.active .handle-move, .transform-box.active .handle-resize { display: flex; }
+
+.editable-content { outline: none; }
+.back-flap h3{ font-family:'Orbitron',sans-serif; font-size:30px; margin-bottom:15px; }
+.tracklist{ font-family:'Orbitron',sans-serif; font-size:20px; font-weight:700; line-height:1.4; }
+
+.spine .transform-box {
+    transform: rotate(90deg);
+    transform-origin: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    width: auto;
+    height: auto;
+}
+
+.spine .editable-content.spine-text {
+    transform: none !important; 
+    font-family: "Orbitron"; 
+    font-size: 55px;
+    color: inherit;
+    line-height: 1;
+}
+
+.spine .handle-move, .spine .handle-resize { transform: rotate(-90deg); }
+.front-overlay h1{ font-family:'Orbitron',sans-serif; font-size:110px; margin:0; line-height:0.8; }
+
+.exporting .transform-box { border: none !important; background: transparent !important; }
+.exporting .handle-move, .exporting .handle-resize { display: none !important; }
+
+.color-row { display: flex; gap: 10px; width: 100%; }
+.color-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.color-group input[type="color"] { width: 100%; height: 40px; padding: 2px; cursor: pointer; }
+
+.web-info-tab {
+    background: var(--glass);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 400px;
+    padding: 50px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.info-content h2 { margin: 0 0 5px 0; font-size: 17px; letter-spacing: 4px; font-weight: 900; color: #ffffff; text-transform: uppercase; }
+.info-content p { margin: 0; font-size: 13px; letter-spacing: 1px; line-height: 1.5; color: rgba(255, 255, 255, 0.7); font-weight: 400; }
+
+#jcard-canvas-full {
+    width: 1031px;
+    height: 1020px;
+    display: flex;
+    color: black;
+    transform-origin: top left;
+    transform: scale(0.35);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    background-size: cover;
+    background-position: center;
+}
+
+#jcard-canvas-full .section {
+    background: transparent !important;
+    border-right: 2px dashed #444;
+}
+
+#jcard-canvas-full .front-cover { border-right: none !important; }
+
+.profile-photo {
+    display: flex;
+    justify-content: center;
+    margin-top: 110px; 
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.profile-photo img { width: 250px; height: auto; display: block; opacity: 0; transform: translateY(40px); }
+
+@keyframes profileSlide {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.app-header h1 { margin-top: 10px; font-size: 24px; letter-spacing: 2px; }
+
+nav {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    transition: transform 0.45s ease;
+}
+
+nav.nav-hidden { transform: translateY(-120%); }
+nav.nav-show { transform: translateY(0); }
+
 .nav-container {
     width: 92%; 
-    max-width: 450px; /* Membatasi lebar agar tidak terlalu panjang */
+    max-width: 450px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 12px; /* Super tipis */
+    padding: 6px 12px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -58,1386 +298,1901 @@ justify-content:center;
     border-radius: 50px;
 }
 
-nav{
-transition: transform 0.45s ease;
-}
-
-nav.nav-hidden{
-transform: translateY(-120%);
-}
-
-nav.nav-show{
-transform: translateY(0);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-}
-
-.brand img {
-    height: 28px; /* Logo kecil dan rapi */
-    width: auto;
-    display: block;
-}
-
-/* Mengatur area Tombol Menu */
-
-.menu {
-    display: flex;
-    gap: 6px; /* KUNCI: Jarak antar tombol sangat rapat */
-    margin: 0;
-    padding: 0;
-}
+.brand img { height: 28px; width: auto; display: block; }
+.menu { display: flex; gap: 6px; }
 
 .nav-bubble {
-    font-family: 'Stack Sans Text', sans-serif;
-    font-weight: 500;
-    font-size: 10px; /* Teks kecil agar muat banyak */
-    padding: 4px 8px;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 10px 15px;
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.08);
     color: white;
     text-decoration: none;
+    transition: 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-bubble:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+.nav-bubble.active { background: white; color: black; border: none; }
+
+/* ============================
+   TAMBAHAN CSS 3D PREVIEW - DIPERBAIKI DENGAN TEXT SUPPORT
+============================ */
+.scene-3d {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    perspective: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+    cursor: grab;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+}
+.scene-3d:active { cursor: grabbing; }
+
+.jcard-3d-wrapper {
+    position: relative;
+    width: 650px;
+    height: 1020px;
+    transform-style: preserve-3d;
+    transform: scale(0.25) rotateX(15deg) rotateY(-35deg);
+    transition: transform 0.1s ease-out;
+}
+
+.panel {
+    position: absolute;
+    transform-style: preserve-3d;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.front-panel {
+    width: 650px;
+    height: 1020px;
+    transform-origin: left center;
+}
+
+.spine-panel {
+    width: 127px;
+    height: 1020px;
+    left: -127px;
+    transform-origin: right center; 
+    transform: rotateY(-90deg); 
+}
+
+.back-panel {
+    width: 254px;
+    height: 1020px;
+    left: -254px;
+    transform-origin: right center; 
+    transform: rotateY(-90deg); 
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background-color: #ffffff;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.face.outer { 
+    transform: rotateY(0deg); 
+    z-index: 2;
+}
+
+.face.inner { 
+    transform: rotateY(180deg); 
+    z-index: 1;
+}
+
+.inner-texture {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Full wrap 3D - satu gambar utuh di semua sisi */
+#3d-front-inner,
+#3d-spine-inner,
+#3d-back-inner {
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Mirror untuk inner faces */
+#3d-front-inner,
+#3d-spine-inner,
+#3d-back-inner {
+    transform: scaleX(-1);
+}
+
+
+
+/* ============================
+   TEXT 3D STYLES - BARU
+============================ */
+.text-3d-overlay {
+    position: absolute;
+    font-family: 'Orbitron', sans-serif;
+    color: #000;
+    font-weight: 900;
+    text-align: left;
+    pointer-events: none;
+    user-select: none;
+    z-index: 10;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+/* Front Cover Text */
+#front-text-3d {
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    font-size: 110px;
+    line-height: 0.8;
+    max-width: 90%;
+}
+
+/* Spine Text */
+#spine-text-3d {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    font-size: 55px;
     white-space: nowrap;
-    transition: 0.2s;
+    transform-origin: center;
 }
 
-/* HAPUS SEMUA .menu a { margin-left: 20px } YANG LAMA */
-.menu a {
-    margin-left: 0 !important; /* Memaksa reset margin lama */
-    opacity: 1 !important;
+/* Back Cover Text */
+#back-text-3d {
+    top: 40px;
+    left: 20px;
+    font-size: 30px;
+    max-width: 90%;
 }
 
-.nav-bubble:hover {
+#back-text-3d h3 {
+    font-size: 30px;
+    margin-bottom: 15px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+#back-text-3d .tracklist-3d {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Mirror text untuk inner faces */
+.face.inner .text-3d-overlay {
+    transform: scaleX(-1);
+}
+
+.face.inner #spine-text-3d {
+    transform: translate(-50%, -50%) rotate(90deg) scaleX(-1);
+}
+    .label-maker-section { margin-top: 5px; width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10;}
+/* Update pada label-canvas agar bagian tengahnya 'bolong' secara visual */
+.label-canvas {
+    width: 350px;
+    height: 180px;
+    background: #ffffff;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    
+    /* MASK BARU: Berbentuk kapsul presisi di tengah */
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='350' height='180'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='350' height='180' fill='white'/%3E%3Crect x='60' y='55' width='230' height='70' rx='10' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='350' height='180' fill='black' mask='url(%23m)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='350' height='180'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='350' height='180' fill='white'/%3E%3Crect x='60' y='55' width='230' height='70' rx='10' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='350' height='180' fill='black' mask='url(%23m)'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
+
+/* Cara yang lebih presisi dengan clip-path untuk membuat lubang kotak tumpul */
+.label-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    /* Memotong bagian tengah (lubang jendela) */
+    clip-path: polygon(
+        0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 
+        18% 33%, 18% 67%, 82% 67%, 82% 33%, 18% 33%
+    );
+}    
+    .label-transform-box { position: absolute; border: 2px solid transparent; padding: 5px; z-index: 10; display: inline-block; top: 20px; left: 85px; }
+    .label-transform-box.active { border-color: #00ff96; background: rgba(0, 255, 150, 0.05); }
+    .label-transform-box .handle-move { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #00ff96; color: black; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: move; font-weight: bold; z-index: 20; }
+    .label-transform-box .handle-resize { position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px; background: white; border: 3px solid #00ff96; border-radius: 50%; display: none; cursor: nwse-resize; z-index: 20; }
+    .label-transform-box.active .handle-move, .label-transform-box.active .handle-resize { display: flex; }
+    
+    .label-text { font-family: 'Orbitron', sans-serif; font-size: 24px; color: #000; outline: none; font-weight: 900; line-height: 1.2; text-transform: uppercase; text-align: center; white-space: nowrap;}
+    .tape-cutout { position: absolute; width: 220px; height: 60px; background: transparent; border: 2px dashed rgba(0,0,0,0.3); border-radius: 10px; z-index: 2; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;}
+    
+    .exporting-label .tape-cutout { display: none !important; }
+    .exporting-label .label-transform-box { border: none !important; background: transparent !important; }
+    .exporting-label .handle-move, .exporting-label .handle-resize { display: none !important; }
+    .exporting-label { box-shadow: none !important; }
+
+/* 3D Cassette Styles - RAPIH & REALISTIS TANPA BLUR */
+.cassette-3d-scene { 
+    width: 100%; 
+    max-width: 500px; 
+    height: 380px; 
+    perspective: 1200px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    cursor: grab; 
+    background: rgba(255, 255, 255, 0.05); 
+    border-radius: 20px; 
+    border: 1px solid rgba(255, 255, 255, 0.15); 
+    margin-bottom: 20px; 
+    overflow: hidden;
+}
+.cassette-3d-scene:active { cursor: grabbing; }
+
+.cas-wrapper { 
+    position: relative; 
+    width: 300px; 
+    height: 190px; 
+    transform-style: preserve-3d; 
+    transform: translateZ(-15px) rotateX(20deg) rotateY(-25deg); 
+    transition: transform 0.1s ease-out;
+}
+
+.cas-face { 
+    position: absolute; 
+    background-color: #2a2a2a; 
+    border: none;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transform-style: preserve-3d; 
+    backface-visibility: hidden;
+}
+
+/* Front dan Back - kaca bening TANPA BLUR */
+.cas-front { 
+    width: 300px; 
+    height: 190px; 
+    transform: rotateY(0deg) translateZ(15px); 
+    background: linear-gradient(135deg, 
+        rgba(255,255,255,0.4) 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        rgba(255,255,255,0.3) 100%);
+    box-shadow: 
+        inset 0 0 20px rgba(255,255,255,0.3),
+        inset 2px 2px 10px rgba(255,255,255,0.2),
+        inset -2px -2px 10px rgba(0,0,0,0.1),
+        0 0 15px rgba(255,255,255,0.2);
+}
+
+.cas-back { 
+    width: 300px; 
+    height: 190px; 
+    transform: rotateY(180deg) translateZ(15px); 
+    background: linear-gradient(135deg, 
+        rgba(255,255,255,0.3) 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        rgba(255,255,255,0.4) 100%);
+    box-shadow: 
+        inset 0 0 20px rgba(255,255,255,0.3),
+        inset 2px 2px 10px rgba(255,255,255,0.2),
+        inset -2px -2px 10px rgba(0,0,0,0.1),
+        0 0 15px rgba(255,255,255,0.2);
+}
+
+/* Sisi kanan dan kiri - TANPA BLUR */
+.cas-right { 
+    width: 30px; 
+    height: 190px; 
+    left: 135px; 
+    top: 0; 
+    transform: rotateY(90deg) translateZ(150px); 
+    background: linear-gradient(to right, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.2) 100%);
+    box-shadow: inset -5px 0 15px rgba(255,255,255,0.1);
+}
+
+.cas-left { 
+    width: 30px; 
+    height: 190px; 
+    left: 135px; 
+    top: 0; 
+    transform: rotateY(-90deg) translateZ(150px); 
+    background: linear-gradient(to left, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.2) 100%);
+    box-shadow: inset 5px 0 15px rgba(255,255,255,0.1);
+}
+
+/* Atas dan bawah - TANPA BLUR */
+.cas-top { 
+    width: 300px; 
+    height: 30px; 
+    top: 80px; 
+    left: 0; 
+    transform: rotateX(90deg) translateZ(95px); 
+    background: linear-gradient(to top, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.2) 100%);
+    box-shadow: inset 0 -5px 15px rgba(255,255,255,0.1);
+}
+
+.cas-bottom { 
+    width: 300px; 
+    height: 30px; 
+    top: 80px; 
+    left: 0; 
+    transform: rotateX(-90deg) translateZ(95px); 
+    background: linear-gradient(to bottom, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.2) 100%);
+    box-shadow: inset 0 5px 15px rgba(255,255,255,0.1);
+}
+
+/* Window cassette - TANPA BLUR */
+/* Window cassette - SEKARANG TRANSPARAN */
+.cas-window-3d { 
+    position: absolute; 
+    width: 140px; 
+    height: 45px; 
+    background: transparent; /* Diubah dari rgba(0,0,0,0.3) */
+    border-radius: 22px; 
+    z-index: 10; 
+    border: 3px solid rgba(0,0,0,0.2);
+    /* Efek bayangan dalam agar terlihat seperti lubang */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Reel/Spool - SEKARANG BULAT SEMPURNA */
+.cas-wheel-l, .cas-wheel-r { 
+    position: absolute; 
+    width: 38px; 
+    height: 38px; 
+    border-radius: 50%; /* Menambah ini agar jadi bulat */
+    background: conic-gradient(from 0deg, 
+        #eee 0deg, #ccc 90deg, #eee 180deg, #999 270deg, #eee 360deg);
+    z-index: 9; /* Di bawah window */
+    top: 50%; 
+    transform: translateY(-50%); 
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.cas-wheel-l { left: 85px; } 
+.cas-wheel-r { right: 85px; }
+
+
+.cas-wheel-l::after, .cas-wheel-r::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 3px rgba(255,255,255,0.2);
+}
+
+/* Label area */
+/* Area Label - Diperketat agar tidak ada celah putih */
+.cas-label-3d { 
+    position: absolute; 
+    width: 220px; 
+    height: 115px; 
+    background: transparent; /* PENTING: Harus transparan agar bolongnya terlihat */
+    border-radius: 5px; 
+    z-index: 5; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    
+    /* MASK YANG SAMA UNTUK 3D */
+    -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='350' height='180'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='350' height='180' fill='white'/%3E%3Crect x='60' y='55' width='230' height='70' rx='10' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='350' height='180' fill='black' mask='url(%23m)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='350' height='180'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='350' height='180' fill='white'/%3E%3Crect x='60' y='55' width='230' height='70' rx='10' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='350' height='180' fill='black' mask='url(%23m)'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
+
+
+
+/* Texture - TANPA BLUR */
+.cas-texture { 
+    position: absolute; 
+    width:100%; 
+    height:100%; 
+    top:0; 
+    left:0; 
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%); 
+    pointer-events: none; 
+    border-radius: inherit; 
+    z-index: 20;
+}
+
+/* Container Konten Label - Skala Diperbaiki */
+.cas-label-content { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 350px; /* Lebar asli container konten */
+    height: 180px; /* Tinggi asli container konten */
+    transform-origin: top left;
+    /* Pastikan skala menutupi area 220x115 dengan pas tanpa celah */
+    transform: scale(0.63); 
+}
+/* ============================
+   BAUT/SCREWS UNTUK CASSETTE 3D
+   Hanya di Front dan Back
+============================ */
+.cas-screw {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 30% 30%, #333 0%, #000 60%, #111 100%);
+    border-radius: 50%;
+    z-index: 25;
+    box-shadow: 
+        0 2px 4px rgba(0,0,0,0.6),
+        inset 0 1px 2px rgba(255,255,255,0.1);
+}
+
+/* Garis silang baut Phillips */
+.cas-screw::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 1.5px;
+    background: #222;
+    transform: translate(-50%, -50%);
+}
+
+.cas-screw::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.5px;
+    height: 6px;
+    background: #222;
+    transform: translate(-50%, -50%);
+}
+
+/* Posisi baut Front - 4 pojok */
+.cas-front .cas-screw-tl { top: 12px; left: 12px; }
+.cas-front .cas-screw-tr { top: 12px; right: 12px; }
+.cas-front .cas-screw-bl { bottom: 12px; left: 12px; }
+.cas-front .cas-screw-br { bottom: 12px; right: 12px; }
+
+/* Posisi baut Back - 4 pojok */
+.cas-back .cas-screw-tl { top: 12px; left: 12px; }
+.cas-back .cas-screw-tr { top: 12px; right: 12px; }
+.cas-back .cas-screw-bl { bottom: 12px; left: 12px; }
+.cas-back .cas-screw-br { bottom: 12px; right: 12px; }
+
+/* ============================================
+   KONTROL LIPATAN 3D
+   ============================================ */
+
+.fold-controls {
+    width: 100%;
+    max-width: 450px;        /* Lebar cukup */
+    margin: 15px auto;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-sizing: border-box;
+    user-select: none;       /* Mencegah text selection saat drag */
+    -webkit-user-select: none;
+}
+
+.fold-controls label {
+    font-size: 12px;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+}
+
+/* ⭐ TRACK - cukup tinggi untuk mudah di-tap */
+.fold-slider {
+    width: 100%;
+    height: 8px;               /* Dari 4px → 8px */
+    border-radius: 4px;
     background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
 }
 
-.nav-bubble.active {
-    background: white;
-    color: black;
+/* ⭐ THUMB - cukup besar untuk mudah di-drag */
+.fold-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;               /* Dari 16px → 22px */
+    height: 22px;              /* Dari 16px → 22px */
+    border-radius: 50%;
+    background: #00ff96;
+    cursor: grab;              /* Cursor grab */
+    box-shadow: 
+        0 2px 8px rgba(0, 255, 150, 0.4),
+        0 0 0 4px rgba(0, 255, 150, 0.1);  /* Ring glow */
+    transition: transform 0.15s ease;
+    margin-top: -7px;          /* Center di track */
 }
 
-/* HERO */
-.hero{
-padding-top:110px;
-text-align:center;
-}
-.hero h1{
-font-size:28px;
-letter-spacing:4px;
-font-weight:600;
+.fold-slider::-webkit-slider-thumb {
+    width: 40px;               /* 40px */
+    height: 40px;              /* 40px */
+    margin-top: 0px;         /* Center: (40-10)/2 = 15 */
+    box-shadow: 
+        0 4px 16px rgba(0, 255, 150, 0.5),
+        0 0 0 8px rgba(0, 255, 150, 0.15);
 }
 
-/* ===== PROFILE PHOTO ===== */
-.profile-photo{
-display:flex;
-justify-content:center;
-margin-bottom:20px;
+.fold-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(0.95);
 }
 
-.profile-photo img{
-width:300px;   /* atur ukuran sesuai kebutuhan */
-height:auto;
-display:block;
-background:none;
-border:none;
-box-shadow:none;
-border-radius:0;
+/* Firefox */
+.fold-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #00ff96;
+    cursor: grab;
+    border: none;
+    box-shadow: 
+        0 2px 8px rgba(0, 255, 150, 0.4),
+        0 0 0 4px rgba(0, 255, 150, 0.1);
 }
 
-/* GLASS CARD */
-.glass{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(18px);
-border:1px solid rgba(255,255,255,0.08);
-border-radius:28px;
-padding:32px;
-margin:40px auto;
-width:65%;
-max-width:500px;
-animation:fadeUp 0.8s ease;
+.fold-labels {
+    font-size: 11px;
+    margin-top: 10px;
 }
 
-@keyframes fadeUp{
-from{opacity:0; transform:translateY(30px);}
-to{opacity:1; transform:translateY(0);}
+#foldValue {
+    font-size: 12px;
 }
 
-/* ZINE */
-.zine{ text-align:center; }
-.zine img{
-width:200px;
-aspect-ratio:auto;
-object-fit:cover;
-margin-buttom:15px;
-border-radius:12px;
-cursor:pointer;
-transition:0.4s;
-}
-.zine img:hover{ transform:scale(1.05); }
-.zine p{
-font-size:13px;
-margin-top:15px;
-letter-spacing:2px;
-opacity:0.7;
-will-change: transform;
-transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-
-/* FLIPBOOK */
-#flipbook-container{
-display:none;
-position:fixed;
-inset:0;
-background:#000;
-z-index:2000;
-}
-
-#flipbook{ margin:auto; }
-
-#flipbook .page{
-background:#111;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-#flipbook canvas{
-  max-width:100%;
-  max-height:100%;
-  pointer-events: none;
-}
-
-/* ===== READER UI ===== */
-.glass-ui{
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(18px);
-border:1px solid rgba(255,255,255,0.15);
-border-radius:14px;
-padding:10px 16px;
-}
-
-/* CLOSE */
-.close-btn{
-position:fixed;
-
-/* POSISI BARU: DI ATAS TOMBOL PANAH */
-bottom:95px;
-left:50%;
-transform:translateX(-50%);
-
-font-size:11px;
-letter-spacing:2px;
-cursor:pointer;
-z-index:9999;
-}
-
-/* SWIPE HINT */
-.swipe-hint{
-position:fixed;
-top:20px;
-left:20px;
-font-size:11px;
-opacity:0.7;
-z-index:9999;
-}
-
-/* NAV ARROWS */
-.nav-arrows{
-position:fixed;
-bottom:30px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:50px;
-z-index:9999;
-}
-
-.arrow{
-width:48px;
-height:48px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:50%;
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(14px);
-border:1px solid rgba(255,255,255,0.18);
-font-size:22px;
-cursor:pointer;
-user-select:none;
-transition:0.25s;
-}
-
-.arrow:active{ transform:scale(0.9); }
-
-footer{
-text-align:center;
-padding:50px 0;
-font-size:11px;
-opacity:0.4;
-}
-.read-btn{
-padding:8px 18px;
-background:white;
-color:black;
-border:none;
-border-radius:20px;
-font-size:11px;
-letter-spacing:2px;
-cursor:pointer;
-transition:0.3s;
-}
-
-.read-btn:hover{
-transform:scale(1.05);
-}
-.zine-buttons{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-margin-top:12px;
-}
-
-.download-btn{
-background:white;
-color:black;
-
-border:1px solid black;
-border-radius:50px;
-
-padding:8px 12px;
-font-size:12px;
-letter-spacing:1px;
-
-cursor:pointer;
-
-transition:0.05s;
-}
-
-/* efek saat ditekan */
-.download-btn:active{
-background:black;
-color:white;
-transform:translateY(2px);
-}
-#intro{
-position:fixed;
-inset:0;
-background:black;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-z-index:9999;
-transition:1.2s ease;
-}
-
-#introText{
-font-size:18px;
-letter-spacing:8px;
-opacity:0;
-filter:blur(10px);
-transition:1.2s ease;
-}
-
-#introSub{
-margin-top:20px;
-font-size:11px;
-letter-spacing:4px;
-opacity:0;
-filter:blur(10px);
-transition:1.5s ease;
-opacity:0.5;
-}
-#zine-loading{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#000;
-color:#fff;
-display:none;
-justify-content:center;
-align-items:center;
-z-index:999999; /* harus lebih tinggi dari flipbook */
-font-size:14px;
-letter-spacing:4px;
-}
-#pagination{
-text-align:center;
-margin-top:40px;
-}
-
-#pagination button{
-margin:5px;
-padding:8px 16px;
-background:rgba(255,255,255,0.1);
-color:white;
-border:1px solid rgba(255,255,255,0.2);
-border-radius:20px;
-cursor:pointer;
-}
-
-#pagination button.active{
-background:white;
-color:black;
-}
-.profile-photo img {
-    /* ... kode yang sudah ada ... */
-    pointer-events: none;       /* Gambar tidak bisa di-klik/sentuh */
-    user-select: none;          /* Gambar tidak bisa di-select */
-    -webkit-user-drag: none;    /* Mencegah gambar ditarik (drag) */
-    touch-action: none;         /* Mematikan interaksi sentuh di mobile */
-}
-img {
-    -webkit-touch-callout: none; /* Mematikan menu save/copy di iOS/Android */
-    -webkit-user-drag: none;      /* Mencegah gambar diseret */
-    user-select: none;            /* Mencegah seleksi gambar */
-}
-
-.loader-text{
-color:white;
-font-size:14px;
-letter-spacing:4px;
-animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-0%{opacity:0.3;}
-50%{opacity:1;}
-100%{opacity:0.3;}
-}
-/* ===== SKELETON LOADING - OVERRIDE MAXIMUM ===== */
-
-/* Selector super spesifik untuk menangkal font color */
-body.loading .glass h1,
-body.loading .glass h2,
-body.loading .glass h3,
-body.loading .glass p,
-body.loading .glass .glass-text,
-body.loading .glass .archive-text,
-body.loading section .glass p,
-body.loading #about .glass p {
-  color: transparent !important;
-  background: rgba(255,255,255,0.08) !important;
-  border-radius: 4px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Shimmer effect */
-body.loading .glass h1::after,
-body.loading .glass h2::after,
-body.loading .glass h3::after,
-body.loading .glass p::after,
-body.loading .glass .glass-text::after,
-body.loading .glass .archive-text::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,0.15),
-    transparent
-  );
-  animation: skeletonMove 1.2s infinite;
-  z-index: 9999;
-}
-
-@keyframes skeletonMove {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-
-/* === EXCEPTION - ZINE CARD === */
-body.loading .glass.zine-card h1,
-body.loading .glass.zine-card h2,
-body.loading .glass.zine-card h3,
-body.loading .glass.zine-card p,
-body.loading .glass.zine-card .glass-text {
-  color: inherit !important;
-  background: transparent !important;
-}
-body.loading .glass.zine-card h1::after,
-body.loading .glass.zine-card h2::after,
-body.loading .glass.zine-card h3::after,
-body.loading .glass.zine-card p::after,
-body.loading .glass.zine-card .glass-text::after {
-  display: none !important;
-}
-
-/* === EXCEPTION - BUTTON & INPUT === */
-body.loading .glass button,
-body.loading .glass a,
-body.loading .glass input,
-body.loading .glass textarea {
-  color: inherit !important;
-  background: inherit !important;
-}
-body.loading .glass button::after,
-body.loading .glass a::after,
-body.loading .glass input::after,
-body.loading .glass textarea::after {
-  display: none !important;
-}
-
-/* === EXCEPTION - MUSIC TEXT === */
-body.loading .glass .music-text {
-  color: inherit !important;
-}
-body.loading .glass .music-text::after {
-  display: none !important;
-}
-
-.reveal{
-opacity:0;
-transform:translateY(40px);
-transition:0.8s ease;
-}
-
-.reveal.show{
-opacity:1;
-transform:translateY(0);
-}
-
-.brand{
-display:60px;
-align-items:center;
-}
-
-.profile-photo img{
-  width:300px;
-  height:auto;
-  display:block;
-  opacity:0;
-  transform: translateY(40px);
-}
-
-@keyframes profileSlide{
-  from{
-    opacity:0;
-    transform: translateY(40px);
-  }
-  to{
-    opacity:1;
-    transform: translateY(0);
-  }
-}
-#about{
-  text-align:center;
-}
-
-/* FONT ARCHIVE TEXT ONLY */
-/* CSS FONT - versi tanpa !important di color */
-.glass.archive-text,
-.glass-text,
-.glass p:not(.zine p):not(.music-text) {
-    font-family: 'Poppins', monospace !important;
-    font-size:13px !important;
-    line-height:1.6 !important;
-    color: rgba(255, 255, 255, 0.60); /* ← HAPUS !important */
-}
-/* JUDUL ZINE TETAP NORMAL */
-.zine-title {
-    font-family: 'Poppins', serif !important;
-    font-weight: 700;           /* ← ini menebalkan teks */
-    font-size: 11px !important;
-    letter-spacing: 1.6px;
-    color: white !important;
-    display: inline-block;
-    padding: 2px 8px;
+.fold-controls-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;        /* Lebih kecil lagi */
+    margin: 8px auto;
+    padding: 8px 12px;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(8px);
-    border-radius: 9px;
-    border: 1px solid rgba(255, 255, 255, 0.01);
-}
-/* SEARCH INPUT TIDAK IKUT FONT ARCHIVE */
-#zineSearch{
-    font-family: Arial, sans-serif !important;
-}
-/* Semua teks dalam card glass lebih lembut */
-.gif-bg{
-position:fixed;
-top:0;
-left:0;
-
-width:100vw;
-height:100dvh;
-
-background-image:url("back1.jpg");
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-
-z-index:-1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-sizing: border-box;
 }
 
-#bgimg{
-position:fixed;
-top:0;
-left:0;
-
-width:100%;
-height:100%;
-
-object-fit:cover;
-object-position:center;
-
-z-index:-1;
-pointer-events:none;
-}
-.gif-bg::after{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-
-background:rgba(0,0,0,0.60);
-}
-/* MENU CONTAINER */
-.menu{
-display:flex;
-gap:3px;
+.fold-controls-inline label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
 }
 
-/* GLASS BUBBLE */
-.nav-bubble{
-
-font-family:'Stack Sans Text', sans-serif; /* sama seperti brand */
-
-font-weight:700;
-
-letter-spacing:1px;
-
-font-size:10px;
-
-padding:10px 15px;
-
-border-radius:40px;
-
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(12px);
-
-border:1px solid rgba(255,255,255,0.15);
-
-color:white;
-text-decoration:none;
-
-transition:0.25s ease;
-
+.fold-controls-inline .fold-slider {
+    flex: 1;
+    max-width: 150px;
+    height: 3px;
 }
 
-/* HOVER EFFECT */
-.nav-bubble:hover{
-
-background:rgba(255,255,255,0.18);
-
-transform:translateY(-1px);
-
+.fold-controls-inline .fold-slider::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
 }
 
-/* CLICK EFFECT */
-.nav-bubble.active{
-
-background:white;
-color:black;
-
-border:none;
-
-transform:scale(0.95);
-
+.fold-controls-inline #foldValue {
+    font-size: 10px;
+    font-weight: 700;
+    color: #00ff96;
+    min-width: 25px;
+    text-align: center;
 }
+
+/* ============================================
+   CSS 3D FOLDING TRANSITIONS
+   ============================================ */
+
+.spine-panel, .back-panel {
+    transition: transform 0.3s ease-out;
+}
+
 
 
 </style>
 </head>
 <body>
-<div class="gif-bg"></div>
-<script>
-var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
-var bg = images[Math.floor(Math.random()*images.length)];
-document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
-</script>
-<body oncontextmenu="return false;">
-<div id="intro">
-  <h id="introText">ZINE FLIPBOOK</h>
-  <p id="introSub">digital underground archive</p>
-</div>
-<nav class="nav-hidden">
-<audio id="bg-music" loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
-<div class="nav-container">
-<div class="brand">
-<a href="#">
-<img src="logo.png" alt="logo">
-</a>
-</div>
-        <div class="menu">
-            <a href="#zine" class="nav-bubble">ZINE</a>
-            <a href="j-card.html" class="nav-bubble">J-CARD</a>
-            <a href="#about" class="nav-bubble">ABOUT</a>
+    <nav class="nav-hidden">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="index.html"> <img src="logo.png" alt="logo"> </a>
+            </div>
+            <div class="menu">
+                <a href="index.html#zine" class="nav-bubble">ZINE</a>
+                <a href="#" class="nav-bubble active">J-CARD</a>
+                <a href="index.html#about" class="nav-bubble">ABOUT</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="profile-photo">
+        <img src="profile2.png" alt="Profile" id="profileImg">
+    </div>
+    
+    <div class="gif-bg"></div>
+    <div class="app-header"><h1>J-CARD MAKER</h1></div>
+    <div class="web-info-tab">
+        <div class="info-content">
+            <h2>J-CARD CASSETTE</h2>
+            <p>Melalui J-Card Cassette Maker, proses pembuatan sampul kaset menjadi lebih terstruktur. Anda hanya perlu mengunggah materi visual, mengatur komposisi posisi, dan sistem akan menghasilkan sampul yang siap untuk dicetak.
+</p>
         </div>
     </div>
-</div>
-
-
-</div>
-</nav>
-<audio id="bg-music" loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
-
-<div class="hero">
-  <div class="profile-photo">
-    <img src="profile.png" alt="Profile" id="profileImg" draggable="false">
-</div>
-  <h1>ZINE FLIPBOOK</h1>
-</div>
-
-<div class="glass">
-  <h3 style="letter-spacing:2px;">CHARITY FOR GAZA</h3>
-  <p class="glass-text">Satu kebaikan bisa jadi selimut, roti, dan obat bagi mereka.</p>
-  <button onclick="window.location.href='https://kasihpalestina.com/'"
-    style="margin-top:15px;
-        padding:10px 25px;
-        background:white;
-        color:black;
-        border:none;
-        border-radius:20px;
-        cursor:pointer;
-        font-size:12px;
-        letter-spacing:1px;">
-        DONASI SEKARANG
-  </button>
-</div>
-</section>
-
-<!-- ===== ZINE LIST (3 ITEM) ===== -->
-<section id="zine">
-<div class="glass" style="text-align:center;">
-  <input 
-    type="text" 
-    id="zineSearch" 
-    placeholder="Search zine..."
-    onkeyup="searchZine()"
-    style="
-      width:100%;
-      padding:12px;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:20px;
-      color:white;
-      outline:none;
-      font-size:13px;
-      letter-spacing:1px;
-    ">
-</div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
     
-        <img 
-    src="cover6.jpg" 
-    onclick="openFlipbook('zine6.pdf'); addView('zine6')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title">LYCHNOBITE THEORY</p>
-    
-        <p style="opacity:0.4; font-size:10px;">
-          ♫ music : TITLE FIGHT - Head in the Ceiling Fan
-        </p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine6">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine6.pdf'); addView('zine6')">
-            READ
-          </button>
-    
-                <a href="zine6.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
-      </div>
-    </div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover5.jpg" 
-    onclick="openFlipbook('zine5.pdf'); addView('zine5')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title">WHO DO YOU CALL<br>WHEN POLICE MURDER?</p>
-    
-        <p style="opacity:0.4; font-size:10px;">
-          ♫ music : HOMICIDE - Rima Ababil
-        </p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine5">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine5.pdf'); addView('zine5')">
-            READ
-          </button>
-    
-                <a href="zine5.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
-        </div>
-    </div>
-    </div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover1.jpg" 
-    onclick="openFlipbook('zine1.pdf'); addView('zine1')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title"> DREAM TURNED INTO<br>STRAIGHT BULLSHIT</p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine1">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine1.pdf'); addView('zine1')">
-            READ
-          </button>
-    
-                <a href="zine1.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
+    <div class="controls">
+        <button onclick="document.getElementById('imageUpload').click()">Upload Front Cover</button>
+        <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'front')">
+        <button onclick="document.getElementById('spineUpload').click()">Upload Spine Cover</button>
+        <input type="file" id="spineUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'spine')">
+        <button onclick="document.getElementById('backUpload').click()">Upload Back Cover</button>
+        <input type="file" id="backUpload" accept="image/*" style="display:none" onchange="handleUpload(this, 'back')">
+        
+        <div class="color-row">
+            <div class="color-group">
+                <label>Cover Color</label>
+                <input type="color" id="coverColor" value="#ffffff" onchange="changeBackColor()">
+            </div>
+            <div class="color-group">
+                <label>Font Color</label>
+                <input type="color" id="fontColor" value="#000000" onchange="changeFontColor()">
+            </div>
         </div>
 
+        <label>Font Family</label>
+        <select id="fontSelector" onchange="changeFont()"></select>
     </div>
-    </div>
-<div class="glass zine-item zine-card reveal">
-        <div class="zine">
-      
-          <img 
-    src="cover2.jpg" 
-    onclick="openFlipbook('zine2.pdf'); addView('zine2')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
 
-      
-          <p class="zine-title"> AKU, KAMU, & PALESTINE 🍉</p>
-      
-          <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine2">0</span> views
-</p>
-            <button class="read-btn" onclick="openFlipbook('zine2.pdf'); addView('zine2')">
-              READ
-            </button>
-      
-                  <a href="zine2.pdf" download class="download-btn">
-                              ⬇︎
-                            </a>
-                            </div>
-      
-          </div>
-  
-      </div>
-      </div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover4.jpg" 
-    onclick="openFlipbook('zine4.pdf'); addView('zine4')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title"> MEMERAS JAM SAMPAI<br>KELUAR DETIK TERAKHIR</p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine4">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine4.pdf'); addView('zine4')">
-            READ
-          </button>
-    
-                <a href="zine4.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
+    <div class="web-info-tab">
+        <div class="info-content">
+            <h3>PENTING!</h3>
+            <p>Jika Sudah Mempunyai design<br>tinggal drop design yang sudah ada, Klik Text untuk menghapus,<br>atau tahan tanda + untuk menggeser.<br><br>Front Cover: 650 x 1020 px <br>Spine Cover: 127 x 1020 px<br>Back Cover: 254 x 1020 px</p>
         </div>
-
     </div>
+    
+    <div class="canvas-viewport">
+        <div id="jcard-canvas">
+            <div class="section back-flap" id="playlistSection">
+                <div class="transform-box" style="top:40px; left:20px;">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content">
+                        <h3 contenteditable="true" id="backTitle">playlist</h3>
+                        <div class="tracklist" contenteditable="true" id="backTracklist">1. track<br>2. track<br>3. track</div>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+            <div class="section spine">
+                <div class="transform-box">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content spine-text" contenteditable="true" id="spineTitle">band name</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+            <div class="section front-cover" id="albumArt">
+                <div class="transform-box" style="left:30px;">
+                    <div class="handle-move">+</div>
+                    <div class="front-overlay">
+                        <h1 class="editable-content" contenteditable="true" id="frontTitle">Cover</h1>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
     </div>
-<div id="pagination"></div>
-  <div class="glass zine-item">
-    <div class="zine">
-      <img src="cover.gif">
-    <h4 style="letter-spacing:2px;">COMING SOON</h4>
-    </div>
-  </div>
-
-</section>
-<section id="kritik">
-  <div class="glass">
-    <h3 style="letter-spacing:2px;">Fedback</h3>
-
-    <textarea id="kritikPesan"
-      placeholder="Tulis kritik & saran kamu di sini..."
-      style="
-        width:100%;
-        height:30px;
-        margin-top:5px;
-        padding:5px;
-        background:rgba(255,255,255,0.05);
-        border:1px solid rgba(255,255,255,0.15);
-        border-radius:10px;
-        color:white;
-        resize:none;
-        outline:none;
-        font-size:15px;
-      ">
-    </textarea>
-
-    <button onclick="kirimKritik()"
-      style="
-        margin-top:15px;
-        padding:10px 25px;
-        background:white;
-        color:black;
-        border:none;
-        border-radius:20px;
-        cursor:pointer;
-        font-size:12px;
-        letter-spacing:1px;
-      ">
-      KIRIM
+ <div class="controls">
+    <button onclick="document.getElementById('fullWrapUpload').click()" style="background: rgba(0, 255, 150, 0.15); border: 1px solid #00ff96; color: #00ff96; margin-bottom: 20px;">
+        Upload Full Wrap Image
     </button>
-  </div>
-</section>
-<section id="about">
-<div class="glass zine-item">
-<h3 style="letter-spacing:2px;">ABOUT ARCHIVE</h3>
-<p class="glass-text">
-Website ini adalah arsip digital zine independen.
-Eksplorasi visual dan teks dalam format flipbook digital.
-Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik secara perlahan. Beberapa zine mungkin terasa kasar, tidak rapi, atau penuh kesalahan. Halaman-halaman yang kotor, kalimat yang patah, dan ide yang tidak selalu selesai, website ini hanyalah sebuah arsip kecil di internet. Tempat menyimpan halaman-halaman yang mungkin tidak pernah diminta oleh siapa pun untuk ada. Zine-zine ini tetap dibiarkan hidup di sini untuk dibaca, dibagikan, atau sekadar dilihat oleh siapa saja.
-<p class="music-text" style="opacity:0.4; font-size:11px;">
-    ♫ background music : hasohkah (shcool rooftop)
-</p>
+    <input type="file" id="fullWrapUpload" accept="image/*" style="display:none" onchange="handleFullWrap(this)">
 
-</p>
+    <div class="app-header"><h3>COVER BACK FULL WRAP MODE</h3></div>
+    </div>
+   </div>
+    <div class="canvas-viewport">
+        <div id="jcard-canvas-full" class="full-wrap-container">
+            <div class="section back-flap">
+                <div class="transform-box" style="top:40px; left:20px;">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content">
+                        <h3 contenteditable="true"></h3>
+                        <div class="tracklist" contenteditable="true"></div>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+            <div class="section spine">
+                <div class="transform-box">
+                    <div class="handle-move">+</div>
+                    <div class="editable-content spine-text" contenteditable="true"></div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+            <div class="section front-cover">
+                <div class="transform-box" style="left:30px;">
+                    <div class="handle-move">+</div>
+                    <div class="front-overlay">
+                        <h1 class="editable-content" contenteditable="true"></h1>
+                    </div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-header" style="margin-top: 20px;"><h3>3D J-CARD PREVIEW</h3></div>
+    <div class="scene-3d">
+        <div class="jcard-3d-wrapper" id="jcard-3d-object">
+            <div class="panel front-panel">
+                <div class="face outer front-outer" id="3d-front-outer">
+                    <div class="text-3d-overlay" id="front-text-3d">Cover</div>
+                </div>
+                <div class="face inner front-inner">
+                    <div class="inner-texture" id="3d-front-inner"></div>
+                    <div class="text-3d-overlay" id="front-text-3d-inner"></div>
+                </div>
+                
+                <div class="panel spine-panel">
+                    <div class="face outer spine-outer" id="3d-spine-outer">
+                        <div class="text-3d-overlay" id="spine-text-3d">band name</div>
+                    </div>
+                    <div class="face inner spine-inner">
+                        <div class="inner-texture" id="3d-spine-inner"></div>
+                        <div class="text-3d-overlay" id="spine-text-3d-inner"></div>
+                    </div>
+                    
+                    <div class="panel back-panel">
+                        <div class="face outer back-outer" id="3d-back-outer">
+                            <div class="text-3d-overlay" id="back-text-3d">
+                                <h3>playlist</h3>
+                                <div class="tracklist-3d">1. track<br>2. track<br>3. track</div>
+                            </div>
+                        </div>
+                        <div class="face inner back-inner">
+                            <div class="inner-texture" id="3d-back-inner"></div>
+                            <div class="text-3d-overlay" id="back-text-3d-inner">
+                                <h3></h3>
+                                <div class="tracklist-3d"></div>
+                                <div class="fold-controls-inline">
+                            </div>
+                        </div>
+                     </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fold-controls-inline">
+    <label>Lipat</label>
+    <input type="range" id="foldSlider" min="0" max="180" value="0" class="fold-slider">
+    <span id="foldValue">0°</span>
 </div>
-</section>
+        <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
+        <p>DOWNLOAD DESIGN COVER</p>
+        <div class="button-group">
+            <button onclick="saveDesign('manual', 'jpg')">JPG</button>
+            <button onclick="saveDesign('manual', 'pdf')">PDF</button>
+        </div>
 
-<footer>ZINE FLIPBOOK Copyright © Rath x Souterrain</footer>
-<!-- ===== FLIPBOOK VIEW ===== -->
-<div id="zine-loading">
-  membuka zine...
+        <p style="margin-top: 15px;">DOWNLOAD DESIGN BACK (FULL WRAP)</p>
+        <div class="button-group">
+            <button onclick="saveDesign('full', 'jpg')" class="btn-save-full">JPG</button>
+            <button onclick="saveDesign('full', 'pdf')" class="btn-save-full">PDF</button>
+        </div>
+
+        <button onclick="location.reload()" class="btn-reset" style="margin-top: 5px; width: 100%;">RESET DESIGN</button>
+    </div>
+<div class="label-maker-section">
+    <div class="app-header"><h3>CASSETTE LABEL MAKER</h3></div>
+    
+    <div class="controls">
+        <div class="button-group">
+            <button onclick="document.getElementById('uploadSideA').click()">Upload Side A</button>
+            <input type="file" id="uploadSideA" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideA')">
+            <button onclick="document.getElementById('uploadSideB').click()">Upload Side B</button>
+            <input type="file" id="uploadSideB" accept="image/*" style="display:none" onchange="uploadStickerLabel(this, 'sideB')">
+        </div>
+        
+        <div class="color-row">
+            <div class="color-group">
+                <label>Warna Kaset</label>
+                <input type="color" id="casShellColor" value="#222222" onchange="updateLabelColors()">
+            </div>
+            <div class="color-group">
+                <label>Warna Label</label>
+                <input type="color" id="lblCanvasColor" value="#ffffff" onchange="updateLabelColors()">
+            </div>
+            <div class="color-group">
+                <label>Warna Text</label>
+                <input type="color" id="lblTextColor" value="#000000" onchange="updateLabelColors()">
+            </div>
+        </div>
+
+        <label>Font Label</label>
+        <select id="labelFontSelector" onchange="updateLabelFont()"></select>
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; width: 100%; max-width: 800px;">
+        <div>
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE A DESIGN</p>
+            <div id="canvas-sideA" class="label-canvas">
+                <div class="label-bg" id="bg-sideA"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box" id="label-box-sideA" style="top: 20px; left: 85px;">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" id="text-sideA" contenteditable="true">BAND NAME</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin-bottom: 10px; color:rgba(255,255,255,0.7); letter-spacing: 2px;">SIDE B DESIGN</p>
+            <div id="canvas-sideB" class="label-canvas">
+                <div class="label-bg" id="bg-sideB"></div>
+                <div class="tape-cutout"></div>
+                <div class="label-transform-box" id="label-box-sideB" style="top: 20px; left: 85px;">
+                    <div class="handle-move">+</div>
+                    <div class="label-text editable-content" id="text-sideB" contenteditable="true">BAND NAME</div>
+                    <div class="handle-resize"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-header"><h3>3D CASSETTE PREVIEW</h3></div>
+    <div class="cassette-3d-scene" id="cas-scene">
+        <div class="cas-wrapper" id="cas-object">
+<!-- FRONT FACE - dengan 4 baut -->
+<div class="cas-face cas-front">
+    <div class="cas-texture"></div>
+    <div class="cas-screw cas-screw-tl"></div>
+    <div class="cas-screw cas-screw-tr"></div>
+    <div class="cas-screw cas-screw-bl"></div>
+    <div class="cas-screw cas-screw-br"></div>
+    
+    <div class="cas-label-3d" id="preview-sideA">
+        <div class="cas-label-content" id="content-sideA"></div>
+    </div>
+    
+    <div class="cas-window-3d"></div>
+    <div class="cas-wheel-l"></div>
+    <div class="cas-wheel-r"></div>
 </div>
-<div id="flipbook-container">
 
-  <div class="close-btn glass-ui" onclick="closeFlipbook()">CLOSE</div>
-  <div id="flipbook"></div>
 
-  <div class="nav-arrows">
-    <div class="arrow" id="prevBtn">←</div>
-    <div class="arrow" id="nextBtn">→</div>
-  </div>
-
+<!-- BACK FACE - dengan 4 baut -->
+<div class="cas-face cas-back">
+    <div class="cas-texture"></div>
+    <!-- 4 BAUT POJOK -->
+    <div class="cas-screw cas-screw-tl"></div>
+    <div class="cas-screw cas-screw-tr"></div>
+    <div class="cas-screw cas-screw-bl"></div>
+    <div class="cas-screw cas-screw-br"></div>
+    
+    <div class="cas-label-3d" id="preview-sideB">
+        <div class="cas-label-content" id="content-sideB"></div>
+    </div>
+    <div class="cas-window-3d"></div>
+    <div class="cas-wheel-l"></div>
+    <div class="cas-wheel-r"></div>
 </div>
+
+<!-- Sisi lain tetap sama tanpa baut -->
+<div class="cas-face cas-top"><div class="cas-texture"></div></div>
+<div class="cas-face cas-bottom"><div class="cas-texture"></div></div>
+<div class="cas-face cas-left"><div class="cas-texture"></div></div>
+<div class="cas-face cas-right"><div class="cas-texture"></div></div>
 </div>
+    </div>
 
-
+    <div class="action-buttons" style="margin-top: 0; margin-bottom: 50px;">
+        <p>DOWNLOAD LABEL (PNG TRANSPARAN)</p>
+        <div class="button-group">
+            <button onclick="downloadLabelPng('sideA')">SIDE A</button>
+            <button onclick="downloadLabelPng('sideB')">SIDE B</button>
+        </div>
+    </div>
+</div>
 <script>
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAw66sRfrCj_3oyu2vPKKaxnwsqX_QuYV0",
-  authDomain: "zine-flipbook.firebaseapp.com",
-  projectId: "zine-flipbook",
-  storageBucket: "zine-flipbook.firebasestorage.app",
-  messagingSenderId: "622704887061",
-  appId: "1:622704887061:web:28d1d9c4ad8763e0cc151c",
-  measurementId: "G-J4748E8EZJ"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-async function addView(zineId){
-
-const ref = db.collection("zineViews").doc(zineId);
-
-await ref.set({
-views: firebase.firestore.FieldValue.increment(1)
-},{merge:true});
-
-const doc = await ref.get();
-
-if(doc.exists){
-document.getElementById("view-"+zineId).innerText = doc.data().views;
-}
-
-}
-
-  let currentSession = 0;
-async function openFlipbook(pdfUrl){
-
-  const session = ++currentSession; // 🔥 buat session baru
-
-  const loading = document.getElementById("zine-loading");
-  loading.style.display = "flex";
-
-  const container = document.getElementById("flipbook-container");
-  container.style.display = "block";
-
-  const oldFlipbook = document.getElementById("flipbook");
-
-  if($(oldFlipbook).data("turn")){
-    $(oldFlipbook).turn("destroy");
-  }
-
-  const newFlipbook = document.createElement("div");
-  newFlipbook.id = "flipbook";
-  oldFlipbook.parentNode.replaceChild(newFlipbook, oldFlipbook);
-
-const music = document.getElementById("bg-music");
-  
-  music.pause();
-  
-  if(pdfUrl === "zine5.pdf"){
-    music.src = "music-zine5.mp3";
-  }
-  else if(pdfUrl === "zine6.pdf"){
-    music.src = "music-zine6.mp3";
-  }
-  else{
-    music.src = "music.mp3"; // musik default untuk zine lain
-  }
-  
-  music.volume = 0.5;
-  music.currentTime = 0;
-  music.play().catch(()=>{});
-
-  try{
-
-    const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-
-    // 🔥 kalau sudah bukan session aktif, hentikan
-    if(session !== currentSession) return;
-
-    const total = pdf.numPages;
-
-    for(let i = 1; i <= total; i++){
-
-      if(session !== currentSession) return; // 🔥 stop kalau sudah close
-
-      const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 2 });
-
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      await page.render({
-        canvasContext: context,
-        viewport: viewport
-      }).promise;
-
-      const div = document.createElement("div");
-      div.className = "page";
-      div.appendChild(canvas);
-
-      newFlipbook.appendChild(div);
-    }
-
-    let isMobile = window.innerWidth <= 768;
-    let ratio = 1.414;
-    let pageWidth = isMobile ? window.innerWidth * 0.9 : 500;
-    let pageHeight = pageWidth * ratio;
-
-    $(newFlipbook).turn({
-      width: isMobile ? pageWidth : pageWidth * 2,
-      height: pageHeight,
-      autoCenter: true,
-      display: isMobile ? "single" : "double",
-      duration: 1200
-    });
-
-    document.getElementById("nextBtn").onclick = () => {
-      $(newFlipbook).turn("next");
-    };
-
-    document.getElementById("prevBtn").onclick = () => {
-      $(newFlipbook).turn("previous");
-    };
-
-  }catch(err){
-    console.error(err);
-  }
-
-  if(session === currentSession){
-    loading.style.display = "none";
-  }
-}
-
-function closeFlipbook(){
-
-  currentSession++; // 🔥 batalkan semua proses lama
-
-  const music = document.getElementById("bg-music");
-  music.pause();
-  music.currentTime = 0;
-
-  const flip = document.getElementById("flipbook");
-  if($(flip).data("turn")){
-    $(flip).turn("destroy");
-  }
-
-  document.getElementById("flipbook-container").style.display="none";
-  document.getElementById("zine-loading").style.display="none";
-}
-function searchZine(){
-  const input = document.getElementById("zineSearch").value.toLowerCase();
-  const items = document.querySelectorAll(".zine-item");
-
-  items.forEach(item => {
-    const text = item.innerText.toLowerCase();
-    if(text.includes(input)){
-      item.style.display = "block";
-    } else {
-      item.style.display = "none";
-    }
-  });
-}
-function kirimKritik(){
-  const pesan = document.getElementById("kritikPesan").value.trim();
-
-  if(pesan === ""){
-    alert("Pesan tidak boleh kosong.");
-    return;
-  }
-
-  const email = "ulinnha1140@gmail.com";
-  const subject = "Kritik & Saran Website";
-
-  const link = "mailto:" + email +
-    "?subject=" + encodeURIComponent(subject) +
-    "&body=" + encodeURIComponent(pesan);
-
-  window.location.href = link;
-
-  document.getElementById("kritikPesan").value = "";
-}
-// aktifkan skeleton setelah intro selesai
-setTimeout(()=>{
-
-  document.body.classList.add("loading");
-
-},3000);
-
-
-// hilangkan skeleton setelah sebentar
-setTimeout(()=>{
-
-  document.body.classList.remove("loading");
-
-},5500);
-
-  window.addEventListener("load", ()=>{
-  const intro = document.getElementById("intro");
-  const text = document.getElementById("introText");
-  const sub = document.getElementById("introSub");
-  const profile = document.querySelector(".profile-photo img");
-
-  // munculkan teks utama
-  setTimeout(()=>{
-    text.style.opacity = "1";
-    text.style.filter = "blur(0px)";
-  }, 500);
-
-  // munculkan sub text
-  setTimeout(()=>{
-    sub.style.opacity = "0.6";
-    sub.style.filter = "blur(0px)";
-  }, 1200);
-
-  // fade out intro
-  setTimeout(()=>{
-    intro.style.opacity = "0";
-  }, 3000);
-
-  // hapus dari layar & jalankan animasi profil
-  setTimeout(()=>{
-    intro.style.display = "none";
-    profile.style.animation = "profileSlide 1s ease forwards";
-  }, 4200);
-});
-function revealZines(){
-
-const items = document.querySelectorAll("#zine .zine-card");
-
-items.forEach((item,i)=>{
-
-if(item.style.display === "none") return;
-
-const rect = item.getBoundingClientRect();
-
-if(rect.top < window.innerHeight - 100){
-
-setTimeout(()=>{
-item.classList.add("show");
-}, i * 150);
-
-}
-
-});
-
-}
-
-window.addEventListener("scroll", revealZines);
-window.addEventListener("load", revealZines);
-const itemsPerPage = 3;
-const zines = document.querySelectorAll("#zine .zine-card");
-const pagination = document.getElementById("pagination");
-
-function showPage(page, scroll=true){
-
-let start = page * itemsPerPage;
-let end = start + itemsPerPage;
-
-zines.forEach((item,index)=>{
-item.style.display = (index >= start && index < end) ? "block" : "none";
-
-if(index >= start && index < end){
-item.classList.remove("show");
-}
-
-});
-
-const buttons = document.querySelectorAll("#pagination button");
-
-buttons.forEach((btn,i)=>{
-btn.classList.toggle("active", i === page);
-});
-
-setTimeout(revealZines,100);
-
-// scroll hanya jika klik pagination
-if(scroll){
-document.getElementById("zine").scrollIntoView({
-behavior:"smooth"
-});
-}
-
-}
-
-function createPagination(){
-
-let totalPages = Math.ceil(zines.length / itemsPerPage);
-
-for(let i=0;i<totalPages;i++){
-
-let btn = document.createElement("button");
-btn.innerText = i + 1;
-
-btn.onclick = () => showPage(i, true);
-
-pagination.appendChild(btn);
-
-}
-
-}
-
-createPagination();
-showPage(0, false);
-async function loadViews(){
-
-const zines = ["zine1","zine2","zine4","zine5","zine6"];
-
-for(let id of zines){
-
-const ref = db.collection("zineViews").doc(id);
-const doc = await ref.get();
-
-if(doc.exists){
-document.getElementById("view-"+id).innerText = doc.data().views;
-}
-
-}
-
-}
-
-window.addEventListener("load", loadViews);
-if ('scrollRestoration' in history) {
-  history.scrollRestoration = 'manual';
-}
-
-window.addEventListener('load', () => {
-  window.scrollTo(0, 0);
-});
-
-const sections = document.querySelectorAll("section");
-const navLinks = document.querySelectorAll(".nav-bubble");
-
-window.addEventListener("scroll", () => {
-
-let current = "";
-
-sections.forEach(section => {
-
-const sectionTop = section.offsetTop - 120;
-
-if (scrollY >= sectionTop) {
-current = section.getAttribute("id");
-}
-
-});
-
-navLinks.forEach(link => {
-
-link.classList.remove("active");
-
-if(link.getAttribute("href") === "#" + current){
-link.classList.add("active");
-}
-
-});
-
-});
-window.addEventListener("load", () => {
-  const nav = document.querySelector("nav");
-  let lastScroll = window.pageYOffset;
-
-  // navbar muncul setelah intro
-  setTimeout(() => {
-    nav.classList.add("nav-show");
-    lastScroll = window.pageYOffset;
-  }, 4200);
-
-  // animasi scroll
-  window.addEventListener("scroll", () => {
-    const currentScroll = window.pageYOffset;
-
-    if (currentScroll > lastScroll && currentScroll > 120) {
-      // scroll ke bawah → sembunyikan navbar
-      nav.classList.remove("nav-show");
-      nav.classList.add("nav-hidden");
-    } 
-    // scroll ke atas → tampilkan navbar hanya jika sebelumnya hidden
-    else if (currentScroll < lastScroll && nav.classList.contains("nav-hidden")) {
-      nav.classList.remove("nav-hidden");
-      nav.classList.add("nav-show");
-    }
-
-    lastScroll = currentScroll;
-  });
-
-  // klik menu navbar
-  document.querySelectorAll(".nav-bubble").forEach(link => {
-    link.addEventListener("click", () => {
-      // langsung tampilkan navbar
-      nav.classList.remove("nav-hidden");
-      nav.classList.add("nav-show");
-
-      // kunci navbar agar tidak hilang walau scroll ke atas
-      let unlockScrollDown = false;
-
-      const scrollHandler = () => {
-        const scroll = window.pageYOffset;
-        if (scroll > lastScroll) {
-          // scroll ke bawah → bisa sembunyikan navbar
-          nav.classList.remove("nav-show");
-          nav.classList.add("nav-hidden");
-          lastScroll = scroll;
-          unlockScrollDown = true;
-        } else if (!unlockScrollDown) {
-          // scroll ke atas → abaikan, jangan hilangkan navbar
-          lastScroll = scroll;
-        }
-      };
-
-      window.addEventListener("scroll", scrollHandler, { once: true });
-
-      // reset lastScroll sekarang
-      lastScroll = window.pageYOffset;
-    });
-  });
-});
-
-
-document.addEventListener("DOMContentLoaded", function(){
-
-const backgrounds = [
-"back1.jpg",
-"back2.jpg",
-"back3.jpg",
-"back4.jpg",
-"back5.jpg"
+const fontList = [
+    "Archivo Black", "Bebas Neue", "Anton", "Orbitron", "Russo One", "Kanit", "Montserrat", "Oswald", "Teko", "Rajdhani",
+    "Press Start 2P", "Monoton", "Bungee", "Bungee Shade", "Alfa Slab One", "Abril Fatface", "Permanent Marker", "Lobster", "Righteous", "Staatliches",
+    "Black Ops One", "Special Elite", "Fredoka One", "Silkscreen", "VT323", "Michroma", "Syncopate", "Faster One", "Creepster", "Bangers",
+    "Quantico", "Koulen", "Major Mono Display", "Nova Mono", "JetBrains Mono", "Unica One", "Vampiro One", "Comfortaa", "Cinzel", "Londrina Solid",
+    "Cabin Sketch", "Amatic SC", "Alumni Sans Collegiate One", "Barlow Condensed", "Alegreya Sans SC", "Graduate", "Gravitas One", "Gruppo", "Iceberg", "Jura"
 ];
 
-const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
+function populateFonts() {
+    const selector = document.getElementById('fontSelector');
+    if(!selector) return;
+    
+    selector.innerHTML = ""; 
+    fontList.sort().forEach(font => {
+        let opt = document.createElement('option');
+        opt.value = font; 
+        opt.innerHTML = font;
+        opt.style.fontFamily = font; 
+        selector.appendChild(opt);
+    });
+}
 
-document.getElementById("bgimg").src = randomBg;
+function changeFont() {
+    const selectedFont = document.getElementById("fontSelector").value;
+    const elements = document.querySelectorAll(".editable-content, .editable-content h3, .tracklist, .spine-text");
+    elements.forEach(el => {
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;  // ✅ BENAR
+    });
+    
+    // Update font di 3D preview juga
+    const text3dElements = document.querySelectorAll('.text-3d-overlay, .text-3d-overlay h3, .tracklist-3d');
+    text3dElements.forEach(el => {
+        el.style.fontFamily = `'${selectedFont}', sans-serif`;  // ✅ BENAR
+    });
+    
+    // Trigger sync ke 3D
+    syncTextTo3D();
+}
 
+document.addEventListener("DOMContentLoaded", populateFonts);
+
+// ============================
+// SYNC TEXT DARI CANVAS KE 3D
+// ============================
+function syncTextTo3D() {
+    // Sync Front Title
+    const frontTitle = document.getElementById('frontTitle');
+    const frontText3D = document.getElementById('front-text-3d');
+    const frontText3DInner = document.getElementById('front-text-3d-inner');
+    if(frontTitle && frontText3D) {
+        frontText3D.textContent = frontTitle.textContent;
+        if(frontText3DInner) frontText3DInner.textContent = frontTitle.textContent;
+    }
+    
+    // Sync Spine Title
+    const spineTitle = document.getElementById('spineTitle');
+    const spineText3D = document.getElementById('spine-text-3d');
+    const spineText3DInner = document.getElementById('spine-text-3d-inner');
+    if(spineTitle && spineText3D) {
+        spineText3D.textContent = spineTitle.textContent;
+        if(spineText3DInner) spineText3DInner.textContent = spineTitle.textContent;
+    }
+    
+    // Sync Back Title dan Tracklist
+    const backTitle = document.getElementById('backTitle');
+    const backTracklist = document.getElementById('backTracklist');
+    const backText3D = document.getElementById('back-text-3d');
+    const backText3DInner = document.getElementById('back-text-3d-inner');
+    
+    if(backTitle && backText3D) {
+        const h3 = backText3D.querySelector('h3');
+        const tracklist = backText3D.querySelector('.tracklist-3d');
+        if(h3) h3.textContent = backTitle.textContent;
+        if(tracklist) tracklist.innerHTML = backTracklist.innerHTML;
+        
+        // Sync ke inner juga
+        if(backText3DInner) {
+            const h3Inner = backText3DInner.querySelector('h3');
+            const tracklistInner = backText3DInner.querySelector('.tracklist-3d');
+            if(h3Inner) h3Inner.textContent = backTitle.textContent;
+            if(tracklistInner) tracklistInner.innerHTML = backTracklist.innerHTML;
+        }
+    }
+}
+
+// Setup MutationObserver untuk auto-sync
+document.addEventListener("DOMContentLoaded", function() {
+    const frontTitle = document.getElementById('frontTitle');
+    const spineTitle = document.getElementById('spineTitle');
+    const backTitle = document.getElementById('backTitle');
+    const backTracklist = document.getElementById('backTracklist');
+    
+    const observer = new MutationObserver(function(mutations) {
+        syncTextTo3D();
+    });
+    
+    if(frontTitle) observer.observe(frontTitle, { childList: true, subtree: true, characterData: true });
+    if(spineTitle) observer.observe(spineTitle, { childList: true, subtree: true, characterData: true });
+    if(backTitle) observer.observe(backTitle, { childList: true, subtree: true, characterData: true });
+    if(backTracklist) observer.observe(backTracklist, { childList: true, subtree: true, characterData: true });
+    
+    // Sync posisi juga
+    setupPositionSync();
 });
+
+// Sync posisi dari transform-box ke 3D
+function setupPositionSync() {
+    const frontBox = document.querySelector('#albumArt .transform-box');
+    const frontText3D = document.getElementById('front-text-3d');
+    const frontText3DInner = document.getElementById('front-text-3d-inner');
+    
+    const spineBox = document.querySelector('.spine .transform-box');
+    const spineText3D = document.getElementById('spine-text-3d');
+    const spineText3DInner = document.getElementById('spine-text-3d-inner');
+    
+    const backBox = document.querySelector('#playlistSection .transform-box');
+    const backText3D = document.getElementById('back-text-3d');
+    const backText3DInner = document.getElementById('back-text-3d-inner');
+    
+    // Sync posisi front
+    if(frontBox && frontText3D) {
+        const updateFrontPos = () => {
+            const left = parseInt(frontBox.style.left) || 30;
+            const top = parseInt(frontBox.style.top) || 0;
+            frontText3D.style.left = left + 'px';
+            frontText3D.style.top = (50 + (top / 1020) * 100) + '%';
+            frontText3D.style.transform = `translateY(-50%)`;
+            
+            if(frontText3DInner) {
+                frontText3DInner.style.left = left + 'px';
+                frontText3DInner.style.top = (50 + (top / 1020) * 100) + '%';
+                frontText3DInner.style.transform = `translateY(-50%) scaleX(-1)`;
+            }
+        };
+        
+        const frontObserver = new MutationObserver(updateFrontPos);
+        frontObserver.observe(frontBox, { attributes: true, attributeFilter: ['style'] });
+        updateFrontPos();
+    }
+    
+    // Sync posisi spine
+    if(spineBox && spineText3D) {
+        const updateSpinePos = () => {
+            // Spine text selalu di tengah
+        };
+        
+        const spineObserver = new MutationObserver(updateSpinePos);
+        spineObserver.observe(spineBox, { attributes: true, attributeFilter: ['style'] });
+    }
+    
+    // Sync posisi back
+    if(backBox && backText3D) {
+        const updateBackPos = () => {
+            const left = parseInt(backBox.style.left) || 20;
+            const top = parseInt(backBox.style.top) || 40;
+            backText3D.style.left = left + 'px';
+            backText3D.style.top = top + 'px';
+            
+            if(backText3DInner) {
+                backText3DInner.style.left = left + 'px';
+                backText3DInner.style.top = top + 'px';
+            }
+        };
+        
+        const backObserver = new MutationObserver(updateBackPos);
+        backObserver.observe(backBox, { attributes: true, attributeFilter: ['style'] });
+        updateBackPos();
+    }
+}
+
+function handleUpload(input, target) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const targetElement = {
+            'front': document.getElementById("albumArt"),
+            'back': document.getElementById("playlistSection"),
+            'spine': document.querySelector(".spine") 
+        };
+
+        if (targetElement[target]) {
+            targetElement[target].style.backgroundImage = "url(" + e.target.result + ")";
+            targetElement[target].style.backgroundSize = "cover";
+            targetElement[target].style.backgroundPosition = "center";
+        }
+
+        // UPDATE TEKSTUR 3D
+        const map3D = { 
+            'front': '3d-front-outer', 
+            'spine': '3d-spine-outer', 
+            'back': '3d-back-outer' 
+        };
+        
+        const target3D = document.getElementById(map3D[target]);
+        if (target3D) {
+            target3D.style.backgroundImage = "url(" + e.target.result + ")";
+            target3D.style.backgroundSize = "cover";
+            target3D.style.backgroundPosition = "center";
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function changeBackColor(){ document.documentElement.style.setProperty("--backColor", document.getElementById("coverColor").value); }
+
+function changeFontColor(){
+    const color=document.getElementById("fontColor").value;
+    document.querySelectorAll(".editable-content, .editable-content h3, .tracklist").forEach(el=>{el.style.color=color});
+    
+    // Update warna font di 3D juga
+    document.querySelectorAll(".text-3d-overlay, .text-3d-overlay h3, .tracklist-3d").forEach(el=>{el.style.color=color});
+}
+
+const canvas = document.getElementById('jcard-canvas');
+function getScale() { return canvas.getBoundingClientRect().width / 1031; }
+
+document.querySelectorAll('.transform-box').forEach(box => {
+    const moveBtn = box.querySelector('.handle-move');
+    const resizeBtn = box.querySelector('.handle-resize');
+    const textPart = box.querySelector('.editable-content');
+
+    box.addEventListener('mousedown', () => {
+        document.querySelectorAll('.transform-box').forEach(b => b.classList.remove('active'));
+        box.classList.add('active');
+    });
+
+    const startDrag = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const ev = e.touches ? e.touches[0] : e;
+        let sX = ev.clientX, sY = ev.clientY, iL = box.offsetLeft, iT = box.offsetTop;
+        const move = me => {
+            const mev = me.touches ? me.touches[0] : me;
+            box.style.left = iL + (mev.clientX - sX) / getScale() + 'px';
+            box.style.top = iT + (mev.clientY - sY) / getScale() + 'px';
+        };
+        const stop = () => { document.removeEventListener('mousemove', move); document.removeEventListener('touchmove', move); };
+        document.addEventListener('mousemove', move);
+        document.addEventListener('touchmove', move, {passive:false});
+        document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+    };
+
+    const startResize = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const ev = e.touches ? e.touches[0] : e;
+        let sX = ev.clientX, iSize = parseFloat(window.getComputedStyle(textPart).fontSize);
+        const resize = re => {
+            const rev = re.touches ? re.touches[0] : re;
+            textPart.style.fontSize = iSize + (rev.clientX - sX) / getScale() + 'px';
+        };
+        const stop = () => { document.removeEventListener('mousemove', resize); document.removeEventListener('touchmove', resize); };
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('touchmove', resize, {passive:false});
+        document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+    };
+    moveBtn.addEventListener('mousedown', startDrag); moveBtn.addEventListener('touchstart', startDrag);
+    resizeBtn.addEventListener('mousedown', startResize); resizeBtn.addEventListener('touchstart', startResize);
+});
+
+async function saveDesign(type, format) {
+    const canvasId = (type === 'manual') ? 'jcard-canvas' : 'jcard-canvas-full';
+    const targetCanvas = document.getElementById(canvasId);
+    const btn = event ? event.currentTarget : null;
+    
+    if (!targetCanvas) return;
+
+    const originalText = btn ? btn.innerText : "SAVE";
+    if (btn) {
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+    }
+
+    targetCanvas.classList.add('exporting');
+
+    try {
+        const options = {
+            scale: 2, 
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            width: 1031,
+            height: 1020,
+            onclone: (clonedDoc) => {
+                const element = clonedDoc.getElementById(canvasId);
+                element.style.transform = "none";
+                element.style.left = "0";
+                element.style.top = "0";
+                element.style.position = "relative";
+            }
+        };
+
+        const canvas = await html2canvas(targetCanvas, options);
+
+        if (format === 'jpg') {
+            const imgData = canvas.toDataURL("image/jpeg", 0.98);
+            const link = document.createElement("a");
+            link.download = `jcard--.jpg`;
+            link.href = imgData;
+            link.click();
+        } 
+        else if (format === 'pdf') {
+            const imgData = canvas.toDataURL("image/png");
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: "landscape",
+                unit: "px",
+                format: [1031, 1020]
+            });
+            pdf.addImage(imgData, "PNG", 0, 0, 1031, 1020);
+            pdf.save(`jcard-.pdf`);
+        }
+    } catch (error) {
+        console.error("Error detail:", error);
+        alert("Gagal menyimpan. Pastikan kamu menggunakan Google Chrome atau Safari.");
+    } finally {
+        targetCanvas.classList.remove('exporting');
+        if (btn) {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
+    const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    const bgElement = document.querySelector(".gif-bg");
+    if (bgElement) {
+        bgElement.style.backgroundImage = "url('" + randomBg + "')";
+    }
+});
+
+function handleFullWrap(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const imgUrl = "url(" + e.target.result + ")";
+        
+        // 1. UPDATE CANVAS 2D FULL WRAP
+        const fullCanvas = document.getElementById("jcard-canvas-full");
+        if (fullCanvas) {
+            fullCanvas.style.backgroundImage = imgUrl;
+            fullCanvas.style.backgroundSize = "cover";
+            fullCanvas.style.backgroundPosition = "center";
+        }
+
+        // 2. UPDATE TEKSTUR 3D KHUSUS BAGIAN DALAM (INNER) AGAR SEAMLESS
+        // Total Lebar: Back(254) + Spine(127) + Front(650) = 1031px
+        const bgSize = "1031px 1020px";
+        
+        // Front Inner (Sisi kanan dari gambar fullwrap)
+        const frontInner = document.getElementById('3d-front-inner');
+        if(frontInner) {
+            frontInner.style.backgroundImage = imgUrl;
+            frontInner.style.backgroundSize = bgSize;
+            frontInner.style.backgroundPosition = "-381px 0"; // Digeser 254 (Back) + 127 (Spine)
+            frontInner.style.transform = "scaleX(-1)"; // Mirror dipertahankan
+        }
+        
+        // Spine Inner (Bagian tengah dari gambar fullwrap)
+        const spineInner = document.getElementById('3d-spine-inner');
+        if(spineInner) {
+            spineInner.style.backgroundImage = imgUrl;
+            spineInner.style.backgroundSize = bgSize;
+            spineInner.style.backgroundPosition = "-254px 0"; // Digeser 254 (Back)
+            spineInner.style.transform = "scaleX(-1)";
+        }
+        
+        // Back Inner (Sisi kiri dari gambar fullwrap)
+        const backInner = document.getElementById('3d-back-inner');
+        if(backInner) {
+            backInner.style.backgroundImage = imgUrl;
+            backInner.style.backgroundSize = bgSize;
+            backInner.style.backgroundPosition = "0px 0px"; // Paling kiri, tidak digeser
+            backInner.style.transform = "scaleX(-1)";
+        }
+
+        // Catatan: Bagian OUTER sama sekali tidak disentuh di sini 
+        // agar fitur upload satu-satu tetap berfungsi normal.
+    };
+    reader.readAsDataURL(file);
+}
+
+window.addEventListener("load", () => {
+    const nav = document.querySelector("nav");
+    const profile = document.getElementById("profileImg");
+    let lastScroll = window.pageYOffset;
+
+    setTimeout(() => {
+        if(profile) profile.style.animation = "profileSlide 1s ease forwards";
+    }, 500);
+
+    setTimeout(() => {
+        nav.classList.add("nav-show");
+    }, 1000);
+
+    window.addEventListener("scroll", () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll > lastScroll && currentScroll > 120) {
+            nav.classList.remove("nav-show");
+            nav.classList.add("nav-hidden");
+        } else if (currentScroll < lastScroll) {
+            nav.classList.remove("nav-hidden");
+            nav.classList.add("nav-show");
+        }
+        lastScroll = currentScroll;
+    });
+});
+
+// ============================
+// JS DRAG & ROTATE 3D PREVIEW
+// ============================
+const scene3D = document.querySelector('.scene-3d');
+const jcardObj = document.getElementById('jcard-3d-object');
+let isDragging3D = false, prevX = 0, prevY = 0;
+let rotX = 15, rotY = -35; 
+
+function update3D() {
+    if(jcardObj) {
+        jcardObj.style.transform = `scale(0.25) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+}
+
+if(scene3D && jcardObj) {
+    const isTransformBox = (target) => {
+        return target.closest('.transform-box') !== null;
+    };
+
+    scene3D.addEventListener('mousedown', (e) => {
+        if(isTransformBox(e.target)) return;
+        isDragging3D = true; 
+        prevX = e.clientX; 
+        prevY = e.clientY;
+        scene3D.style.cursor = 'grabbing';
+    });
+    
+    window.addEventListener('mouseup', () => {
+        isDragging3D = false;
+        scene3D.style.cursor = 'grab';
+    });
+    
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging3D) return;
+        rotY += (e.clientX - prevX) * 0.6;
+        rotX -= (e.clientY - prevY) * 0.6;
+        prevX = e.clientX; 
+        prevY = e.clientY;
+        update3D();
+    });
+
+    scene3D.addEventListener('touchstart', (e) => {
+        if(isTransformBox(e.target)) return;
+        isDragging3D = true; 
+        prevX = e.touches[0].clientX; 
+        prevY = e.touches[0].clientY;
+    }, {passive: true});
+    
+    window.addEventListener('touchend', () => {
+        isDragging3D = false;
+    });
+    
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging3D) return;
+        rotY += (e.touches[0].clientX - prevX) * 0.8;
+        rotX -= (e.touches[0].clientY - prevY) * 0.8;
+        prevX = e.touches[0].clientX; 
+        prevY = e.touches[0].clientY;
+        update3D();
+    }, {passive: true});
+}
+    // Init Label Fonts using existing fontList
+    function initLabelFonts() {
+    const selector = document.getElementById('labelFontSelector');
+    if(!selector || typeof fontList === 'undefined') return;
+    fontList.sort().forEach(font => {
+        let opt = document.createElement('option');
+        opt.value = font; 
+        opt.innerHTML = font;
+        opt.style.fontFamily = font;
+        if(font === 'Orbitron') opt.selected = true;
+        selector.appendChild(opt);
+    });
+    
+    // Set default font ke label text setelah populate
+    setTimeout(() => {
+        const defaultFont = selector.value || 'Orbitron';
+        document.querySelectorAll('.label-text').forEach(el => {
+            el.style.fontFamily = `'${defaultFont}', sans-serif`;
+        });
+        syncLabelTo3D();
+    }, 100);
+}
+setTimeout(initLabelFonts, 500);
+ 
+
+function updateLabelFont() {
+    const font = document.getElementById('labelFontSelector').value;
+    document.querySelectorAll('.label-text').forEach(el => {
+        el.style.fontFamily = `'${font}', sans-serif`;
+    });
+    syncLabelTo3D();
+}
+
+    function updateLabelColors() {
+        const shellCol = document.getElementById('casShellColor').value;
+        const canvasCol = document.getElementById('lblCanvasColor').value;
+        const textCol = document.getElementById('lblTextColor').value;
+
+        document.querySelectorAll('.cas-face').forEach(el => {
+            if(el.classList.contains('cas-front') || el.classList.contains('cas-back')) {
+                el.style.backgroundColor = shellCol;
+            } else {
+                el.style.backgroundColor = darkenColor(shellCol, 10);
+            }
+        });
+        
+        document.getElementById('canvas-sideA').style.backgroundColor = canvasCol;
+        document.getElementById('canvas-sideB').style.backgroundColor = canvasCol;
+        document.querySelectorAll('.label-text').forEach(el => el.style.color = textCol);
+
+        syncLabelTo3D();
+    }
+
+    function darkenColor(color, percent) {
+        const num = parseInt(color.replace("#",""), 16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) - amt,
+        B = (num >> 8 & 0x00FF) - amt,
+        G = (num & 0x0000FF) - amt;
+        return "#" + (0x1000000 + (R>0?R:0)*0x10000 + (B>0?B:0)*0x100 + (G>0?G:0)).toString(16).slice(1);
+    }
+
+function uploadStickerLabel(input, side) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById(`bg-${side}`).style.backgroundImage = `url(${e.target.result})`;
+        document.getElementById(`bg-${side}`).style.backgroundSize = 'cover';
+        document.getElementById(`bg-${side}`).style.backgroundPosition = 'center';
+        syncLabelTo3D();
+    };
+    reader.readAsDataURL(file);
+}
+
+
+    // SYNC LABEL TO 3D - DIPERBAIKI GAMBAR & TEXT
+    function syncLabelTo3D() {
+        const boxA = document.getElementById('label-box-sideA');
+        const boxB = document.getElementById('label-box-sideB');
+        const textA = document.getElementById('text-sideA');
+        const textB = document.getElementById('text-sideB');
+        const bgA = document.getElementById('bg-sideA');
+        const bgB = document.getElementById('bg-sideB');
+        const contentA = document.getElementById('content-sideA');
+        const contentB = document.getElementById('content-sideB');
+        
+        const canvasCol = document.getElementById('lblCanvasColor').value;
+        const textCol = document.getElementById('lblTextColor').value;
+        const font = document.getElementById('labelFontSelector').value || 'Orbitron';
+        
+        // Sync Side A
+        if(contentA && boxA && textA && bgA) {
+            const leftA = parseInt(boxA.style.left) || 85;
+            const topA = parseInt(boxA.style.top) || 20;
+            const fontSizeA = parseFloat(window.getComputedStyle(textA).fontSize) || 24;
+            
+            // Clear dan setup container
+            contentA.innerHTML = '';
+            contentA.style.width = '350px';
+            contentA.style.height = '180px';
+            contentA.style.position = 'absolute';
+            contentA.style.top = '0';
+            contentA.style.left = '0';
+            contentA.style.backgroundColor = 'transparent';
+            
+            // GAMBAR BACKGROUND - SYNC
+            const bgImageA = bgA.style.backgroundImage;
+            if(bgImageA && bgImageA !== 'none' && bgImageA !== '') {
+                const bgDiv = document.createElement('div');
+                bgDiv.style.width = '350px';
+                bgDiv.style.height = '180px';
+                bgDiv.style.position = 'absolute';
+                bgDiv.style.top = '0';
+                bgDiv.style.left = '0';
+                bgDiv.style.backgroundImage = bgImageA;
+                bgDiv.style.backgroundSize = 'cover';
+                bgDiv.style.backgroundPosition = 'center';
+                bgDiv.style.backgroundRepeat = 'no-repeat';
+                bgDiv.style.zIndex = '1';
+                contentA.appendChild(bgDiv);
+            } else {
+                contentA.style.backgroundColor = canvasCol;
+            }
+
+                        // TEXT - SYNC
+            const textDivA = document.createElement('div');
+            textDivA.innerHTML = textA.innerHTML;
+            textDivA.style.fontFamily = textA.style.fontFamily || `'${font}', sans-serif`;
+            textDivA.style.color = textCol;
+            textDivA.style.fontSize = fontSizeA + 'px';
+            textDivA.style.fontWeight = '900';
+            textDivA.style.lineHeight = '1.2';
+            textDivA.style.textTransform = 'uppercase';
+            textDivA.style.textAlign = 'center';
+            textDivA.style.whiteSpace = 'nowrap';
+            textDivA.style.position = 'absolute';
+            textDivA.style.left = leftA + 'px';
+            textDivA.style.top = topA + 'px';
+            textDivA.style.zIndex = '10';
+            textDivA.style.margin = '0';
+            textDivA.style.padding = '0';
+            
+            contentA.appendChild(textDivA);
+        }
+        // Sync Side B
+        if(contentB && boxB && textB && bgB) {
+            const leftB = parseInt(boxB.style.left) || 85;
+            const topB = parseInt(boxB.style.top) || 20;
+            const fontSizeB = parseFloat(window.getComputedStyle(textB).fontSize) || 24;
+            
+            contentB.innerHTML = '';
+            contentB.style.width = '350px';
+            contentB.style.height = '180px';
+            contentB.style.position = 'absolute';
+            contentB.style.top = '0';
+            contentB.style.left = '0';
+            contentB.style.backgroundColor = 'transparent';
+            
+            // GAMBAR BACKGROUND - SYNC
+            const bgImageB = bgB.style.backgroundImage;
+            if(bgImageB && bgImageB !== 'none' && bgImageB !== '') {
+                const bgDiv = document.createElement('div');
+                bgDiv.style.width = '350px';
+                bgDiv.style.height = '180px';
+                bgDiv.style.position = 'absolute';
+                bgDiv.style.top = '0';
+                bgDiv.style.left = '0';
+                bgDiv.style.backgroundImage = bgImageB;
+                bgDiv.style.backgroundSize = 'cover';
+                bgDiv.style.backgroundPosition = 'center';
+                bgDiv.style.backgroundRepeat = 'no-repeat';
+                bgDiv.style.zIndex = '1';
+                contentB.appendChild(bgDiv);
+            } else {
+                contentB.style.backgroundColor = canvasCol;
+            }
+
+            
+            // TEXT - SYNC
+                        // TEXT - SYNC
+            const textDivB = document.createElement('div');
+            textDivB.innerHTML = textB.innerHTML;
+            textDivB.style.fontFamily = textB.style.fontFamily || `'${font}', sans-serif`;
+            textDivB.style.color = textCol;
+            textDivB.style.fontSize = fontSizeB + 'px';
+            textDivB.style.fontWeight = '900';
+            textDivB.style.lineHeight = '1.2';
+            textDivB.style.textTransform = 'uppercase';
+            textDivB.style.textAlign = 'center';
+            textDivB.style.whiteSpace = 'nowrap';
+            textDivB.style.position = 'absolute';
+            textDivB.style.left = leftB + 'px';
+            textDivB.style.top = topB + 'px';
+            textDivB.style.zIndex = '10';
+            textDivB.style.margin = '0';
+            textDivB.style.padding = '0';
+            
+            contentB.appendChild(textDivB);
+        }
+    }
+
+    // Drag and Resize untuk Label
+    document.querySelectorAll('.label-transform-box').forEach(box => {
+        const moveBtn = box.querySelector('.handle-move');
+        const resizeBtn = box.querySelector('.handle-resize');
+        const textPart = box.querySelector('.label-text');
+
+        box.addEventListener('mousedown', (e) => {
+            if(e.target === moveBtn || e.target === resizeBtn) return;
+            document.querySelectorAll('.label-transform-box, .transform-box').forEach(b => b.classList.remove('active'));
+            box.classList.add('active');
+        });
+
+        const startDrag = (e) => {
+            e.preventDefault(); e.stopPropagation();
+            const ev = e.touches ? e.touches[0] : e;
+            let sX = ev.clientX, sY = ev.clientY, iL = box.offsetLeft, iT = box.offsetTop;
+            const move = me => {
+                const mev = me.touches ? me.touches[0] : me;
+                box.style.left = iL + (mev.clientX - sX) + 'px';
+                box.style.top = iT + (mev.clientY - sY) + 'px';
+                requestAnimationFrame(syncLabelTo3D);
+            };
+            const stop = () => { 
+                document.removeEventListener('mousemove', move); 
+                document.removeEventListener('touchmove', move);
+                syncLabelTo3D();
+            };
+            document.addEventListener('mousemove', move);
+            document.addEventListener('touchmove', move, {passive:false});
+            document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+        };
+
+        const startResize = (e) => {
+            e.preventDefault(); e.stopPropagation();
+            const ev = e.touches ? e.touches[0] : e;
+            let sX = ev.clientX, iSize = parseFloat(window.getComputedStyle(textPart).fontSize);
+            const resize = re => {
+                const rev = re.touches ? re.touches[0] : re;
+                textPart.style.fontSize = iSize + (rev.clientX - sX) + 'px';
+                requestAnimationFrame(syncLabelTo3D);
+            };
+            const stop = () => { 
+                document.removeEventListener('mousemove', resize); 
+                document.removeEventListener('touchmove', resize);
+                syncLabelTo3D();
+            };
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('touchmove', resize, {passive:false});
+            document.addEventListener('mouseup', stop); document.addEventListener('touchend', stop);
+        };
+        
+        moveBtn.addEventListener('mousedown', startDrag); moveBtn.addEventListener('touchstart', startDrag);
+        resizeBtn.addEventListener('mousedown', startResize); resizeBtn.addEventListener('touchstart', startResize);
+    });
+
+    // Observer untuk live sync
+    document.addEventListener("DOMContentLoaded", function() {
+        const textA = document.getElementById('text-sideA');
+        const textB = document.getElementById('text-sideB');
+        const boxA = document.getElementById('label-box-sideA');
+        const boxB = document.getElementById('label-box-sideB');
+        const bgA = document.getElementById('bg-sideA');
+        const bgB = document.getElementById('bg-sideB');
+        
+        const textObserver = new MutationObserver(syncLabelTo3D);
+        if(textA) textObserver.observe(textA, { childList: true, subtree: true, characterData: true });
+        if(textB) textObserver.observe(textB, { childList: true, subtree: true, characterData: true });
+        
+        const styleObserver = new MutationObserver(syncLabelTo3D);
+        if(boxA) styleObserver.observe(boxA, { attributes: true, attributeFilter: ['style'] });
+        if(boxB) styleObserver.observe(boxB, { attributes: true, attributeFilter: ['style'] });
+        
+        // Observer untuk background image changes
+        const bgObserver = new MutationObserver(syncLabelTo3D);
+        if(bgA) bgObserver.observe(bgA, { attributes: true, attributeFilter: ['style'] });
+        if(bgB) bgObserver.observe(bgB, { attributes: true, attributeFilter: ['style'] });
+        
+        setTimeout(syncLabelTo3D, 100);
+    });
+
+    // 3D Cassette Drag & Rotate
+    const cScene = document.getElementById('cas-scene');
+    const cObj = document.getElementById('cas-object');
+    let cDrag = false, cPx = 0, cPy = 0, cRx = 20, cRy = -25;
+
+    function updateCas3DObj() {
+    cObj.style.transform = `translateZ(-15px) rotateX(${cRx}deg) rotateY(${cRy}deg)`;
+}
+
+    if(cScene && cObj) {
+        cScene.addEventListener('mousedown', (e) => {
+            cDrag = true; cPx = e.clientX; cPy = e.clientY;
+            cScene.style.cursor = 'grabbing';
+        });
+        window.addEventListener('mouseup', () => { cDrag = false; cScene.style.cursor = 'grab'; });
+        window.addEventListener('mousemove', (e) => {
+            if (!cDrag) return;
+            cRy += (e.clientX - cPx) * 0.7;
+            cRx -= (e.clientY - cPy) * 0.7;
+            cPx = e.clientX; cPy = e.clientY;
+            updateCas3DObj();
+        });
+
+        cScene.addEventListener('touchstart', (e) => {
+            cDrag = true; cPx = e.touches[0].clientX; cPy = e.touches[0].clientY;
+        }, {passive: true});
+        window.addEventListener('touchend', () => { cDrag = false; });
+        window.addEventListener('touchmove', (e) => {
+            if (!cDrag) return;
+            cRy += (e.touches[0].clientX - cPx) * 0.9;
+            cRx -= (e.touches[0].clientY - cPy) * 0.9;
+            cPx = e.touches[0].clientX; cPy = e.touches[0].clientY;
+            updateCas3DObj();
+        }, {passive: true});
+    }
+
+    // Download Label - HD & Transparan
+    async function downloadLabelPng(side) {
+        const target = document.getElementById('canvas-' + side);
+        const btn = event.currentTarget;
+        const origText = btn.innerText;
+        
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+        
+        target.classList.add('exporting-label');
+        target.querySelectorAll('.label-transform-box').forEach(b => b.classList.remove('active'));
+
+        try {
+            const originalBackground = target.style.background;
+            const originalBgImage = target.style.backgroundImage;
+            
+            target.style.background = 'transparent';
+            target.style.backgroundImage = 'none';
+            
+            const canvas = await html2canvas(target, {
+                scale: 4, 
+                backgroundColor: null, 
+                useCORS: true,
+                allowTaint: true,
+                width: 350,
+                height: 180,
+                logging: false
+            });
+            
+            target.style.background = originalBackground;
+            target.style.backgroundImage = originalBgImage;
+
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const cutoutWidth = 220 * 4;
+            const cutoutHeight = 60 * 4;
+            const cutoutLeft = centerX - (cutoutWidth / 2);
+            const cutoutTop = centerY - (cutoutHeight / 2);
+            
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = canvas.width;
+            finalCanvas.height = canvas.height;
+            const finalCtx = finalCanvas.getContext('2d');
+            
+            finalCtx.putImageData(imageData, 0, 0);
+            finalCtx.clearRect(cutoutLeft, cutoutTop, cutoutWidth, cutoutHeight);
+            
+            const imgData = finalCanvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.download = `cassette-label--HD.png`;
+            link.href = imgData;
+            link.click();
+        } catch (err) {
+            console.error(err);
+            alert("Gagal mendownload label.");
+        } finally {
+            target.classList.remove('exporting-label');
+            btn.innerText = origText;
+            btn.disabled = false;
+        }
+    }
+    // ============================================
+// KONTROL LIPATAN J-CARD 3D
+// ============================================
+
+let currentFoldAngle = 0;
+
+// Setup slider saat DOM ready
+document.addEventListener("DOMContentLoaded", function() {
+    const foldSlider = document.getElementById('foldSlider');
+    const foldValue = document.getElementById('foldValue');
+    
+    if(foldSlider) {
+        foldSlider.addEventListener('input', function(e) {
+            currentFoldAngle = parseInt(e.target.value);
+            if(foldValue) foldValue.textContent = currentFoldAngle + '°';
+            updateFold(currentFoldAngle);
+        });
+    }
+});
+
+// Fungsi update lipatan utama
+function updateFold(angle) {
+    const wrapper = document.getElementById('jcard-3d-object');
+    if(!wrapper) return;
+    
+    // Hitung rotasi untuk spine dan back panel
+    // 0° = terbuka penuh, 180° = tertutup penuh
+    
+    const spineAngle = -90 + (angle / 2);  // -90° ke 0°
+    const backAngle = -90 + (angle / 2);   // -90° ke 0°
+    
+    const spinePanel = wrapper.querySelector('.spine-panel');
+    const backPanel = wrapper.querySelector('.back-panel');
+    
+    if(spinePanel) {
+        spinePanel.style.transform = `rotateY(${spineAngle}deg)`;
+    }
+    
+    if(backPanel) {
+        backPanel.style.transform = `rotateY(${backAngle}deg)`;
+    }
+}
+
+// Fungsi animasi lipat otomatis (opsional)
+function animateFold(targetAngle, duration = 500) {
+    const startAngle = currentFoldAngle;
+    const startTime = performance.now();
+    
+    function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        
+        const newAngle = startAngle + (targetAngle - startAngle) * easeProgress;
+        updateFold(newAngle);
+        
+        if(progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            currentFoldAngle = targetAngle;
+            const slider = document.getElementById('foldSlider');
+            const valueLabel = document.getElementById('foldValue');
+            if(slider) slider.value = targetAngle;
+            if(valueLabel) valueLabel.textContent = targetAngle + '°';
+        }
+    }
+    
+    requestAnimationFrame(animate);
+}
+
+// Preset tombol (jika ingin tambah tombol preset)
+function foldPreset(type) {
+    switch(type) {
+        case 'open': animateFold(0); break;
+        case 'half': animateFold(90); break;
+        case 'closed': animateFold(180); break;
+    }
+}
 
 
 </script>
