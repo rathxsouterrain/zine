@@ -869,30 +869,60 @@
       updateStatus("Generating cover preview...", 10);
       
       try {
-        // Generate cover dari halaman 1
+        // Generate cover dari halaman 1 dengan optimasi performa
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        // Optimasi: Gunakan scale lebih kecil untuk preview lebih cepat
+        const pdf = await pdfjsLib.getDocument({ 
+          data: arrayBuffer,
+          useSystemFonts: true,
+          cMapUrl: null,
+          cMapPacked: false
+        }).promise;
+        
         const page = await pdf.getPage(1);
         
-        // Render dengan kualitas tinggi
-        const scale = 2;
+        // Optimasi: Scale 1.5 cukup untuk cover (tidak perlu 2)
+        const scale = 1.5;
         const viewport = page.getViewport({ scale });
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
         
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        // Optimasi: Buat canvas dengan ukuran yang lebih efisien
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { alpha: false }); // Non-alpha untuk performa
+        
+        // Batasi ukuran maksimum untuk menghindari memory leak
+        const maxWidth = 800;
+        const maxHeight = 1200;
+        
+        if (viewport.width > maxWidth) {
+          const ratio = maxWidth / viewport.width;
+          canvas.width = maxWidth;
+          canvas.height = viewport.height * ratio;
+        } else {
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+        }
+        
+        // Render dengan optimasi
+        await page.render({
+          canvasContext: ctx,
+          viewport: page.getViewport({ scale: scale * (canvas.width / viewport.width) }),
+          background: 'white'
+        }).promise;
+        
+        // Cleanup
+        page.cleanup();
+        pdf.destroy();
         
         // Tampilkan preview
         const previewImg = document.getElementById("coverPreview");
-        const previewUrl = canvas.toDataURL("image/jpeg", 0.9);
+        const previewUrl = canvas.toDataURL("image/jpeg", 0.85);
         previewImg.src = previewUrl;
         document.getElementById("previewSection").classList.add("active");
         
-        // Simpan blob untuk upload
+        // Simpan blob untuk upload dengan kompresi
         generatedCoverBlob = await new Promise(resolve => {
-          canvas.toBlob(resolve, "image/jpeg", 0.85);
+          canvas.toBlob(resolve, "image/jpeg", 0.8); // Kualitas 80% untuk ukuran lebih kecil
         });
         
         // Auto-fill judul dari filename
@@ -919,7 +949,7 @@
     }
     
     // ==========================================
-    // UPLOAD PROCESS
+    // UPLOAD PROCESS - OPTIMIZED
     // ==========================================
     
     async function uploadZine() {
@@ -941,22 +971,47 @@
       hideMessage("uploadError");
       
       try {
-        // Generate ID unik
+        // Generate ID unik dengan timestamp
         const timestamp = Date.now();
-        const zineId = "zine" + timestamp;
+        const zineId = "zine_" + timestamp;
         
-        // 1. Upload PDF (30-60%)
+        // Metadata untuk upload
+        const pdfMetadata = {
+          contentType: 'application/pdf',
+          customMetadata: {
+            title: title,
+            uploadedAt: new Date().toISOString()
+          }
+        };
+        
+        const coverMetadata = {
+          contentType: 'image/jpeg',
+          cacheControl: 'public, max-age=31536000',
+          customMetadata: {
+            title: title
+          }
+        };
+        
+        // 1. Upload PDF dengan resumable upload (30-60%)
         updateStatus("Uploading PDF...", 30);
-        const pdfRef = storage.ref(`zines/.pdf`);
         
-        const pdfUploadTask = pdfRef.put(selectedPDF);
+        // ✅ PERBAIKAN: Gunakan zineId di path
+        const pdfRef = storage.ref(`zines/${zineId}.pdf`);
         
+        // Optimasi: Gunakan resumable upload untuk file besar
+        const pdfUploadTask = pdfRef.put(selectedPDF, pdfMetadata);
+        
+        // Progress tracking yang lebih akurat
         pdfUploadTask.on("state_changed", 
           (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 30 + 30;
-            updateProgress(progress);
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes);
+            const mappedProgress = 30 + (progress * 30); // 30% - 60%
+            updateProgress(mappedProgress);
+            updateStatusText(`Uploading PDF... ${Math.round(progress * 100)}%`);
           },
-          (err) => { throw err; }
+          (err) => { 
+            throw new Error("PDF upload failed: " + err.message);
+          }
         );
         
         await pdfUploadTask;
@@ -964,19 +1019,38 @@
         
         // 2. Upload Cover (60-90%)
         updateStatus("Uploading cover...", 60);
-        const coverRef = storage.ref(`covers/.jpg`);
-        await coverRef.put(generatedCoverBlob);
+        
+        // ✅ PERBAIKAN: Gunakan zineId di path
+        const coverRef = storage.ref(`covers/${zineId}.jpg`);
+        
+        const coverUploadTask = coverRef.put(generatedCoverBlob, coverMetadata);
+        
+        coverUploadTask.on("state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes);
+            const mappedProgress = 60 + (progress * 30); // 60% - 90%
+            updateProgress(mappedProgress);
+          },
+          (err) => {
+            throw new Error("Cover upload failed: " + err.message);
+          }
+        );
+        
+        await coverUploadTask;
         const coverUrl = await coverRef.getDownloadURL();
         
         // 3. Save metadata (90-100%)
         updateStatus("Saving to database...", 90);
+        
         await db.collection("zines").doc(zineId).set({
           title: title,
           music: music,
           pdfUrl: pdfUrl,
           coverUrl: coverUrl,
           views: 0,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          fileSize: selectedPDF.size,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
         // Complete
@@ -1055,7 +1129,7 @@
     }
     
     // ==========================================
-    // ZINE LIST MANAGEMENT
+    // ZINE LIST MANAGEMENT - FIXED
     // ==========================================
     
     async function loadZineList() {
@@ -1091,16 +1165,19 @@
             ? date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "2-digit" })
             : "-";
           
+          // ✅ PERBAIKAN: Isi data yang benar
           html += `
             <div class="zine-item-admin">
-              <img src="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2270%22><rect width=%2250%22 height=%2270%22 fill=%22%23333%22/></svg>'">
+              <img src="${escapeHtml(zine.coverUrl || '')}" 
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2270%22><rect width=%2250%22 height=%2270%22 fill=%22%23333%22/></svg>'" 
+                   alt="${escapeHtml(zine.title)}">
               <div class="zine-info">
-                <p class="title"></p>
-                <p class="meta"> views • </p>
+                <p class="title">${escapeHtml(zine.title)}</p>
+                <p class="meta">${zine.views || 0} views • ${dateStr}</p>
               </div>
               <div class="zine-actions">
-                <button class="secondary" onclick="viewZine('')" title="View">👁</button>
-                <button class="danger" onclick="deleteZine('', '')" title="Delete">🗑</button>
+                <button class="secondary" onclick="viewZine('${escapeHtml(zine.pdfUrl)}')" title="View">👁</button>
+                <button class="danger" onclick="deleteZine('${doc.id}', '${escapeHtml(zine.title)}')" title="Delete">🗑</button>
               </div>
             </div>
           `;
@@ -1109,31 +1186,32 @@
         container.innerHTML = html;
         
       } catch (err) {
-        container.innerHTML = `<div class="empty-state" style="color:#ff6666;">Error: </div>`;
+        container.innerHTML = `<div class="empty-state" style="color:#ff6666;">Error: ${err.message}</div>`;
       }
     }
     
     function escapeHtml(text) {
+      if (!text) return '';
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
     }
     
     function viewZine(url) {
-      window.open(url, "_blank");
+      if (url) window.open(url, "_blank");
     }
     
     async function deleteZine(id, title) {
-      if (!confirm(`Hapus zine ""?\n\nTindakan ini tidak bisa dibatalkan.`)) return;
+      if (!confirm(`Hapus zine "${title}"?\n\nTindakan ini tidak bisa dibatalkan.`)) return;
       
       try {
         // Hapus dari Firestore
         await db.collection("zines").doc(id).delete();
         
-        // Hapus file dari Storage (opsional - bisa di-skip jika mau keep file)
+        // Hapus file dari Storage
         try {
-          await storage.ref(`zines/.pdf`).delete();
-          await storage.ref(`covers/.jpg`).delete();
+          await storage.ref(`zines/${id}.pdf`).delete();
+          await storage.ref(`covers/${id}.jpg`).delete();
         } catch (e) {
           console.log("File mungkin sudah tidak ada");
         }
@@ -1178,6 +1256,10 @@
     function updateStatus(text, percent) {
       document.getElementById("progressStatus").innerText = text;
       updateProgress(percent);
+    }
+    
+    function updateStatusText(text) {
+      document.getElementById("progressStatus").innerText = text;
     }
     
     function updateProgress(percent) {
