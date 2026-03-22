@@ -210,7 +210,7 @@ let allZines = [];
 const itemsPerPage = 3;
 
 // ==========================================
-// LOAD ZINES FROM DATABASE - BARU
+// LOAD ZINES FROM DATABASE
 // ==========================================
 async function loadZinesFromDB() {
   const container = document.getElementById("zine-container");
@@ -238,7 +238,7 @@ async function loadZinesFromDB() {
 }
 
 // ==========================================
-// RENDER ZINE - BARU
+// RENDER ZINE - FIXED: Data sekarang diisi!
 // ==========================================
 function renderZinePage(pageNum) {
   const container = document.getElementById("zine-container");
@@ -252,13 +252,19 @@ function renderZinePage(pageNum) {
     const card = document.createElement("div");
     card.className = "glass zine-item zine-card reveal";
     
-    const musicHtml = zine.music ? `<p style="opacity:0.4;font-size:10px;">♫ music : </p>` : '';
+    // ✅ FIXED: Isi data dari database
+    const musicHtml = zine.music ? `<p style="opacity:0.4;font-size:10px;">♫ music : ${escapeHtml(zine.music)}</p>` : '';
     
-    // TEMPLATE SAMA PERSIS DENGAN YANG LAMA, HANYA DATA YANG DINAMIS
     card.innerHTML = `
       <div class="zine">
-        <img src="" onclick="openFlipbook(''); addView('')" oncontextmenu="return false;" draggable="false">
-        <p class="zine-title"></p>
+        <img src="${escapeHtml(zine.coverUrl)}" 
+             onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')" 
+             oncontextmenu="return false;" 
+             draggable="false"
+             alt="${escapeHtml(zine.title)}">
+        
+        <p class="zine-title">${escapeHtml(zine.title)}</p>
+        ${musicHtml}
         
         <div class="zine-buttons">
           <p style="font-size:12px;opacity:0.6;display:flex;align-items:center;gap:6px;">
@@ -266,10 +272,10 @@ function renderZinePage(pageNum) {
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
-            <span id="view-"></span> views
+            <span id="view-${zine.id}">${zine.views || 0}</span> views
           </p>
-          <button class="read-btn" onclick="openFlipbook(''); addView('')">READ</button>
-          <a href="" download class="download-btn">⬇︎</a>
+          <button class="read-btn" onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')">READ</button>
+          <a href="${escapeHtml(zine.pdfUrl)}" download class="download-btn">⬇︎</a>
         </div>
       </div>
     `;
@@ -283,7 +289,7 @@ function renderZinePage(pageNum) {
 }
 
 // ==========================================
-// PAGINATION - BARU
+// PAGINATION
 // ==========================================
 function setupPagination(totalItems) {
   const pagination = document.getElementById("pagination");
@@ -309,7 +315,7 @@ function setupPagination(totalItems) {
 }
 
 // ==========================================
-// SEARCH - UPDATE
+// SEARCH - FIXED
 // ==========================================
 function searchZine() {
   const input = document.getElementById("zineSearch").value.toLowerCase().trim();
@@ -339,20 +345,27 @@ function searchZine() {
     const card = document.createElement("div");
     card.className = "glass zine-item zine-card reveal show";
     
-    const musicHtml = zine.music ? `<p style="opacity:0.4;font-size:10px;">♫ music : </p>` : '';
+    const musicHtml = zine.music ? `<p style="opacity:0.4;font-size:10px;">♫ music : ${escapeHtml(zine.music)}</p>` : '';
     
+    // ✅ FIXED: Isi data juga di search
     card.innerHTML = `
       <div class="zine">
-        <img src="" onclick="openFlipbook(''); addView('')" oncontextmenu="return false;" draggable="false">
-        <p class="zine-title"></p>
+        <img src="${escapeHtml(zine.coverUrl)}" 
+             onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')" 
+             oncontextmenu="return false;" 
+             draggable="false"
+             alt="${escapeHtml(zine.title)}">
+        
+        <p class="zine-title">${escapeHtml(zine.title)}</p>
+        ${musicHtml}
         
         <div class="zine-buttons">
           <p style="font-size:12px;opacity:0.6;display:flex;align-items:center;gap:6px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            <span id="view-"></span> views
+            <span id="view-${zine.id}">${zine.views || 0}</span> views
           </p>
-          <button class="read-btn" onclick="openFlipbook(''); addView('')">READ</button>
-          <a href="" download class="download-btn">⬇︎</a>
+          <button class="read-btn" onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')">READ</button>
+          <a href="${escapeHtml(zine.pdfUrl)}" download class="download-btn">⬇︎</a>
         </div>
       </div>
     `;
@@ -361,7 +374,7 @@ function searchZine() {
 }
 
 // ==========================================
-// VIEW COUNTER - UPDATE
+// VIEW COUNTER - FIXED
 // ==========================================
 async function addView(zineId) {
   try {
@@ -509,7 +522,7 @@ function kirimKritik() {
   document.getElementById("kritikPesan").value = "";
 }
 
-// INTRO ANIMATION - TETAP SAMA
+// INTRO ANIMATION
 window.addEventListener("load", () => {
   const intro = document.getElementById("intro");
   const text = document.getElementById("introText");
@@ -540,14 +553,13 @@ window.addEventListener("load", () => {
 });
 
 // ==========================================
-// NAVBAR - VERSI PALING STABIL
+// NAVBAR
 // ==========================================
 window.addEventListener("load", () => {
   const nav = document.querySelector("nav");
   let lastScroll = 0;
   let isNavVisible = false;
 
-  // Munculkan navbar setelah intro
   setTimeout(() => {
     nav.classList.remove("nav-hidden");
     nav.classList.add("nav-show");
@@ -559,12 +571,10 @@ window.addEventListener("load", () => {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > lastScroll && currentScroll > 120 && isNavVisible) {
-      // Scroll down
       nav.classList.remove("nav-show");
       nav.classList.add("nav-hidden");
       isNavVisible = false;
     } else if (currentScroll < lastScroll && !isNavVisible) {
-      // Scroll up
       nav.classList.remove("nav-hidden");
       nav.classList.add("nav-show");
       isNavVisible = true;
@@ -573,7 +583,6 @@ window.addEventListener("load", () => {
     lastScroll = currentScroll;
   });
 
-  // Klik menu
   document.querySelectorAll(".nav-bubble").forEach(link => {
     link.addEventListener("click", () => {
       nav.classList.remove("nav-hidden");
@@ -584,8 +593,7 @@ window.addEventListener("load", () => {
   });
 });
 
-
-// ACTIVE NAV LINK - TETAP SAMA
+// ACTIVE NAV LINK
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll(".nav-bubble");
 window.addEventListener("scroll", () => {
@@ -600,7 +608,7 @@ window.addEventListener("scroll", () => {
   });
 });
 
-// SCROLL RESTORATION - TETAP SAMA
+// SCROLL RESTORATION
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.addEventListener('load', () => window.scrollTo(0, 0));
 </script>
