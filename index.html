@@ -855,7 +855,18 @@ document.getElementById("view-"+zineId).innerText = doc.data().views;
 }
 
   let currentSession = 0;
-async function openFlipbook(pdfUrl){
+async function openFlipbook(pdfUrl, zineId) { // Tambahkan zineId di sini
+    if (!pdfUrl) return;
+
+    // --- TAMBAHKAN KODE INI UNTUK UPDATE VIEWS ---
+    if (zineId) {
+        await _supabase.rpc('increment_views', { row_id: zineId });
+        // Update angka di layar secara real-time tanpa refresh
+        const viewElement = document.getElementById("view-" + zineId);
+        if (viewElement) {
+            viewElement.innerText = parseInt(viewElement.innerText) + 1;
+        }
+    }
   // KUNCI SCROLL: Cara paling aman di semua browser
   document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
@@ -1061,13 +1072,21 @@ function showPage(page, scroll=true){
 let start = page * itemsPerPage;
 let end = start + itemsPerPage;
 
-zines.forEach((item,index)=>{
-item.style.display = (index >= start && index < end) ? "block" : "none";
-
-if(index >= start && index < end){
-item.classList.remove("show");
-}
-
+zines.forEach(zine => {
+    const zineHTML = `
+    <div class="glass zine-item zine-card reveal show">
+        <div class="zine">
+            <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id})" draggable="false">
+            <p class="zine-title">${zine.title}</p>
+            <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
+            <div class="zine-buttons">
+                <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
+                <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}', ${zine.id})">READ</button>
+                <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
+            </div>
+        </div>
+    </div>`;
+    container.insertAdjacentHTML('beforeend', zineHTML);
 });
 
 const buttons = document.querySelectorAll("#pagination button");
