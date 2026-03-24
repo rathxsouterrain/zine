@@ -738,17 +738,38 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </section>
 
 <!-- ===== ZINE LIST (3 ITEM) ===== -->
-<div id="dynamic-zine-list" class="zine-grid">
+<section id="zine">
+    <div class="glass" style="text-align:center;">
+      <input 
+        type="text" 
+        id="zineSearch" 
+        placeholder="Search zine..."
+        onkeyup="searchZine()"
+        style="
+          width:100%;
+          padding:12px;
+          background:rgba(255,255,255,0.05);
+          border:1px solid rgba(255,255,255,0.15);
+          border-radius:20px;
+          color:white;
+          outline:none;
+          font-size:13px;
+          letter-spacing:1px;
+        ">
     </div>
 
+    <div id="dynamic-zine-list" class="zine-grid"></div>
+
+    <div id="pagination"></div>
+
+    <div class="glass zine-item">
+        <div class="zine">
+            <img src="cover.gif">
+            <h4 style="letter-spacing:2px;">COMING SOON</h4>
+        </div>
     </div>
-<div id="pagination"></div>
-  <div class="glass zine-item">
-    <div class="zine">
-      <img src="cover.gif">
-    <h4 style="letter-spacing:2px;">COMING SOON</h4>
-    </div>
-  </div>
+</section>
+
 
 </section>
 <section id="kritik">
