@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id" translate="no">
 <head>
@@ -13,6 +14,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -736,204 +739,15 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </section>
 
 <!-- ===== ZINE LIST (3 ITEM) ===== -->
-<section id="zine">
-<div class="glass" style="text-align:center;">
-  <input 
-    type="text" 
-    id="zineSearch" 
-    placeholder="Search zine..."
-    onkeyup="searchZine()"
-    style="
-      width:100%;
-      padding:12px;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:20px;
-      color:white;
-      outline:none;
-      font-size:13px;
-      letter-spacing:1px;
-    ">
-</div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover6.jpg" 
-    onclick="openFlipbook('zine6.pdf'); addView('zine6')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title">LYCHNOBITE THEORY</p>
-    
-        <p style="opacity:0.4; font-size:10px;">
-          ♫ music : TITLE FIGHT - Head in the Ceiling Fan
-        </p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine6">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine6.pdf'); addView('zine6')">
-            READ
-          </button>
-    
-                <a href="zine6.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
-      </div>
-    </div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover5.jpg" 
-    onclick="openFlipbook('zine5.pdf'); addView('zine5')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title">WHO DO YOU CALL<br>WHEN POLICE MURDER?</p>
-    
-        <p style="opacity:0.4; font-size:10px;">
-          ♫ music : HOMICIDE - Rima Ababil
-        </p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine5">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine5.pdf'); addView('zine5')">
-            READ
-          </button>
-    
-                <a href="zine5.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
+<section id="zine-gallery">
+    <div class="container">
+        <h2 style="text-align: center; letter-spacing: 5px;">ARCHIVE</h2>
+        
+        <div id="dynamic-zine-list" class="zine-grid">
+            <p style="text-align: center; opacity: 0.5;">Loading archives...</p>
         </div>
     </div>
-    </div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover1.jpg" 
-    onclick="openFlipbook('zine1.pdf'); addView('zine1')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title"> DREAM TURNED INTO<br>STRAIGHT BULLSHIT</p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine1">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine1.pdf'); addView('zine1')">
-            READ
-          </button>
-    
-                <a href="zine1.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
-        </div>
-
-    </div>
-    </div>
-<div class="glass zine-item zine-card reveal">
-        <div class="zine">
-      
-          <img 
-    src="cover2.jpg" 
-    onclick="openFlipbook('zine2.pdf'); addView('zine2')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-      
-          <p class="zine-title"> AKU, KAMU, & PALESTINE 🍉</p>
-      
-          <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine2">0</span> views
-</p>
-            <button class="read-btn" onclick="openFlipbook('zine2.pdf'); addView('zine2')">
-              READ
-            </button>
-      
-                  <a href="zine2.pdf" download class="download-btn">
-                              ⬇︎
-                            </a>
-                            </div>
-      
-          </div>
-  
-      </div>
-      </div>
-<div class="glass zine-item zine-card reveal">
-      <div class="zine">
-    
-        <img 
-    src="cover4.jpg" 
-    onclick="openFlipbook('zine4.pdf'); addView('zine4')" 
-    oncontextmenu="return false;" 
-    draggable="false"
->
-
-    
-        <p class="zine-title"> MEMERAS JAM SAMPAI<br>KELUAR DETIK TERAKHIR</p>
-    
-        <div class="zine-buttons">
-<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-
-  <span id="view-zine4">0</span> views
-</p>
-          <button class="read-btn" onclick="openFlipbook('zine4.pdf'); addView('zine4')">
-            READ
-          </button>
-    
-                <a href="zine4.pdf" download class="download-btn">
-                            ⬇︎
-                          </a>
-                          </div>
-    
-        </div>
-
-    </div>
+</section>
     </div>
 <div id="pagination"></div>
   <div class="glass zine-item">
@@ -1016,6 +830,47 @@ Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik
 
 
 <script>
+const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
+const SUBA_KEY = "sb_publishable_Xa6zqP2tRRCTaVUcubIAQw_0Pze_knE";
+const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
+
+async function loadZines() {
+    // Pastikan di HTML kamu ada <div id="dynamic-zine-list"></div>
+    const container = document.getElementById('dynamic-zine-list'); 
+    
+    const { data: zines, error } = await _supabase
+        .from('zine')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Gagal ambil data:", error);
+        return;
+    }
+
+    container.innerHTML = ''; 
+
+    zines.forEach(zine => {
+        const zineHTML = `
+        <div class="glass zine-item zine-card reveal show">
+            <div class="zine">
+                <img src="" onclick="openFlipbook('')" draggable="false">
+                <p class="zine-title"></p>
+                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ </p>
+                <div class="zine-buttons">
+                    <p style="font-size:12px; opacity:0.6;"> views</p>
+                    <button class="read-btn" onclick="openFlipbook('')">READ</button>
+                    <a href="" download class="download-btn">⬇︎</a>
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', zineHTML);
+    });
+}
+
+// Panggil saat web dibuka
+document.addEventListener('DOMContentLoaded', loadZines);
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAw66sRfrCj_3oyu2vPKKaxnwsqX_QuYV0",
