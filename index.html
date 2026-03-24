@@ -715,11 +715,11 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </a>
 </div>
 <div class="menu">
-    <a href="javascript:void(0)" onclick="scrollToSection('zine')" class="nav-bubble">ZINE</a>
-    
-    <a href="/j-card" class="nav-bubble">J-CARD</a>
-    
-    <a href="javascript:void(0)" onclick="scrollToSection('about')" class="nav-bubble">ABOUT</a>
+            <a href="#zine" class="nav-bubble">ZINE</a>
+            <a href="j-card.html" class="nav-bubble">J-CARD</a>
+            <a href="#about" class="nav-bubble">ABOUT</a>
+        </div>
+    </div>
 </div>
 
 
@@ -952,22 +952,6 @@ window.addEventListener("scroll", () => {
         }
     });
 });
-function scrollToSection(id) {
-    const element = document.getElementById(id);
-    if (element) {
-        // Offset 80px agar judul tidak tertutup navbar yang melayang
-        const offset = 80;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = element.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition - offset;
-
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth"
-        });
-    }
-}
 
 /* --- 3. FIX KLIK NAVBAR (AGAR SMOOTH SCROLL) --- */
 document.querySelectorAll(".nav-bubble").forEach(link => {
