@@ -885,19 +885,31 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) { // Tambah paramete
     oldFlip.parentNode.replaceChild(newFlip, oldFlip);
 
     /* --- LOGIKA MUSIK DINAMIS (EDITED) --- */
-    const music = document.getElementById("bg-music");
+const music = document.getElementById("bg-music");
     music.pause();
     
-    // Jika ada link musik khusus di database, putar itu. 
-    // Jika tidak, cek apakah zine5/zine6, jika tidak juga, putar music.mp3 default.
+    // 1. Cek apakah ada customMusicUrl dari database
     if (customMusicUrl && customMusicUrl !== 'undefined' && customMusicUrl.trim() !== '') {
         music.src = customMusicUrl;
-    } else {
-        music.src = (pdfUrl.includes("zine5")) ? "music-zine5.mp3" : (pdfUrl.includes("zine6") ? "music-zine6.mp3" : "music.mp3");
+    } 
+    // 2. Kalau tidak ada, cek apakah ini zine lama (zine5/6)
+    else if (pdfUrl.includes("zine5")) {
+        music.src = "music-zine5.mp3";
+    } else if (pdfUrl.includes("zine6")) {
+        music.src = "music-zine6.mp3";
+    } 
+    // 3. Kalau semua kosong, pakai musik default
+    else {
+        music.src = "music.mp3";
     }
     
     music.volume = 0.5;
-    music.play().catch(()=>{});
+    
+    // Penting: Tunggu sebentar sebelum play agar browser tidak memblokir
+    music.load(); 
+    music.play().catch((err) => {
+        console.log("Autoplay diblokir browser, musik akan jalan setelah klik pertama.");
+    });
     /* ------------------------------------- */
 
     try {
