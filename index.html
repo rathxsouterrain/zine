@@ -157,7 +157,7 @@ border:1px solid rgba(255,255,255,0.08);
 border-radius:28px;
 padding:32px;
 margin:40px auto;
-width:65%;
+width:55%;
 max-width:500px;
 animation:fadeUp 0.8s ease;
 }
@@ -857,7 +857,7 @@ async function loadZines(page = 1) {
             <div class="zine">
                 <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')" draggable="false">
                 <p class="zine-title">${zine.title}</p>
-                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Default'}</p>
+                <p style="opacity:0.4; font-size:9px; margin-top: -5px;">♫ ${zine.music_title || 'Default theme'}</p>
                 <div class="zine-buttons">
                     <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
                     <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')">READ</button>
