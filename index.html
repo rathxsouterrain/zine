@@ -872,15 +872,15 @@ async function loadZines(page = 1) {
 }
 
 /* --- FIX TOMBOL PAGINATION (WARNA SOLID & SCROLL) --- */
+/* --- 1. FIX PAGINATION (AGAR PUTIH SOLID) --- */
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    let navContainer = document.getElementById('pagination-nav');
+    let navContainer = document.getElementById('pagination'); // Pakai ID sesuai CSS lama
     
     if (!navContainer) {
         const list = document.getElementById('dynamic-zine-list');
         navContainer = document.createElement('div');
-        navContainer.id = 'pagination-nav';
-        navContainer.style = "display: flex; justify-content: center; gap: 10px; margin: 20px 0 40px 0; width: 100%;";
+        navContainer.id = 'pagination';
         list.after(navContainer); 
     }
 
@@ -888,32 +888,62 @@ function renderPagination(totalItems) {
 
     if (totalPages > 1) {
         for (let i = 1; i <= totalPages; i++) {
-            const btn = document.createElement('button');
+            let btn = document.createElement("button");
             btn.innerText = i;
-            
-            // Logika Warna: Solid Putih jika aktif (#ffffff)
-            const isActive = (i === currentPage);
-            btn.style = `
-                padding: 8px 15px; 
-                border: 1px solid rgba(255,255,255,0.2); 
-                background: ${isActive ? '#ffffff' : 'rgba(255,255,255,0.05)'}; 
-                color: ${isActive ? '#000000' : '#ffffff'}; 
-                border-radius: 10px; 
-                cursor: pointer; 
-                font-weight: bold;
-                backdrop-filter: blur(5px);
-                transition: 0.3s;
-                opacity: 1;
-            `;
-            
+
+            // KUNCI: Pakai class 'active' agar Putih Solid dari CSS lama bekerja
+            if (i === currentPage) {
+                btn.className = "active";
+            }
+
             btn.onclick = () => {
-                document.getElementById('dynamic-zine-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById("zine").scrollIntoView({ behavior: "smooth" });
                 loadZines(i);
             };
             navContainer.appendChild(btn);
         }
     }
 }
+
+/* --- 2. FIX NAVBAR SCROLL (AGAR OTOMATIS PUTIH SAAT DI ABOUT/ZINE) --- */
+window.addEventListener("scroll", () => {
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll(".nav-bubble");
+    let current = "";
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 150;
+        if (pageYOffset >= sectionTop) {
+            current = section.getAttribute("id");
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove("active");
+        // Jika href link (misal #about) sama dengan id section yang aktif
+        if (link.getAttribute("href") === "#" + current) {
+            link.classList.add("active");
+        }
+    });
+});
+
+/* --- 3. FIX KLIK NAVBAR (AGAR SMOOTH SCROLL) --- */
+document.querySelectorAll(".nav-bubble").forEach(link => {
+    link.addEventListener("click", function(e) {
+        const targetId = this.getAttribute("href");
+        if (targetId.startsWith("#")) {
+            e.preventDefault();
+            const targetEl = document.querySelector(targetId === "#zine" ? "#zine" : targetId);
+            if (targetEl) {
+                window.scrollTo({
+                    top: targetEl.offsetTop - 80,
+                    behavior: "smooth"
+                });
+            }
+        }
+    });
+});
+
 
 /* --- 3. FUNGSI FLIPBOOK --- */
 async function openFlipbook(pdfUrl, zineId, customMusicUrl) { 
