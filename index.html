@@ -279,13 +279,15 @@ transition:0.25s;
 
 footer {
     text-align: center;
-    padding: 80px 0 25px 0; /* Jarak 150px ini WAJIB supaya navigasi ABOUT stabil */
+    /* Jarak 150px di bawah ini supaya bar navigasi ABOUT tetap putih pas di-scroll mentok */
+    padding: 80px 0 25px 0; 
 }
 
 footer img {
-    display: inline-block;
-    vertical-align: middle;
+    display: block;
+    pointer-events: none; /* Supaya logo cuma jadi pajangan, tidak bisa diklik */
 }
+
 
 .read-btn{
 padding:8px 18px;
