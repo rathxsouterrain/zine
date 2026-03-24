@@ -1244,47 +1244,47 @@ function kunciScrollZine(e) {
   }
 }
 
-    const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
-    const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
-    const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
+/* --- KONFIGURASI SUPABASE --- */
+const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
+const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
+const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 
-       async function loadZines() {
-        const container = document.getElementById('dynamic-zine-list');
-        
-        const { data: zines, error } = await _supabase
-            .from('zine')
-            .select('*')
-            .order('created_at', { ascending: false });
+async function loadZines() {
+    const container = document.getElementById('dynamic-zine-list');
+    
+    const { data: zines, error } = await _supabase
+        .from('zine')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-        if (error) return console.error(error);
+    if (error) {
+        console.error("Supabase Error:", error);
+        return;
+    }
 
-        container.innerHTML = ''; // Hapus loading
+    container.innerHTML = ''; 
 
-        zines.forEach(zine => {
-            const zineHTML = `
-            <div class="glass zine-item zine-card reveal show">
-                <div class="zine">
-                    <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}')" draggable="false">
-                    <p class="zine-title">${zine.title}</p>
-                    <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
-                    <div class="zine-buttons">
-                        <p style="font-size:12px; opacity:0.6;">${zine.views || 0} views</p>
-                        <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}')">READ</button>
-                        <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
-                    </div>
+    zines.forEach(zine => {
+        const zineHTML = `
+        <div class="glass zine-item zine-card reveal show">
+            <div class="zine">
+                <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}')" draggable="false">
+                <p class="zine-title">${zine.title}</p>
+                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
+                <div class="zine-buttons">
+                    <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
+                    <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}')">READ</button>
+                    <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
                 </div>
-            </div>`;
-            container.insertAdjacentHTML('beforeend', zineHTML);
-        });
-    }
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', zineHTML);
+    });
+}
 
-    // Fungsi untuk membuka PDF
-    function openFlipbook(url) {
-        if(!url) return alert("File tidak ada");
-        window.open(url, '_blank');
-    }
+// Jalankan load zines saat halaman siap
+document.addEventListener('DOMContentLoaded', loadZines);
 
-    document.addEventListener('DOMContentLoaded', loadZines);
 
 
 </script>
