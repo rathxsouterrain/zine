@@ -853,15 +853,15 @@ async function loadZines(page = 1) {
     
     zines.forEach((zine, index) => {
         const zineHTML = `
-        <div class="glass zine-item zine-card reveal show" style="animation: fadeUp 0.8s ease forwards; animation-delay: s; opacity: 0;">
+        <div class="glass zine-item zine-card reveal show" style="animation: fadeUp 0.8s ease forwards; animation-delay: ${index * 0.15}s; opacity: 0;">
             <div class="zine">
-                <img src="" onclick="openFlipbook('', , '')" draggable="false">
-                <p class="zine-title"></p>
-                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ </p>
+                <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')" draggable="false">
+                <p class="zine-title">${zine.title}</p>
+                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Default'}</p>
                 <div class="zine-buttons">
-                    <p style="font-size:12px; opacity:0.6;"><span id="view-"></span> views</p>
-                    <button class="read-btn" onclick="openFlipbook('', , '')">READ</button>
-                    <a href="" download class="download-btn">⬇︎</a>
+                    <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
+                    <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')">READ</button>
+                    <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
                 </div>
             </div>
         </div>`;
@@ -871,15 +871,16 @@ async function loadZines(page = 1) {
     renderPagination(count);
 }
 
-/* --- 1. FIX PAGINATION (AGAR PUTIH SOLID) --- */
+/* --- FIX TOMBOL PAGINATION (WARNA SOLID & SCROLL) --- */
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    let navContainer = document.getElementById('pagination'); // Pakai ID sesuai CSS lama
+    let navContainer = document.getElementById('pagination-nav');
     
     if (!navContainer) {
         const list = document.getElementById('dynamic-zine-list');
         navContainer = document.createElement('div');
-        navContainer.id = 'pagination';
+        navContainer.id = 'pagination-nav';
+        navContainer.style = "display: flex; justify-content: center; gap: 10px; margin: 20px 0 40px 0; width: 100%;";
         list.after(navContainer); 
     }
 
@@ -887,62 +888,32 @@ function renderPagination(totalItems) {
 
     if (totalPages > 1) {
         for (let i = 1; i <= totalPages; i++) {
-            let btn = document.createElement("button");
+            const btn = document.createElement('button');
             btn.innerText = i;
-
-            // KUNCI: Pakai class 'active' agar Putih Solid dari CSS lama bekerja
-            if (i === currentPage) {
-                btn.className = "active";
-            }
-
+            
+            // Logika Warna: Solid Putih jika aktif (#ffffff)
+            const isActive = (i === currentPage);
+            btn.style = `
+                padding: 8px 15px; 
+                border: 1px solid rgba(255,255,255,0.2); 
+                background: ${isActive ? '#ffffff' : 'rgba(255,255,255,0.05)'}; 
+                color: ${isActive ? '#000000' : '#ffffff'}; 
+                border-radius: 10px; 
+                cursor: pointer; 
+                font-weight: bold;
+                backdrop-filter: blur(5px);
+                transition: 0.3s;
+                opacity: 1;
+            `;
+            
             btn.onclick = () => {
-                document.getElementById("zine").scrollIntoView({ behavior: "smooth" });
+                document.getElementById('dynamic-zine-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 loadZines(i);
             };
             navContainer.appendChild(btn);
         }
     }
 }
-
-/* --- 2. FIX NAVBAR SCROLL (AGAR OTOMATIS PUTIH SAAT DI ABOUT/ZINE) --- */
-window.addEventListener("scroll", () => {
-    const sections = document.querySelectorAll("section");
-    const navLinks = document.querySelectorAll(".nav-bubble");
-    let current = "";
-
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop - 150;
-        if (pageYOffset >= sectionTop) {
-            current = section.getAttribute("id");
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove("active");
-        // Jika href link (misal #about) sama dengan id section yang aktif
-        if (link.getAttribute("href") === "#" + current) {
-            link.classList.add("active");
-        }
-    });
-});
-
-/* --- 3. FIX KLIK NAVBAR (AGAR SMOOTH SCROLL) --- */
-document.querySelectorAll(".nav-bubble").forEach(link => {
-    link.addEventListener("click", function(e) {
-        const targetId = this.getAttribute("href");
-        if (targetId.startsWith("#")) {
-            e.preventDefault();
-            const targetEl = document.querySelector(targetId === "#zine" ? "#zine" : targetId);
-            if (targetEl) {
-                window.scrollTo({
-                    top: targetEl.offsetTop - 80,
-                    behavior: "smooth"
-                });
-            }
-        }
-    });
-});
-
 
 /* --- 3. FUNGSI FLIPBOOK --- */
 async function openFlipbook(pdfUrl, zineId, customMusicUrl) { 
@@ -951,7 +922,7 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
     if (zineId) {
         try {
             await _supabase.rpc('increment_views', { row_id: zineId });
-            const viewSpan = document.getElementById(`view-`);
+            const viewSpan = document.getElementById(`view-${zineId}`);
             if (viewSpan) viewSpan.innerText = parseInt(viewSpan.innerText) + 1;
         } catch (e) { console.error(e); }
     }
@@ -1009,58 +980,58 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
 
 function closeFlipbook(){
     document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
     document.getElementById("flipbook-container").style.display="none";
     document.getElementById("bg-music").pause();
 }
 
-/* --- 4. LOGIC VISUAL (FIX NAVBAR & INTRO) --- */
-
-// FIX NAVBAR KLIK: Pastikan tombol Zine dan About di atas berfungsi
-function fixNavbarClick() {
-    const navLinks = document.querySelectorAll('nav a');
-    navLinks.forEach(link => {
-        link.onclick = (e) => {
-            let targetId = link.getAttribute('href');
-            if (targetId.startsWith('#')) {
-                e.preventDefault();
-                // Jika klik 'Zine' arahkan ke ID list zine
-                if (targetId === '#zine') targetId = '#dynamic-zine-list';
-                
-                const targetEl = document.querySelector(targetId);
-                if (targetEl) {
-                    window.scrollTo({ top: targetEl.offsetTop - 80, behavior: 'smooth' });
-                }
-            }
-        };
-    });
-}
-
+/* --- 4. LOGIC VISUAL (FIX NAVBAR SCROLL & INTRO) --- */
 window.addEventListener("load", () => {
     const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
     const bgContainer = document.querySelector(".gif-bg");
-    if(bgContainer) bgContainer.style.backgroundImage = `url('')`;
+    if(bgContainer) bgContainer.style.backgroundImage = `url('${randomBg}')`;
 
     const intro = document.getElementById("intro");
     const text = document.getElementById("introText");
     const sub = document.getElementById("introSub");
     const profile = document.getElementById("profileImg");
 
-    setTimeout(() => { if(text) text.style.opacity = "1"; text.style.filter = "blur(0px)"; }, 500);
-    setTimeout(() => { if(sub) sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; }, 1200);
+    setTimeout(() => { if(text) { text.style.opacity = "1"; text.style.filter = "blur(0px)"; } }, 500);
+    setTimeout(() => { if(sub) { sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; } }, 1200);
     setTimeout(() => { if(intro) intro.style.opacity = "0"; }, 3000);
     
     setTimeout(() => {
         if(intro) intro.style.display = "none";
-        document.querySelector("nav").classList.add("nav-show");
-        if(profile) profile.style.animation = "profileSlide 1s ease forwards";
         
-        fixNavbarClick(); // Panggil fungsi fix klik navbar di sini
+        // Animasi Muncul Navbar (Slide Down)
+        const nav = document.querySelector("nav");
+        if(nav) {
+            nav.style.transform = "translateY(0)";
+            nav.style.opacity = "1";
+            nav.classList.add("nav-show");
+        }
+        
+        if(profile) profile.style.animation = "profileSlide 1s ease forwards";
         loadZines(1); 
     }, 4200);
 });
 
-// NAVBAR SCROLL (STAY ASLI)
+// FIX NAVBAR BUTTON SCROLL (Tambahkan ini untuk About & Zine)
+document.querySelectorAll('nav a').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href.startsWith('#')) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+});
+
+// FIX NAVBAR SCROLL
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
@@ -1078,8 +1049,9 @@ window.addEventListener("scroll", () => {
 function kirimKritik(){
     const pesan = document.getElementById("kritikPesan").value;
     if(!pesan) return alert("Pesan kosong!");
-    window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=`;
+    window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
+
 
 
 </script>
