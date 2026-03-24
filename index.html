@@ -574,9 +574,23 @@ align-items:center;
     border: 1px solid rgba(255, 255, 255, 0.01);
 }
 /* SEARCH INPUT TIDAK IKUT FONT ARCHIVE */
-#zineSearch{
+#zineSearch {
+    display: block;          /* Memastikan input bisa diatur margin-nya */
+    width: 90%;             /* Sesuaikan lebar agar tidak terlalu mentok */
+    max-width: 400px;       /* Batas lebar maksimal */
+    margin: 0 auto;         /* KUNCI: Membuat elemen kotak berada di tengah */
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    color: white;
+    outline: none;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-align: center;     /* KUNCI: Membuat teks placeholder & input di tengah */
     font-family: Arial, sans-serif !important;
 }
+
 /* Semua teks dalam card glass lebih lembut */
 .gif-bg{
 position:fixed;
