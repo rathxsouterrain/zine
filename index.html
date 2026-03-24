@@ -823,7 +823,7 @@ Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik
 
 
 <script>
-/* --- 1. KONFIGURASI & VARIABLE --- */
+/* --- 1. KONFIGURASI --- */
 const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
 const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
 const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
@@ -831,7 +831,7 @@ const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 let currentPage = 1;
 const itemsPerPage = 3; 
 
-/* --- 2. FUNGSI LOAD ZINES (DENGAN FIX ANIMASI & SCROLL) --- */
+/* --- 2. FUNGSI LOAD ZINES (DENGAN SCROLL LANGSUNG) --- */
 async function loadZines(page = 1) {
     currentPage = page;
     const container = document.getElementById('dynamic-zine-list');
@@ -869,7 +869,7 @@ async function loadZines(page = 1) {
     renderPagination(count);
 }
 
-/* --- FIX TOMBOL PAGINATION (WARNA & SCROLL) --- */
+/* --- TOMBOL HALAMAN SOLID & SCROLL FIX --- */
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     let navContainer = document.getElementById('pagination-nav');
@@ -878,7 +878,7 @@ function renderPagination(totalItems) {
         const list = document.getElementById('dynamic-zine-list');
         navContainer = document.createElement('div');
         navContainer.id = 'pagination-nav';
-        navContainer.style = "display: flex; justify-content: center; gap: 10px; margin: 20px 0 40px 0; width: 100%;";
+        navContainer.style = "display: flex; justify-content: center; gap: 10px; margin: 30px 0 50px 0; width: 100%;";
         list.after(navContainer); 
     }
 
@@ -889,23 +889,24 @@ function renderPagination(totalItems) {
             const btn = document.createElement('button');
             btn.innerText = i;
             
-            // Logika Warna: Putih jika aktif, Transparan jika tidak
+            // Perbaikan Warna: Solid Putih jika aktif
+            const isActive = (i === currentPage);
             btn.style = `
-                padding: 8px 15px; 
-                border: 1px solid rgba(255,255,255,0.2); 
-                background: ${i === currentPage ? 'white' : 'rgba(255,255,255,0.05)'}; 
-                color: ${i === currentPage ? 'black' : 'white'}; 
-                border-radius: 10px; 
+                padding: 10px 18px; 
+                border: 1px solid rgba(255,255,255,0.3); 
+                background: ${isActive ? '#ffffff' : 'rgba(255,255,255,0.1)'}; 
+                color: ${isActive ? '#000000' : '#ffffff'}; 
+                border-radius: 12px; 
                 cursor: pointer; 
                 font-weight: bold;
-                backdrop-filter: blur(5px);
-                transition: 0.3s;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                box-shadow: ${isActive ? '0 4px 15px rgba(255,255,255,0.3)' : 'none'};
             `;
             
             btn.onclick = () => {
-                // Langsung ke area Zine (tanpa jeda jauh)
-                const target = document.getElementById('dynamic-zine-list');
-                window.scrollTo({ top: target.offsetTop - 100, behavior: 'smooth' });
+                // Scroll langsung ke Zine List
+                document.getElementById('dynamic-zine-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 loadZines(i);
             };
             navContainer.appendChild(btn);
@@ -913,7 +914,7 @@ function renderPagination(totalItems) {
     }
 }
 
-/* --- 3. FUNGSI FLIPBOOK --- */
+/* --- 3. FUNGSI FLIPBOOK & MUSIC --- */
 async function openFlipbook(pdfUrl, zineId, customMusicUrl) { 
     if (!pdfUrl) return;
 
@@ -982,36 +983,46 @@ function closeFlipbook(){
     document.getElementById("bg-music").pause();
 }
 
-/* --- 4. LOGIC VISUAL (FIX NAVBAR & INTRO) --- */
+/* --- 4. LOGIC VISUAL (ANIMASI NAVBAR & INTRO) --- */
 window.addEventListener("load", () => {
-    const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
-    const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
-    const bgContainer = document.querySelector(".gif-bg");
-    if(bgContainer) bgContainer.style.backgroundImage = `url('${randomBg}')`;
-
     const intro = document.getElementById("intro");
     const text = document.getElementById("introText");
     const sub = document.getElementById("introSub");
     const profile = document.getElementById("profileImg");
+    const nav = document.querySelector("nav");
 
-    setTimeout(() => { if(text) text.style.opacity = "1"; text.style.filter = "blur(0px)"; }, 500);
-    setTimeout(() => { if(sub) sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; }, 1200);
+    // Pastikan Navbar tersembunyi dulu sebelum animasi
+    if(nav) {
+        nav.style.opacity = "0";
+        nav.style.transform = "translateY(-20px)";
+        nav.style.transition = "all 1s ease";
+    }
+
+    setTimeout(() => { if(text) { text.style.opacity = "1"; text.style.filter = "blur(0px)"; } }, 500);
+    setTimeout(() => { if(sub) { sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; } }, 1200);
     setTimeout(() => { if(intro) intro.style.opacity = "0"; }, 3000);
     
     setTimeout(() => {
         if(intro) intro.style.display = "none";
-        // Aktifkan Navbar dengan Animasi
-        document.querySelector("nav").classList.add("nav-show");
+        
+        // Animasi Muncul Navbar
+        if(nav) {
+            nav.classList.add("nav-show");
+            nav.style.opacity = "1";
+            nav.style.transform = "translateY(0)";
+        }
+        
         if(profile) profile.style.animation = "profileSlide 1s ease forwards";
         loadZines(1); 
     }, 4200);
 });
 
-// FIX NAVBAR SCROLL (KEMBALI KE ASLI)
+// NAVBAR SCROLL LOGIC
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
     const currentScroll = window.pageYOffset;
+    
     if (currentScroll > lastScroll && currentScroll > 120) {
         nav.classList.remove("nav-show");
         nav.classList.add("nav-hidden");
@@ -1027,10 +1038,6 @@ function kirimKritik(){
     if(!pesan) return alert("Pesan kosong!");
     window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
-
-
-
-
 
 
 </script>
