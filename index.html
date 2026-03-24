@@ -1073,40 +1073,55 @@ window.addEventListener("scroll", () => {
     lastScroll = currentScroll;
 });
 /* --- FUNGSI SEARCH ZINE SPESIFIK & OPTIMASI --- */
-function searchZine() {
-    // 1. Ambil input dan bersihkan spasi di depan/belakang (trim)
+/* --- FUNGSI SEARCH GLOBAL & RESPONSIF (SUPABASE) --- */
+async function searchZine() {
     const input = document.getElementById("zineSearch").value.toLowerCase().trim();
-    
-    // 2. Ambil semua kartu zine yang ada
-    const items = document.querySelectorAll(".zine-card");
+    const container = document.getElementById('dynamic-zine-list');
+    const paginationContainer = document.getElementById('pagination');
 
-    items.forEach(item => {
-        // 3. Ambil judul zine saja (lebih spesifik dibanding ambil seluruh teks kartu)
-        const titleElement = item.querySelector(".zine-title");
-        
-        if (titleElement) {
-            const titleText = titleElement.innerText.toLowerCase();
-
-            // 4. Logika Pencarian: 
-            // Jika input kosong, tampilkan semua.
-            // Jika judul mengandung kata kunci, tampilkan.
-            if (input === "" || titleText.includes(input)) {
-                item.style.display = "block";
-                // Tambahkan efek animasi muncul kembali (opsional)
-                item.style.animation = "fadeUp 0.4s ease forwards";
-            } else {
-                // Sembunyikan jika tidak cocok
-                item.style.display = "none";
-            }
-        }
-    });
-
-    // 5. Cek jika tidak ada hasil (opsional: agar user tidak bingung)
-    const visibleItems = document.querySelectorAll(".zine-card[style*='display: block']");
-    if (visibleItems.length === 0 && input !== "") {
-        console.log("Zine tidak ditemukan");
-        // Kamu bisa tambahkan elemen "Not Found" di sini jika mau
+    // Jika input kosong, balikkan ke tampilan pagination normal (halaman 1)
+    if (input === "") {
+        loadZines(1);
+        if (paginationContainer) paginationContainer.style.display = "block";
+        return;
     }
+
+    // Sembunyikan pagination saat mencari agar tidak bingung
+    if (paginationContainer) paginationContainer.style.display = "none";
+
+    // PENCARIAN GLOBAL: Mencari di semua baris database yang mengandung kata kunci
+    // 'ilike' artinya case-insensitive dan bisa mencari di mana saja (tengah/depan/belakang)
+    const { data: zines, error } = await _supabase
+        .from('zine')
+        .select('*')
+        .ilike('title', `%${input}%`) // KUNCI: % berarti cari di posisi mana pun
+        .order('created_at', { ascending: false });
+
+    if (error) return console.error("Search error:", error);
+
+    container.innerHTML = ''; 
+
+    if (zines.length === 0) {
+        container.innerHTML = `<div class="glass" style="text-align:center; width:100%;"><p>Zine "${input}" tidak ditemukan.</p></div>`;
+        return;
+    }
+
+    // Tampilkan hasil pencarian
+    zines.forEach((zine, index) => {
+        const zineHTML = `
+        <div class="glass zine-item zine-card show" style="animation: fadeUp 0.5s ease forwards; animation-delay: ${index * 0.1}s;">
+            <div class="zine">
+                <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')" draggable="false">
+                <p class="zine-title">${zine.title}</p>
+                <div class="zine-buttons">
+                    <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
+                    <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')">READ</button>
+                    <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', zineHTML);
+    });
 }
 
 function kirimKritik(){
