@@ -824,31 +824,37 @@ Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik
 
 <script>
 
-/* --- 1. KONFIGURASI SUPABASE --- */
+/* --- 1. KONFIGURASI SUPABASE & PAGINATION --- */
 const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
 const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
 const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 
-let currentSession = 0;
+let currentPage = 1;
+const itemsPerPage = 3; // Membatasi 3 zine per halaman utama
 
-/* --- 2. FUNGSI LOAD ZINES (DARI SUPABASE) --- */
-async function loadZines() {
+/* --- 2. FUNGSI LOAD ZINES DENGAN PAGINATION & ANIMASI --- */
+async function loadZines(page = 1) {
+    currentPage = page;
     const container = document.getElementById('dynamic-zine-list');
-    const { data: zines, error } = await _supabase
+    
+    // Hitung range data (Pagination)
+    const from = (page - 1) * itemsPerPage;
+    const to = from + itemsPerPage - 1;
+
+    // Ambil data dan total jumlah dari Supabase
+    const { data: zines, error, count } = await _supabase
         .from('zine')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
     if (error) return console.error("Error load:", error);
 
     container.innerHTML = ''; 
     
-    // Tambahkan parameter "index" untuk membuat efek animasi berurutan (stagger)
     zines.forEach((zine, index) => {
-        // PERBAIKAN 1: Tambah parameter '${zine.music_url || ''}' di dalam onclick img dan button
-        // PERBAIKAN 2: Tambah style animation-delay agar card muncul bergantian
         const zineHTML = `
-        <div class="glass zine-item zine-card reveal show" style="animation: fadeUp 0.6s ease forwards; animation-delay: ${index * 0.15}s; opacity: 0;">
+        <div class="glass zine-item zine-card reveal-active" style="animation: fadeUp 0.8s ease forwards; animation-delay: ${index * 0.2}s; opacity: 0;">
             <div class="zine">
                 <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')" draggable="false">
                 <p class="zine-title">${zine.title}</p>
@@ -862,10 +868,53 @@ async function loadZines() {
         </div>`;
         container.insertAdjacentHTML('beforeend', zineHTML);
     });
+
+    renderPagination(count);
 }
 
-/* --- 3. FUNGSI FLIPBOOK & UPDATE VIEWS --- */
+/* --- FUNGSI TOMBOL HALAMAN (1 2 3) --- */
+function renderPagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let navContainer = document.getElementById('pagination-nav');
+    
+    // Buat container jika belum ada
+    if (!navContainer) {
+        const listContainer = document.getElementById('dynamic-zine-list').parentNode;
+        navContainer = document.createElement('div');
+        navContainer.id = 'pagination-nav';
+        navContainer.style = "display: flex; justify-content: center; gap: 15px; margin-top: 40px; padding-bottom: 60px;";
+        listContainer.appendChild(navContainer);
+    }
 
+    navContainer.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i;
+        // Style tombol agar match dengan tema glassmorphism kamu
+        btn.style = `
+            padding: 10px 18px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: ${i === currentPage ? 'white' : 'rgba(255,255,255,0.05)'}; 
+            color: ${i === currentPage ? 'black' : 'white'}; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-weight: bold;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        `;
+        
+        btn.onclick = () => {
+            // Scroll halus ke atas daftar zine saat ganti halaman
+            window.scrollTo({ top: document.getElementById('dynamic-zine-list').offsetTop - 100, behavior: 'smooth' });
+            loadZines(i);
+        };
+        navContainer.appendChild(btn);
+    }
+}
+
+/* --- 3. FUNGSI FLIPBOOK & UPDATE VIEWS (TETAP SAMA TAPI FIX MUSIC) --- */
 async function openFlipbook(pdfUrl, zineId, customMusicUrl) { 
     if (!pdfUrl) return;
 
@@ -888,31 +937,23 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
     newFlip.id = "flipbook";
     oldFlip.parentNode.replaceChild(newFlip, oldFlip);
 
-    /* --- LOGIKA MUSIK DINAMIS (EDITED) --- */
+    /* --- LOGIKA MUSIK DINAMIS --- */
     const music = document.getElementById("bg-music");
     music.pause();
     
-    // 1. Cek apakah ada customMusicUrl dari database
     if (customMusicUrl && customMusicUrl !== 'undefined' && customMusicUrl.trim() !== '') {
         music.src = customMusicUrl;
-    } 
-    // 2. Kalau tidak ada, cek apakah ini zine lama (zine5/6)
-    else if (pdfUrl.includes("zine5")) {
+    } else if (pdfUrl.includes("zine5")) {
         music.src = "music-zine5.mp3";
     } else if (pdfUrl.includes("zine6")) {
         music.src = "music-zine6.mp3";
-    } 
-    // 3. Kalau semua kosong, pakai musik default
-    else {
+    } else {
         music.src = "music.mp3";
     }
     
     music.volume = 0.5;
     music.load(); 
-    music.play().catch((err) => {
-        console.log("Autoplay diblokir browser, musik akan jalan setelah klik pertama.");
-    });
-    /* ------------------------------------- */
+    music.play().catch(() => console.log("Music play blocked by browser"));
 
     try {
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
@@ -926,34 +967,7 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
             
             const div = document.createElement("div");
             div.className = "page";
-            div.style.position = "relative"; // Penting agar nomor halaman bisa disesuaikan posisinya
             div.appendChild(canvas);
-
-            /* --- PERBAIKAN 3: LOGIKA NOMOR HALAMAN ZINE --- */
-            // Hanya buat nomor halaman jika total halaman >= 3, dan jangan taruh nomor di Cover Depan (hal 1) atau Cover Belakang (hal terakhir)
-            if (pdf.numPages >= 3 && i > 1 && i < pdf.numPages) {
-                const pageNum = document.createElement("div");
-                pageNum.innerText = i - 1; // Halaman ke-2 di PDF dihitung sebagai halaman 1 zine
-                
-                // Style nomor halaman (estetik zine)
-                pageNum.style.position = "absolute";
-                pageNum.style.bottom = "15px";
-                pageNum.style.fontSize = "11px";
-                pageNum.style.fontWeight = "bold";
-                pageNum.style.color = "rgba(0,0,0,0.6)"; // Warna agak samar
-                pageNum.style.fontFamily = "'Stack Sans Text', monospace";
-                
-                // Taruh nomor di pojok luar kertas (Kiri untuk genap, Kanan untuk ganjil)
-                if (i % 2 === 0) {
-                    pageNum.style.left = "20px";
-                } else {
-                    pageNum.style.right = "20px";
-                }
-                
-                div.appendChild(pageNum);
-            }
-            /* ----------------------------------------------- */
-
             newFlip.appendChild(div);
         }
 
@@ -979,39 +993,28 @@ function closeFlipbook(){
     document.getElementById("bg-music").pause();
 }
 
-/* --- 4. LOGIC VISUAL (INTRO, BACKGROUND, NAV) --- */
+/* --- 4. LOGIC VISUAL (INTRO & LOADING) --- */
 window.addEventListener("load", () => {
-    // 1. Background Random
+    // Background Random
     const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
     const bgContainer = document.querySelector(".gif-bg");
     if(bgContainer) bgContainer.style.backgroundImage = `url('${randomBg}')`;
 
-    // 2. Intro Animation
     const intro = document.getElementById("intro");
     const text = document.getElementById("introText");
-    const sub = document.getElementById("introSub");
-    const profile = document.getElementById("profileImg");
 
     setTimeout(() => {
         text.style.opacity = "1";
         text.style.filter = "blur(0px)";
     }, 500);
 
-    setTimeout(() => {
-        if(sub) {
-            sub.style.opacity = "0.5";
-            sub.style.filter = "blur(0px)";
-        }
-    }, 1200);
-
     setTimeout(() => intro.style.opacity = "0", 3000);
     
     setTimeout(() => {
         intro.style.display = "none";
         document.querySelector("nav").classList.add("nav-show");
-        if(profile) profile.style.animation = "profileSlide 1s ease forwards";
-        loadZines(); 
+        loadZines(); // Panggil fungsi load zines pertama kali
     }, 4200);
 });
 
@@ -1021,20 +1024,13 @@ window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
     const currentScroll = window.pageYOffset;
     if (currentScroll > lastScroll && currentScroll > 120) {
-        nav.classList.remove("nav-show");
         nav.classList.add("nav-hidden");
-    } else if (currentScroll < lastScroll) {
+    } else {
         nav.classList.remove("nav-hidden");
-        nav.classList.add("nav-show");
     }
     lastScroll = currentScroll;
 });
 
-function kirimKritik(){
-    const pesan = document.getElementById("kritikPesan").value;
-    if(!pesan) return alert("Pesan kosong!");
-    window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
-}
 
 
 </script>
