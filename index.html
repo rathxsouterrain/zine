@@ -739,15 +739,28 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </section>
 
 <!-- ===== ZINE LIST (3 ITEM) ===== -->
-<section id="zine-gallery">
-    <div class="container">
-        <h2 style="text-align: center; letter-spacing: 5px;">ARCHIVE</h2>
-        
-        <div id="dynamic-zine-list" class="zine-grid">
-            <p style="text-align: center; opacity: 0.5;">Loading archives...</p>
+zines.forEach(zine => {
+    const html = `
+    <div class="glass zine-item zine-card reveal show">
+        <div class="zine">
+            <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}')" draggable="false">
+            
+            <p class="zine-title">${zine.title}</p>
+            
+            <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
+            
+            <div class="zine-buttons">
+                <p style="font-size:12px; opacity:0.6;">${zine.views || 0} views</p>
+                
+                <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}')">READ</button>
+                
+                <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
+            </div>
         </div>
-    </div>
-</section>
+    </div>`;
+    container.insertAdjacentHTML('beforeend', html);
+});
+
     </div>
 <div id="pagination"></div>
   <div class="glass zine-item">
