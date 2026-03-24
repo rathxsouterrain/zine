@@ -871,7 +871,7 @@ async function loadZines(page = 1) {
     renderPagination(count);
 }
 
-/* --- FIX TOMBOL PAGINATION (WARNA SOLID & SCROLL) --- */
+/* --- FIX TOMBOL PAGINATION (WARNA & SCROLL) --- */
 /* --- 1. FIX PAGINATION (AGAR PUTIH SOLID) --- */
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -1010,12 +1010,11 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
 
 function closeFlipbook(){
     document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
     document.getElementById("flipbook-container").style.display="none";
     document.getElementById("bg-music").pause();
 }
 
-/* --- 4. LOGIC VISUAL (FIX NAVBAR SCROLL & INTRO) --- */
+/* --- 4. LOGIC VISUAL (FIX NAVBAR & INTRO) --- */
 window.addEventListener("load", () => {
     const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
@@ -1027,88 +1026,32 @@ window.addEventListener("load", () => {
     const sub = document.getElementById("introSub");
     const profile = document.getElementById("profileImg");
 
-    setTimeout(() => { if(text) { text.style.opacity = "1"; text.style.filter = "blur(0px)"; } }, 500);
-    setTimeout(() => { if(sub) { sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; } }, 1200);
+    setTimeout(() => { if(text) text.style.opacity = "1"; text.style.filter = "blur(0px)"; }, 500);
+    setTimeout(() => { if(sub) sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; }, 1200);
     setTimeout(() => { if(intro) intro.style.opacity = "0"; }, 3000);
     
     setTimeout(() => {
         if(intro) intro.style.display = "none";
-        
-        // Animasi Muncul Navbar (Slide Down)
-        const nav = document.querySelector("nav");
-        if(nav) {
-            nav.style.transform = "translateY(0)";
-            nav.style.opacity = "1";
-            nav.classList.add("nav-show");
-        }
-        
+        // Aktifkan Navbar dengan Animasi
+        document.querySelector("nav").classList.add("nav-show");
         if(profile) profile.style.animation = "profileSlide 1s ease forwards";
         loadZines(1); 
     }, 4200);
 });
 
-// FIX NAVBAR BUTTON SCROLL (Tambahkan ini untuk About & Zine)
-document.querySelectorAll('nav a').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href.startsWith('#')) {
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
-});
-
-// FIX NAVBAR SCROLL
+// FIX NAVBAR SCROLL (KEMBALI KE ASLI)
+let lastScroll = 0;
 window.addEventListener("scroll", () => {
+    const nav = document.querySelector("nav");
     const currentScroll = window.pageYOffset;
-
     if (currentScroll > lastScroll && currentScroll > 120) {
-      // scroll ke bawah → sembunyikan navbar
-      nav.classList.remove("nav-show");
-      nav.classList.add("nav-hidden");
-    } 
-    // scroll ke atas → tampilkan navbar hanya jika sebelumnya hidden
-    else if (currentScroll < lastScroll && nav.classList.contains("nav-hidden")) {
-      nav.classList.remove("nav-hidden");
-      nav.classList.add("nav-show");
+        nav.classList.remove("nav-show");
+        nav.classList.add("nav-hidden");
+    } else if (currentScroll < lastScroll) {
+        nav.classList.remove("nav-hidden");
+        nav.classList.add("nav-show");
     }
-
     lastScroll = currentScroll;
-  });
-
-  // klik menu navbar
-  document.querySelectorAll(".nav-bubble").forEach(link => {
-    link.addEventListener("click", () => {
-      // langsung tampilkan navbar
-      nav.classList.remove("nav-hidden");
-      nav.classList.add("nav-show");
-
-      // kunci navbar agar tidak hilang walau scroll ke atas
-      let unlockScrollDown = false;
-
-      const scrollHandler = () => {
-        const scroll = window.pageYOffset;
-        if (scroll > lastScroll) {
-          // scroll ke bawah → bisa sembunyikan navbar
-          nav.classList.remove("nav-show");
-          nav.classList.add("nav-hidden");
-          lastScroll = scroll;
-          unlockScrollDown = true;
-        } else if (!unlockScrollDown) {
-          // scroll ke atas → abaikan, jangan hilangkan navbar
-          lastScroll = scroll;
-        }
-      };
-
-      window.addEventListener("scroll", scrollHandler, { once: true });
-
-      // reset lastScroll sekarang
-      lastScroll = window.pageYOffset;
-    });
-  });
 });
 
 function kirimKritik(){
@@ -1116,6 +1059,7 @@ function kirimKritik(){
     if(!pesan) return alert("Pesan kosong!");
     window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
+
 
 
 
