@@ -831,11 +831,12 @@ const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 let currentPage = 1;
 const itemsPerPage = 3; 
 
-/* --- 2. FUNGSI LOAD ZINES DENGAN PAGINATION & ANIMASI --- */
+/* --- 2. FUNGSI LOAD ZINES (3 PER HALAMAN + ANIMASI) --- */
 async function loadZines(page = 1) {
     currentPage = page;
     const container = document.getElementById('dynamic-zine-list');
     
+    // Menghitung data yang diambil (0-2 untuk hal 1, 3-5 untuk hal 2)
     const from = (page - 1) * itemsPerPage;
     const to = from + itemsPerPage - 1;
 
@@ -847,12 +848,11 @@ async function loadZines(page = 1) {
 
     if (error) return console.error("Error load:", error);
 
-    // Kosongkan container sebelum isi baru
     container.innerHTML = ''; 
     
     zines.forEach((zine, index) => {
         const zineHTML = `
-        <div class="glass zine-item zine-card show" style="animation: fadeUp 0.8s ease forwards; animation-delay: ${index * 0.2}s; opacity: 0;">
+        <div class="glass zine-item zine-card reveal show" style="animation: fadeUp 0.8s ease forwards; animation-delay: ${index * 0.2}s; opacity: 0;">
             <div class="zine">
                 <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id}, '${zine.music_url || ''}')" draggable="false">
                 <p class="zine-title">${zine.title}</p>
@@ -867,61 +867,70 @@ async function loadZines(page = 1) {
         container.insertAdjacentHTML('beforeend', zineHTML);
     });
 
+    // Panggil fungsi pembuat tombol halaman
     renderPagination(count);
 }
 
+/* --- FUNGSI NAVIGASI HALAMAN (1 2 3) --- */
 function renderPagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     let navContainer = document.getElementById('pagination-nav');
     
-    // Pastikan container ada di bawah list zine
+    // Buat element nav tepat di bawah list zine jika belum ada
     if (!navContainer) {
         const parent = document.getElementById('dynamic-zine-list');
         navContainer = document.createElement('div');
         navContainer.id = 'pagination-nav';
-        navContainer.style = "display: flex; justify-content: center; gap: 10px; margin: 20px 0 40px 0; width: 100%;";
+        navContainer.style = "display: flex; justify-content: center; gap: 12px; margin: 30px 0; width: 100%;";
         parent.after(navContainer); 
     }
 
     navContainer.innerHTML = '';
 
-    for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.innerText = i;
-        btn.style = `
-            padding: 8px 14px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            background: ${i === currentPage ? 'white' : 'rgba(255,255,255,0.05)'}; 
-            color: ${i === currentPage ? 'black' : 'white'}; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 12px;
-            backdrop-filter: blur(5px);
-            transition: 0.3s;
-        `;
-        
-        btn.onclick = () => {
-            window.scrollTo({ top: document.getElementById('dynamic-zine-list').offsetTop - 120, behavior: 'smooth' });
-            loadZines(i);
-        };
-        navContainer.appendChild(btn);
+    // Hanya tampilkan jika zine lebih dari 3
+    if (totalPages > 1) {
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.innerText = i;
+            btn.className = (i === currentPage) ? "page-btn active" : "page-btn";
+            
+            // Inline style agar tetap estetik tanpa ubah CSS lama
+            btn.style = `
+                padding: 10px 16px; 
+                border: 1px solid rgba(255,255,255,0.1); 
+                background: ${i === currentPage ? 'white' : 'rgba(255,255,255,0.05)'}; 
+                color: ${i === currentPage ? 'black' : 'white'}; 
+                border-radius: 12px; 
+                cursor: pointer; 
+                font-size: 13px;
+                font-weight: bold;
+                backdrop-filter: blur(5px);
+                transition: 0.3s;
+            `;
+            
+            btn.onclick = () => {
+                window.scrollTo({ top: document.getElementById('dynamic-zine-list').offsetTop - 150, behavior: 'smooth' });
+                loadZines(i);
+            };
+            navContainer.appendChild(btn);
+        }
     }
 }
 
-/* --- 3. FUNGSI FLIPBOOK & VIEWS --- */
+/* --- 3. FUNGSI FLIPBOOK & MUSIC --- */
 async function openFlipbook(pdfUrl, zineId, customMusicUrl) { 
     if (!pdfUrl) return;
 
+    // Update Views
     if (zineId) {
         try {
             await _supabase.rpc('increment_views', { row_id: zineId });
             const viewSpan = document.getElementById(`view-${zineId}`);
             if (viewSpan) viewSpan.innerText = parseInt(viewSpan.innerText) + 1;
-        } catch (e) { console.error("Gagal update views", e); }
+        } catch (e) { console.error(e); }
     }
 
     document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
     document.getElementById("zine-loading").style.display = "flex";
     document.getElementById("flipbook-container").style.display = "block";
 
@@ -931,6 +940,7 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
     newFlip.id = "flipbook";
     oldFlip.parentNode.replaceChild(newFlip, oldFlip);
 
+    // Musik Dinamis Berdasarkan Upload
     const music = document.getElementById("bg-music");
     music.pause();
     
@@ -938,15 +948,13 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
         music.src = customMusicUrl;
     } else if (pdfUrl.includes("zine5")) {
         music.src = "music-zine5.mp3";
-    } else if (pdfUrl.includes("zine6")) {
-        music.src = "music-zine6.mp3";
     } else {
         music.src = "music.mp3";
     }
     
     music.volume = 0.5;
     music.load(); 
-    music.play().catch(() => console.log("Play blocked"));
+    music.play().catch(() => console.log("Audio Play Blocked"));
 
     try {
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
@@ -964,8 +972,8 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
 
         let isMobile = window.innerWidth <= 768;
         $(newFlip).turn({
-            width: isMobile ? window.innerWidth * 0.9 : 1000,
-            height: isMobile ? (window.innerWidth * 0.9) * 1.41 : 700,
+            width: isMobile ? window.innerWidth * 0.95 : 1000,
+            height: isMobile ? (window.innerWidth * 0.95) * 1.41 : 700,
             autoCenter: true,
             display: isMobile ? "single" : "double",
             duration: 1200
@@ -979,45 +987,51 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
 
 function closeFlipbook(){
     document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
     document.getElementById("flipbook-container").style.display="none";
     document.getElementById("bg-music").pause();
 }
 
-/* --- 4. LOGIC VISUAL (RE-FIXED INTRO & PROFILE) --- */
+/* --- 4. LOGIC VISUAL (INTRO, PROFIL, SUB-TEXT) --- */
 window.addEventListener("load", () => {
-    // 1. Background Random
+    // Background
     const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
     const bgContainer = document.querySelector(".gif-bg");
     if(bgContainer) bgContainer.style.backgroundImage = `url('${randomBg}')`;
 
-    // 2. Intro Animation (DENGAN SUB-TEXT & PROFIL)
     const intro = document.getElementById("intro");
     const text = document.getElementById("introText");
-    const sub = document.getElementById("introSub");
-    const profile = document.getElementById("profileImg");
+    const sub = document.getElementById("introSub"); // SUB-TEXT
+    const profile = document.getElementById("profileImg"); // PROFIL
 
+    // Animasi Text Utama
     setTimeout(() => {
         if(text) { text.style.opacity = "1"; text.style.filter = "blur(0px)"; }
     }, 500);
 
+    // Animasi Sub-Text
     setTimeout(() => {
         if(sub) { sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; }
     }, 1200);
 
+    // Intro Selesai
     setTimeout(() => { if(intro) intro.style.opacity = "0"; }, 3000);
     
     setTimeout(() => {
         if(intro) intro.style.display = "none";
         document.querySelector("nav").classList.add("nav-show");
-        // Jalankan animasi profil jika ada
-        if(profile) profile.style.animation = "profileSlide 1s ease forwards";
-        loadZines(1); 
+        
+        // Munculkan Profil
+        if(profile) {
+            profile.style.opacity = "1";
+            profile.style.animation = "profileSlide 1s ease forwards";
+        }
+        
+        loadZines(1); // Load halaman pertama
     }, 4200);
 });
 
-// Navbar Scroll Logic
+// Scroll Navbar
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
@@ -1035,6 +1049,7 @@ function kirimKritik(){
     if(!pesan) return alert("Pesan kosong!");
     window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
+
 
 
 
