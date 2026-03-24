@@ -861,7 +861,8 @@ async function loadZines() {
 }
 
 /* --- 3. FUNGSI FLIPBOOK & UPDATE VIEWS --- */
-async function openFlipbook(pdfUrl, zineId) {
+
+async function openFlipbook(pdfUrl, zineId, customMusicUrl) { // Tambah parameter customMusicUrl
     if (!pdfUrl) return;
 
     if (zineId) {
@@ -883,11 +884,21 @@ async function openFlipbook(pdfUrl, zineId) {
     newFlip.id = "flipbook";
     oldFlip.parentNode.replaceChild(newFlip, oldFlip);
 
+    /* --- LOGIKA MUSIK DINAMIS (EDITED) --- */
     const music = document.getElementById("bg-music");
     music.pause();
-    music.src = (pdfUrl.includes("zine5")) ? "music-zine5.mp3" : (pdfUrl.includes("zine6") ? "music-zine6.mp3" : "music.mp3");
+    
+    // Jika ada link musik khusus di database, putar itu. 
+    // Jika tidak, cek apakah zine5/zine6, jika tidak juga, putar music.mp3 default.
+    if (customMusicUrl && customMusicUrl !== 'undefined' && customMusicUrl.trim() !== '') {
+        music.src = customMusicUrl;
+    } else {
+        music.src = (pdfUrl.includes("zine5")) ? "music-zine5.mp3" : (pdfUrl.includes("zine6") ? "music-zine6.mp3" : "music.mp3");
+    }
+    
     music.volume = 0.5;
     music.play().catch(()=>{});
+    /* ------------------------------------- */
 
     try {
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
@@ -982,10 +993,6 @@ function kirimKritik(){
     if(!pesan) return alert("Pesan kosong!");
     window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
-
-
-
-
 
 </script>
 </body>
