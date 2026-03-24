@@ -3,96 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zine Archive - Admin Panel</title>
+    <title>Admin Panel - Zine Flipbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { letter-spacing: 5px; font-size: 16px; margin-bottom: 30px; text-align: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
-        label { display: block; text-align: left; font-size: 10px; opacity: 0.5; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #0a0a0a; border: 1px solid #222; border-radius: 8px; color: #fff; box-sizing: border-box; font-family: sans-serif; }
-        input:focus { border-color: #555; outline: none; }
-        button { width: 100%; padding: 15px; margin-top: 30px; border-radius: 30px; border: none; background: #fff; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: sans-serif; }
-        button:hover { background: #ccc; }
-        button:disabled { background: #333; color: #777; cursor: not-allowed; }
-        #status { font-size: 11px; margin-top: 20px; text-align: center; min-height: 1em; color: #888; }
+        body { margin: 0; background: #111; color: white; font-family: 'Poppins', sans-serif; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
+        
+        /* LOGIN SCREEN */
+        #login-screen { text-align: center; margin-top: 20vh; }
+        input[type="password"], input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; box-sizing: border-box; }
+        button { background: white; color: black; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; font-family: 'Poppins'; }
+        button:hover { background: #ddd; }
+        
+        /* ADMIN PANEL */
+        #admin-panel { display: none; }
+        .zine-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .zine-info { font-size: 14px; }
+        .action-btn { font-size: 12px; padding: 5px 10px; margin-left: 5px; }
+        .btn-edit { background: #f1c40f; color: black; }
+        .btn-delete { background: #e74c3c; color: white; }
     </style>
 </head>
 <body>
 
-<div class="glass">
-    <h2>ADD TO ARCHIVE</h2>
-    
-    <label>Zine Title</label>
-    <input type="text" id="title" placeholder="e.g. DARKEST HOUR VOL. 1">
-    
-    <label>Background Music (Optional)</label>
-    <input type="text" id="musicTitle" placeholder="Artist - Track Name">
-    
-    <label>Cover Image (JPG/PNG)</label>
-    <input type="file" id="coverFile" accept="image/*">
-    
-    <label>PDF File</label>
-    <input type="file" id="pdfFile" accept=".pdf">
-    
-    <button id="uploadBtn" onclick="publishZine()">PUBLISH ZINE</button>
-    <div id="status">Ready</div>
-</div>
+    <div id="login-screen" class="container glass">
+        <h2>Admin Login</h2>
+        <input type="password" id="password" placeholder="Masukkan Sandi...">
+        <button onclick="login()">MASUK</button>
+    </div>
+
+    <div id="admin-panel" class="container">
+        <h2>Admin Dashboard</h2>
+        
+        <div class="glass">
+            <h3 id="form-title">Tambah Zine Baru</h3>
+            <input type="hidden" id="edit-id">
+            <label>Judul Zine:</label>
+            <input type="text" id="val-title" placeholder="Contoh: Issue 01 - The Beginning">
+            
+            <label>URL Gambar Cover:</label>
+            <input type="text" id="val-cover" placeholder="Link gambar cover (.jpg/.png/.gif)">
+            
+            <label>URL File PDF:</label>
+            <input type="text" id="val-pdf" placeholder="Link file PDF zine">
+            
+            <label>Judul Musik (Opsional):</label>
+            <input type="text" id="val-music-title" placeholder="Contoh: Kertas dan Kaca">
+            
+            <label>URL File Musik (Opsional - Kosongkan jika pakai lagu default):</label>
+            <input type="text" id="val-music-url" placeholder="Link file musik (.mp3)">
+            
+            <button onclick="saveZine()" style="margin-top: 15px; width: 100%;">SIMPAN DATA</button>
+            <button onclick="resetForm()" style="margin-top: 10px; width: 100%; background: transparent; border: 1px solid white; color: white;">BATAL / RESET</button>
+        </div>
+
+        <div class="glass">
+            <h3>Daftar Zine</h3>
+            <div id="zine-list">Loading...</div>
+        </div>
+    </div>
 
 <script>
-    // MASUKKAN DATA API KAMU DI SINI
+    /* --- KONFIGURASI SUPABASE --- */
     const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
     const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
     const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 
-    async function publishZine() {
-        const title = document.getElementById('title').value;
-        const music = document.getElementById('musicTitle').value || "Silent";
-        const coverFile = document.getElementById('coverFile').files[0];
-        const pdfFile = document.getElementById('pdfFile').files[0];
-        const status = document.getElementById('status');
-        const btn = document.getElementById('uploadBtn');
-
-        if (!title || !coverFile || !pdfFile) return alert("Please complete the form!");
-
-        btn.disabled = true;
-        status.innerText = "Uploading files to storage...";
-
-        try {
-            // 1. Upload Cover
-            const cName = `covers/_`;
-            await _supabase.storage.from('zine-files').upload(cName, coverFile);
-            const { data: cUrl } = _supabase.storage.from('zine-files').getPublicUrl(cName);
-
-            // 2. Upload PDF
-            const pName = `pdfs/_`;
-            await _supabase.storage.from('zine-files').upload(pName, pdfFile);
-            const { data: pUrl } = _supabase.storage.from('zine-files').getPublicUrl(pName);
-
-            // 3. Simpan ke Database
-            status.innerText = "Saving to database...";
-            const { error: dbErr } = await _supabase.from('zine').insert([
-                { 
-                    title: title, 
-                    music_title: music,
-                    cover_url: cUrl.publicUrl, 
-                    pdf_url: pUrl.publicUrl,
-                    views: 0 
-                }
-            ]);
-
-            if (dbErr) throw dbErr;
-
-            status.style.color = "#00ff00";
-            status.innerText = "SUCCESSFULLY PUBLISHED!";
-            setTimeout(() => location.reload(), 2000);
-
-        } catch (err) {
-            alert("Error: " + err.message);
-            btn.disabled = false;
-            status.innerText = "Failed to upload.";
-            status.style.color = "red";
+    // 1. SISTEM LOGIN SEDERHANA
+    function login() {
+        const pass = document.getElementById("password").value;
+        if (pass === "sandi123") { // <-- GANTI SANDI DI SINI
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("admin-panel").style.display = "block";
+            fetchZines();
+        } else {
+            alert("Sandi salah!");
         }
+    }
+
+    // 2. AMBIL DATA DARI SUPABASE
+    async function fetchZines() {
+        const listDiv = document.getElementById("zine-list");
+        const { data: zines, error } = await _supabase.from('zine').select('*').order('created_at', { ascending: false });
+        
+        if (error) { listDiv.innerHTML = "Error loading data."; return; }
+        
+        listDiv.innerHTML = "";
+        zines.forEach(zine => {
+            listDiv.innerHTML += `
+                <div class="zine-row">
+                    <div class="zine-info">
+                        <strong>${zine.title}</strong><br>
+                        <span style="opacity: 0.6; font-size: 11px;">Views: ${zine.views || 0} | Music: ${zine.music_title || 'Default'}</span>
+                    </div>
+                    <div>
+                        <button class="action-btn btn-edit" onclick="editZine(${zine.id}, '${zine.title}', '${zine.cover_url}', '${zine.pdf_url}', '${zine.music_title || ''}', '${zine.music_url || ''}')">Edit</button>
+                        <button class="action-btn btn-delete" onclick="deleteZine(${zine.id})">Hapus</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // 3. SIMPAN ATAU UPDATE DATA
+    async function saveZine() {
+        const id = document.getElementById("edit-id").value;
+        const payload = {
+            title: document.getElementById("val-title").value,
+            cover_url: document.getElementById("val-cover").value,
+            pdf_url: document.getElementById("val-pdf").value,
+            music_title: document.getElementById("val-music-title").value || 'Silent',
+            music_url: document.getElementById("val-music-url").value || null
+        };
+
+        if (!payload.title || !payload.cover_url || !payload.pdf_url) {
+            alert("Judul, Cover, dan PDF wajib diisi!"); return;
+        }
+
+        let error;
+        if (id) {
+            // Jika ID ada = UPDATE
+            const res = await _supabase.from('zine').update(payload).eq('id', id);
+            error = res.error;
+            alert("Zine berhasil diperbarui!");
+        } else {
+            // Jika ID kosong = INSERT BARU
+            const res = await _supabase.from('zine').insert([payload]);
+            error = res.error;
+            alert("Zine baru berhasil ditambahkan!");
+        }
+
+        if (error) { alert("Error: " + error.message); } 
+        else { resetForm(); fetchZines(); }
+    }
+
+    // 4. MASUKKAN DATA KE FORM UNTUK DIEDIT
+    function editZine(id, title, cover, pdf, musicTitle, musicUrl) {
+        document.getElementById("form-title").innerText = "Edit Zine";
+        document.getElementById("edit-id").value = id;
+        document.getElementById("val-title").value = title;
+        document.getElementById("val-cover").value = cover;
+        document.getElementById("val-pdf").value = pdf;
+        document.getElementById("val-music-title").value = musicTitle;
+        document.getElementById("val-music-url").value = musicUrl !== 'null' ? musicUrl : '';
+        window.scrollTo(0, 0);
+    }
+
+    // 5. HAPUS ZINE
+    async function deleteZine(id) {
+        if (confirm("Yakin ingin menghapus zine ini?")) {
+            const { error } = await _supabase.from('zine').delete().eq('id', id);
+            if (error) alert("Gagal menghapus.");
+            else fetchZines();
+        }
+    }
+
+    // 6. RESET FORM
+    function resetForm() {
+        document.getElementById("form-title").innerText = "Tambah Zine Baru";
+        document.getElementById("edit-id").value = "";
+        document.getElementById("val-title").value = "";
+        document.getElementById("val-cover").value = "";
+        document.getElementById("val-pdf").value = "";
+        document.getElementById("val-music-title").value = "";
+        document.getElementById("val-music-url").value = "";
     }
 </script>
 </body>
