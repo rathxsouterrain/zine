@@ -864,7 +864,6 @@ async function loadZines() {
 async function openFlipbook(pdfUrl, zineId) {
     if (!pdfUrl) return;
 
-    // Tambah Views ke Supabase
     if (zineId) {
         try {
             await _supabase.rpc('increment_views', { row_id: zineId });
@@ -873,20 +872,17 @@ async function openFlipbook(pdfUrl, zineId) {
         } catch (e) { console.error("Gagal update views", e); }
     }
 
-    // Lock Scroll & Setup UI
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.getElementById("zine-loading").style.display = "flex";
     document.getElementById("flipbook-container").style.display = "block";
 
-    // Reset Flipbook Element
     const oldFlip = document.getElementById("flipbook");
     if($(oldFlip).data("turn")) $(oldFlip).turn("destroy");
     const newFlip = document.createElement("div");
     newFlip.id = "flipbook";
     oldFlip.parentNode.replaceChild(newFlip, oldFlip);
 
-    // Audio Logic
     const music = document.getElementById("bg-music");
     music.pause();
     music.src = (pdfUrl.includes("zine5")) ? "music-zine5.mp3" : (pdfUrl.includes("zine6") ? "music-zine6.mp3" : "music.mp3");
@@ -902,7 +898,6 @@ async function openFlipbook(pdfUrl, zineId) {
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             await page.render({ canvasContext: canvas.getContext("2d"), viewport: viewport }).promise;
-
             const div = document.createElement("div");
             div.className = "page";
             div.appendChild(canvas);
@@ -932,50 +927,62 @@ function closeFlipbook(){
 }
 
 /* --- 4. LOGIC VISUAL (INTRO, BACKGROUND, NAV) --- */
-document.addEventListener("DOMContentLoaded", () => {
-    // Background Random
+window.addEventListener("load", () => {
+    // 1. Background Random
     const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
-    const bgElement = document.getElementById("bgimg");
-    if(bgElement) bgElement.src = randomBg;
+    const bgContainer = document.querySelector(".gif-bg");
+    if(bgContainer) bgContainer.style.backgroundImage = `url('${randomBg}')`;
 
-    // Intro & Profile Animation
+    // 2. Intro Animation
     const intro = document.getElementById("intro");
+    const text = document.getElementById("introText");
+    const sub = document.getElementById("introSub");
     const profile = document.getElementById("profileImg");
-    
+
     setTimeout(() => {
-        document.getElementById("introText").style.opacity = "1";
-        document.getElementById("introText").style.filter = "blur(0px)";
+        text.style.opacity = "1";
+        text.style.filter = "blur(0px)";
     }, 500);
 
+    setTimeout(() => {
+        if(sub) {
+            sub.style.opacity = "0.5";
+            sub.style.filter = "blur(0px)";
+        }
+    }, 1200);
+
     setTimeout(() => intro.style.opacity = "0", 3000);
+    
     setTimeout(() => {
         intro.style.display = "none";
         document.querySelector("nav").classList.add("nav-show");
         if(profile) profile.style.animation = "profileSlide 1s ease forwards";
-        loadZines(); // Load data SETELAH intro selesai
+        loadZines(); 
     }, 4200);
 });
 
-// Navbar Hide/Show on Scroll
+// Navbar Scroll Logic
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
     const currentScroll = window.pageYOffset;
     if (currentScroll > lastScroll && currentScroll > 120) {
-        nav.classList.replace("nav-show", "nav-hidden");
+        nav.classList.remove("nav-show");
+        nav.classList.add("nav-hidden");
     } else if (currentScroll < lastScroll) {
-        nav.classList.replace("nav-hidden", "nav-show");
+        nav.classList.remove("nav-hidden");
+        nav.classList.add("nav-show");
     }
     lastScroll = currentScroll;
 });
 
-// Fungsi Pendukung Lainnya
 function kirimKritik(){
     const pesan = document.getElementById("kritikPesan").value;
     if(!pesan) return alert("Pesan kosong!");
     window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
+
 
 
 
