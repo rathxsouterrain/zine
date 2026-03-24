@@ -823,7 +823,7 @@ Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik
 
 
 <script>
-/* --- 1. KONFIGURASI & VARIABLE --- */
+//* --- 1. KONFIGURASI & VARIABLE --- */
 const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
 const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
 const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
@@ -889,7 +889,7 @@ function renderPagination(totalItems) {
             const btn = document.createElement('button');
             btn.innerText = i;
             
-            // Logika Warna: Solid Putih jika aktif (#ffffff)
+            // PERBAIKAN: Warna Solid Putih saat Aktif (Tanpa blur/transparansi)
             const isActive = (i === currentPage);
             btn.style = `
                 padding: 8px 15px; 
@@ -899,13 +899,13 @@ function renderPagination(totalItems) {
                 border-radius: 10px; 
                 cursor: pointer; 
                 font-weight: bold;
-                backdrop-filter: blur(5px);
+                backdrop-filter: ${isActive ? 'none' : 'blur(5px)'}; 
                 transition: 0.3s;
-                opacity: 1;
             `;
             
             btn.onclick = () => {
-                document.getElementById('dynamic-zine-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const target = document.getElementById('dynamic-zine-list');
+                window.scrollTo({ top: target.offsetTop - 100, behavior: 'smooth' });
                 loadZines(i);
             };
             navContainer.appendChild(btn);
@@ -978,12 +978,11 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl) {
 
 function closeFlipbook(){
     document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
     document.getElementById("flipbook-container").style.display="none";
     document.getElementById("bg-music").pause();
 }
 
-/* --- 4. LOGIC VISUAL (FIX NAVBAR SCROLL & INTRO) --- */
+/* --- 4. LOGIC VISUAL (FIX NAVBAR & INTRO) --- */
 window.addEventListener("load", () => {
     const backgrounds = ["back1.jpg", "back2.jpg", "back3.jpg", "back4.jpg", "back5.jpg"];
     const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
@@ -995,41 +994,33 @@ window.addEventListener("load", () => {
     const sub = document.getElementById("introSub");
     const profile = document.getElementById("profileImg");
 
-    setTimeout(() => { if(text) { text.style.opacity = "1"; text.style.filter = "blur(0px)"; } }, 500);
-    setTimeout(() => { if(sub) { sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; } }, 1200);
+    setTimeout(() => { if(text) text.style.opacity = "1"; text.style.filter = "blur(0px)"; }, 500);
+    setTimeout(() => { if(sub) sub.style.opacity = "0.5"; sub.style.filter = "blur(0px)"; }, 1200);
     setTimeout(() => { if(intro) intro.style.opacity = "0"; }, 3000);
     
     setTimeout(() => {
         if(intro) intro.style.display = "none";
-        
-        // Animasi Muncul Navbar (Slide Down)
-        const nav = document.querySelector("nav");
-        if(nav) {
-            nav.style.transform = "translateY(0)";
-            nav.style.opacity = "1";
-            nav.classList.add("nav-show");
-        }
-        
+        document.querySelector("nav").classList.add("nav-show");
         if(profile) profile.style.animation = "profileSlide 1s ease forwards";
         loadZines(1); 
     }, 4200);
 });
 
-// FIX NAVBAR BUTTON SCROLL (Tambahkan ini untuk About & Zine)
-document.querySelectorAll('nav a').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href.startsWith('#')) {
+// PERBAIKAN: Klik tombol Navbar (Zine & About) langsung scroll ke target
+document.querySelectorAll('nav a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href');
+        if (targetId.startsWith('#')) {
             e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
             }
         }
     });
 });
 
-// FIX NAVBAR SCROLL
+// FIX NAVBAR SCROLL (KEMBALI KE ASLI)
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
@@ -1049,7 +1040,6 @@ function kirimKritik(){
     if(!pesan) return alert("Pesan kosong!");
     window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
 }
-
 
 
 </script>
