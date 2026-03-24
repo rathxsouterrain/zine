@@ -688,6 +688,11 @@ border:none;
 transform:scale(0.95);
 
 }
+#about {
+    min-height: 50vh; /* Memberi ruang agar section about punya area scroll yang jelas */
+    padding-bottom: 100px;
+}
+
 
 
 </style>
@@ -936,21 +941,29 @@ window.addEventListener("scroll", () => {
     const navLinks = document.querySelectorAll(".nav-bubble");
     let current = "";
 
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop - 150;
-        if (pageYOffset >= sectionTop) {
-            current = section.getAttribute("id");
-        }
-    });
+    // Cek apakah user sudah mentok di paling bawah layar
+    const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50;
+
+    if (isAtBottom) {
+        current = "about"; // Paksa 'about' jadi aktif kalau sudah di paling bawah
+    } else {
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 150;
+            if (pageYOffset >= sectionTop) {
+                current = section.getAttribute("id");
+            }
+        });
+    }
 
     navLinks.forEach(link => {
         link.classList.remove("active");
-        // Jika href link (misal #about) sama dengan id section yang aktif
+        // Cocokkan id section dengan href di navbar
         if (link.getAttribute("href") === "#" + current) {
             link.classList.add("active");
         }
     });
 });
+
 
 /* --- 3. FIX KLIK NAVBAR (AGAR SMOOTH SCROLL) --- */
 document.querySelectorAll(".nav-bubble").forEach(link => {
