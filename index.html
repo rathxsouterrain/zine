@@ -739,27 +739,8 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </section>
 
 <!-- ===== ZINE LIST (3 ITEM) ===== -->
-zines.forEach(zine => {
-    const html = `
-    <div class="glass zine-item zine-card reveal show">
-        <div class="zine">
-            <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}')" draggable="false">
-            
-            <p class="zine-title">${zine.title}</p>
-            
-            <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
-            
-            <div class="zine-buttons">
-                <p style="font-size:12px; opacity:0.6;">${zine.views || 0} views</p>
-                
-                <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}')">READ</button>
-                
-                <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
-            </div>
-        </div>
-    </div>`;
-    container.insertAdjacentHTML('beforeend', html);
-});
+<div id="dynamic-zine-list" class="zine-grid">
+    </div>
 
     </div>
 <div id="pagination"></div>
@@ -843,46 +824,6 @@ Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik
 
 
 <script>
-const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
-const SUBA_KEY = "sb_publishable_Xa6zqP2tRRCTaVUcubIAQw_0Pze_knE";
-const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
-
-async function loadZines() {
-    // Pastikan di HTML kamu ada <div id="dynamic-zine-list"></div>
-    const container = document.getElementById('dynamic-zine-list'); 
-    
-    const { data: zines, error } = await _supabase
-        .from('zine')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error("Gagal ambil data:", error);
-        return;
-    }
-
-    container.innerHTML = ''; 
-
-    zines.forEach(zine => {
-        const zineHTML = `
-        <div class="glass zine-item zine-card reveal show">
-            <div class="zine">
-                <img src="" onclick="openFlipbook('')" draggable="false">
-                <p class="zine-title"></p>
-                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ </p>
-                <div class="zine-buttons">
-                    <p style="font-size:12px; opacity:0.6;"> views</p>
-                    <button class="read-btn" onclick="openFlipbook('')">READ</button>
-                    <a href="" download class="download-btn">⬇︎</a>
-                </div>
-            </div>
-        </div>`;
-        container.insertAdjacentHTML('beforeend', zineHTML);
-    });
-}
-
-// Panggil saat web dibuka
-document.addEventListener('DOMContentLoaded', loadZines);
 
 
 const firebaseConfig = {
@@ -1302,6 +1243,68 @@ function kunciScrollZine(e) {
     e.preventDefault();
   }
 }
+
+    const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
+    const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
+    const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
+
+    async function loadZines() {
+        const container = document.getElementById('dynamic-zine-list');
+        
+        // Mengambil data dari tabel 'zine'
+        const { data: zines, error } = await _supabase
+            .from('zine')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Gagal load data:", error);
+            return;
+        }
+
+        // Kosongkan container agar tidak double
+        container.innerHTML = ''; 
+
+        zines.forEach(zine => {
+            // Kita gunakan struktur HTML awal kamu agar CSS-nya tidak berantakan
+            const zineHTML = `
+            <div class="glass zine-item zine-card reveal show">
+                <div class="zine">
+                    <img src="${zine.cover_url}" 
+                         onclick="openFlipbook('${zine.pdf_url}')" 
+                         alt="${zine.title}" 
+                         draggable="false">
+                    
+                    <p class="zine-title">${zine.title}</p>
+                    
+                    <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
+                    
+                    <div class="zine-buttons">
+                        <p style="font-size:12px; opacity:0.6;">${zine.views || 0} views</p>
+                        
+                        <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}')">READ</button>
+                        
+                        <a href="${zine.pdf_url}" download class="download-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+            
+            container.insertAdjacentHTML('beforeend', zineHTML);
+        });
+    }
+
+    // Fungsi untuk membuka PDF di tab baru
+    function openFlipbook(url) {
+        if (!url || url === "undefined") return alert("File PDF tidak ditemukan");
+        window.open(url, '_blank');
+    }
+
+    // Jalankan saat halaman dibuka
+    document.addEventListener('DOMContentLoaded', loadZines);
 
 
 </script>
