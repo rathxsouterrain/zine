@@ -1,175 +1,212 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Zine Flipbook</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { margin: 0; background: #111; color: white; font-family: 'Poppins', sans-serif; }
-        .container { max-width: 800px; margin: 50px auto; padding: 20px; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
-        
-        /* LOGIN SCREEN */
-        #login-screen { text-align: center; margin-top: 20vh; }
-        input[type="password"], input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; box-sizing: border-box; }
-        button { background: white; color: black; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; font-family: 'Poppins'; }
-        button:hover { background: #ddd; }
-        
-        /* ADMIN PANEL */
-        #admin-panel { display: none; }
-        .zine-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .zine-info { font-size: 14px; }
-        .action-btn { font-size: 12px; padding: 5px 10px; margin-left: 5px; }
-        .btn-edit { background: #f1c40f; color: black; }
-        .btn-delete { background: #e74c3c; color: white; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Zine Management</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
+
+  <style>
+    /* ... (CSS tetap menggunakan gaya estetik yang kamu berikan di atas) ... */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { margin: 0; background: #000; color: white; font-family: 'Poppins', Arial, sans-serif; min-height: 100vh; }
+    .gif-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-size: cover; background-position: center; z-index: -1; }
+    .gif-bg::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 32px; margin: 40px auto; width: 92%; max-width: 500px; animation: fadeUp 0.8s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { text-align: center; letter-spacing: 4px; font-size: 24px; margin-bottom: 30px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 11px; letter-spacing: 1px; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; }
+    input { width: 100%; padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; color: white; outline: none; }
+    .drop-zone { border: 2px dashed rgba(255,255,255,0.2); border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
+    .drop-zone:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.03); }
+    #coverPreview { width: 150px; border-radius: 10px; margin-top: 15px; display: none; border: 1px solid white; }
+    button { width: 100%; padding: 14px; background: white; color: black; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 10px; letter-spacing: 1px; }
+    button:disabled { opacity: 0.3; cursor: not-allowed; }
+    .zine-item-admin { display: flex; align-items: center; gap: 15px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 14px; margin-bottom: 10px; }
+    .zine-item-admin img { width: 40px; height: 55px; border-radius: 5px; object-fit: cover; }
+    .zine-info { flex: 1; font-size: 12px; }
+    .btn-del { width: auto; background: rgba(255,0,0,0.2); color: #ff6666; padding: 5px 10px; font-size: 10px; border: 1px solid rgba(255,0,0,0.3); }
+    #uploadSection { display: none; padding-top: 50px; }
+  </style>
 </head>
 <body>
+  <div class="gif-bg" id="bgElement"></div>
+  
+  <div id="loginSection" style="display: flex; align-items: center; min-height: 100vh;">
+    <div class="glass">
+      <h1>ADMIN PANEL</h1>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPassword" placeholder="Masukkan sandi..." onkeypress="if(event.key==='Enter')login()">
+      </div>
+      <button onclick="login()">MASUK</button>
+    </div>
+  </div>
+  
+  <div id="uploadSection">
+    <div class="glass">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="letter-spacing: 2px; font-size: 14px;">UPLOAD ZINE</h3>
+        <button onclick="logout()" style="width: auto; padding: 5px 15px; font-size: 10px; background: transparent; border: 1px solid white; color: white;">LOGOUT</button>
+      </div>
 
-    <div id="login-screen" class="container glass">
-        <h2>Admin Login</h2>
-        <input type="password" id="password" placeholder="Masukkan Sandi...">
-        <button onclick="login()">MASUK</button>
+      <div class="form-group">
+        <label>Pilih File PDF</label>
+        <div class="drop-zone" onclick="document.getElementById('pdfInput').click()">
+          <span id="dropText">Klik untuk pilih PDF</span>
+          <center><img id="coverPreview"></center>
+        </div>
+        <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handleFile(this.files[0])">
+      </div>
+
+      <div class="form-group">
+        <label>Judul Zine</label>
+        <input type="text" id="zineTitle" placeholder="Nama Zine...">
+      </div>
+
+      <div class="form-group">
+        <label>URL Musik Khusus (Opsional)</label>
+        <input type="text" id="zineMusic" placeholder="Link .mp3 (Kosongkan jika default)">
+      </div>
+
+      <button onclick="processUpload()" id="uploadBtn" disabled>SIMPAN KE DATABASE</button>
+      <p id="statusTxt" style="font-size: 10px; text-align: center; margin-top: 10px; opacity: 0.6;"></p>
     </div>
 
-    <div id="admin-panel" class="container">
-        <h2>Admin Dashboard</h2>
-        
-        <div class="glass">
-            <h3 id="form-title">Tambah Zine Baru</h3>
-            <input type="hidden" id="edit-id">
-            <label>Judul Zine:</label>
-            <input type="text" id="val-title" placeholder="Contoh: Issue 01 - The Beginning">
-            
-            <label>URL Gambar Cover:</label>
-            <input type="text" id="val-cover" placeholder="Link gambar cover (.jpg/.png/.gif)">
-            
-            <label>URL File PDF:</label>
-            <input type="text" id="val-pdf" placeholder="Link file PDF zine">
-            
-            <label>Judul Musik (Opsional):</label>
-            <input type="text" id="val-music-title" placeholder="Contoh: Kertas dan Kaca">
-            
-            <label>URL File Musik (Opsional - Kosongkan jika pakai lagu default):</label>
-            <input type="text" id="val-music-url" placeholder="Link file musik (.mp3)">
-            
-            <button onclick="saveZine()" style="margin-top: 15px; width: 100%;">SIMPAN DATA</button>
-            <button onclick="resetForm()" style="margin-top: 10px; width: 100%; background: transparent; border: 1px solid white; color: white;">BATAL / RESET</button>
-        </div>
-
-        <div class="glass">
-            <h3>Daftar Zine</h3>
-            <div id="zine-list">Loading...</div>
-        </div>
+    <div class="glass">
+      <h3 style="margin-bottom: 15px; font-size: 14px;">ZINE TERDAFTAR</h3>
+      <div id="zineList">Loading...</div>
     </div>
+  </div>
 
-<script>
-    /* --- KONFIGURASI SUPABASE --- */
+  <script>
+    // --- CONFIG SUPABASE ---
     const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
     const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
     const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 
-    // 1. SISTEM LOGIN SEDERHANA
+    let selectedPDF = null;
+    let coverBlob = null;
+
+    // --- BG RANDOM ---
+    const bgs = ["back1.jpg","back2.jpg","back3.jpg"];
+    document.getElementById("bgElement").style.backgroundImage = `url('${bgs[Math.floor(Math.random()*bgs.length)]}')`;
+
+    // --- AUTH ---
     function login() {
-        const pass = document.getElementById("password").value;
-        if (pass === "Zine123") { // <-- GANTI SANDI DI SINI
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("admin-panel").style.display = "block";
-            fetchZines();
-        } else {
-            alert("Sandi salah!");
-        }
+      if (document.getElementById("adminPassword").value === "Ulin123") {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("uploadSection").style.display = "block";
+        fetchZines();
+      } else { alert("Sandi salah!"); }
     }
 
-    // 2. AMBIL DATA DARI SUPABASE
+    function logout() { location.reload(); }
+
+    // --- HANDLE FILE & AUTO PREVIEW ---
+    async function handleFile(file) {
+      if (!file) return;
+      selectedPDF = file;
+      document.getElementById("dropText").innerText = "File: " + file.name;
+      document.getElementById("statusTxt").innerText = "Generating preview...";
+      
+      const reader = new FileReader();
+      reader.onload = async function() {
+        const typedarray = new Uint8Array(this.result);
+        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        
+        const previewImg = document.getElementById("coverPreview");
+        previewImg.src = canvas.toDataURL();
+        previewImg.style.display = "block";
+        
+        canvas.toBlob((blob) => { coverBlob = blob; }, "image/jpeg", 0.8);
+        document.getElementById("uploadBtn").disabled = false;
+        document.getElementById("statusTxt").innerText = "Ready to upload.";
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // --- UPLOAD LOGIC ---
+    async function processUpload() {
+      const btn = document.getElementById("uploadBtn");
+      const title = document.getElementById("zineTitle").value;
+      const musicUrl = document.getElementById("zineMusic").value;
+      
+      if(!title) return alert("Judul wajib diisi!");
+      
+      btn.disabled = true;
+      document.getElementById("statusTxt").innerText = "Uploading files...";
+
+      try {
+        const timestamp = Date.now();
+        
+        // 1. Upload PDF
+        const pdfPath = `pdfs/${timestamp}_zine.pdf`;
+        await _supabase.storage.from('zine-files').upload(pdfPath, selectedPDF);
+        const pdfUrl = _supabase.storage.from('zine-files').getPublicUrl(pdfPath).data.publicUrl;
+
+        // 2. Upload Cover (dari auto-preview)
+        const coverPath = `covers/${timestamp}_thumb.jpg`;
+        await _supabase.storage.from('zine-files').upload(coverPath, coverBlob);
+        const coverUrl = _supabase.storage.from('zine-files').getPublicUrl(coverPath).data.publicUrl;
+
+        // 3. Save to Database
+        await _supabase.from('zine').insert([{
+          title: title,
+          pdf_url: pdfUrl,
+          cover_url: coverUrl,
+          music_url: musicUrl || null,
+          views: 0
+        }]);
+
+        alert("Berhasil!");
+        location.reload();
+      } catch (e) {
+        alert("Gagal: " + e.message);
+        btn.disabled = false;
+      }
+    }
+
+    // --- FETCH LIST ---
     async function fetchZines() {
-        const listDiv = document.getElementById("zine-list");
-        const { data: zines, error } = await _supabase.from('zine').select('*').order('created_at', { ascending: false });
-        
-        if (error) { listDiv.innerHTML = "Error loading data."; return; }
-        
-        listDiv.innerHTML = "";
-        zines.forEach(zine => {
-            listDiv.innerHTML += `
-                <div class="zine-row">
-                    <div class="zine-info">
-                        <strong>${zine.title}</strong><br>
-                        <span style="opacity: 0.6; font-size: 11px;">Views: ${zine.views || 0} | Music: ${zine.music_title || 'Default'}</span>
-                    </div>
-                    <div>
-                        <button class="action-btn btn-edit" onclick="editZine(${zine.id}, '${zine.title}', '${zine.cover_url}', '${zine.pdf_url}', '${zine.music_title || ''}', '${zine.music_url || ''}')">Edit</button>
-                        <button class="action-btn btn-delete" onclick="deleteZine(${zine.id})">Hapus</button>
-                    </div>
-                </div>
-            `;
-        });
+      const { data } = await _supabase.from('zine').select('*').order('id', {ascending: false});
+      const list = document.getElementById("zineList");
+      list.innerHTML = "";
+      data.forEach(z => {
+        list.innerHTML += `
+          <div class="zine-item-admin">
+            <img src="${z.cover_url}">
+            <div class="zine-info">
+              <strong>${z.title}</strong><br>
+              <span style="opacity:0.5">${z.views} views</span>
+            </div>
+            <button class="btn-del" onclick="deleteZine(${z.id})">HAPUS</button>
+          </div>
+        `;
+      });
     }
 
-    // 3. SIMPAN ATAU UPDATE DATA
-    async function saveZine() {
-        const id = document.getElementById("edit-id").value;
-        const payload = {
-            title: document.getElementById("val-title").value,
-            cover_url: document.getElementById("val-cover").value,
-            pdf_url: document.getElementById("val-pdf").value,
-            music_title: document.getElementById("val-music-title").value || 'Silent',
-            music_url: document.getElementById("val-music-url").value || null
-        };
-
-        if (!payload.title || !payload.cover_url || !payload.pdf_url) {
-            alert("Judul, Cover, dan PDF wajib diisi!"); return;
-        }
-
-        let error;
-        if (id) {
-            // Jika ID ada = UPDATE
-            const res = await _supabase.from('zine').update(payload).eq('id', id);
-            error = res.error;
-            alert("Zine berhasil diperbarui!");
-        } else {
-            // Jika ID kosong = INSERT BARU
-            const res = await _supabase.from('zine').insert([payload]);
-            error = res.error;
-            alert("Zine baru berhasil ditambahkan!");
-        }
-
-        if (error) { alert("Error: " + error.message); } 
-        else { resetForm(); fetchZines(); }
-    }
-
-    // 4. MASUKKAN DATA KE FORM UNTUK DIEDIT
-    function editZine(id, title, cover, pdf, musicTitle, musicUrl) {
-        document.getElementById("form-title").innerText = "Edit Zine";
-        document.getElementById("edit-id").value = id;
-        document.getElementById("val-title").value = title;
-        document.getElementById("val-cover").value = cover;
-        document.getElementById("val-pdf").value = pdf;
-        document.getElementById("val-music-title").value = musicTitle;
-        document.getElementById("val-music-url").value = musicUrl !== 'null' ? musicUrl : '';
-        window.scrollTo(0, 0);
-    }
-
-    // 5. HAPUS ZINE
     async function deleteZine(id) {
-        if (confirm("Yakin ingin menghapus zine ini?")) {
-            const { error } = await _supabase.from('zine').delete().eq('id', id);
-            if (error) alert("Gagal menghapus.");
-            else fetchZines();
-        }
+      if(confirm("Hapus zine ini?")) {
+        await _supabase.from('zine').delete().eq('id', id);
+        fetchZines();
+      }
     }
-
-    // 6. RESET FORM
-    function resetForm() {
-        document.getElementById("form-title").innerText = "Tambah Zine Baru";
-        document.getElementById("edit-id").value = "";
-        document.getElementById("val-title").value = "";
-        document.getElementById("val-cover").value = "";
-        document.getElementById("val-pdf").value = "";
-        document.getElementById("val-music-title").value = "";
-        document.getElementById("val-music-url").value = "";
-    }
-</script>
+  </script>
 </body>
 </html>
