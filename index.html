@@ -1072,18 +1072,41 @@ window.addEventListener("scroll", () => {
     }
     lastScroll = currentScroll;
 });
-function searchZine(){
-  const input = document.getElementById("zineSearch").value.toLowerCase();
-  const items = document.querySelectorAll(".zine-item");
+/* --- FUNGSI SEARCH ZINE SPESIFIK & OPTIMASI --- */
+function searchZine() {
+    // 1. Ambil input dan bersihkan spasi di depan/belakang (trim)
+    const input = document.getElementById("zineSearch").value.toLowerCase().trim();
+    
+    // 2. Ambil semua kartu zine yang ada
+    const items = document.querySelectorAll(".zine-card");
 
-  items.forEach(item => {
-    const text = item.innerText.toLowerCase();
-    if(text.includes(input)){
-      item.style.display = "block";
-    } else {
-      item.style.display = "none";
+    items.forEach(item => {
+        // 3. Ambil judul zine saja (lebih spesifik dibanding ambil seluruh teks kartu)
+        const titleElement = item.querySelector(".zine-title");
+        
+        if (titleElement) {
+            const titleText = titleElement.innerText.toLowerCase();
+
+            // 4. Logika Pencarian: 
+            // Jika input kosong, tampilkan semua.
+            // Jika judul mengandung kata kunci, tampilkan.
+            if (input === "" || titleText.includes(input)) {
+                item.style.display = "block";
+                // Tambahkan efek animasi muncul kembali (opsional)
+                item.style.animation = "fadeUp 0.4s ease forwards";
+            } else {
+                // Sembunyikan jika tidak cocok
+                item.style.display = "none";
+            }
+        }
+    });
+
+    // 5. Cek jika tidak ada hasil (opsional: agar user tidak bingung)
+    const visibleItems = document.querySelectorAll(".zine-card[style*='display: block']");
+    if (visibleItems.length === 0 && input !== "") {
+        console.log("Zine tidak ditemukan");
+        // Kamu bisa tambahkan elemen "Not Found" di sini jika mau
     }
-  });
 }
 
 function kirimKritik(){
