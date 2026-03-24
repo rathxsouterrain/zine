@@ -1268,41 +1268,151 @@ const SUBA_URL = "https://yzekxpgjgnbksaleosti.supabase.co";
 const SUBA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6ZWt4cGdqZ25ia3NhbGVvc3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMzc1NjksImV4cCI6MjA4OTkxMzU2OX0.GXUHhaFQji-KfeFGwJ3ratj-uvm5E8KBvXp_oXNl0Y4";
 const _supabase = supabase.createClient(SUBA_URL, SUBA_KEY);
 
+let currentSession = 0;
+
+// 1. FUNGSI LOAD DATA DARI SUPABASE
 async function loadZines() {
     const container = document.getElementById('dynamic-zine-list');
-    
     const { data: zines, error } = await _supabase
         .from('zine')
         .select('*')
         .order('created_at', { ascending: false });
 
-    if (error) {
-        console.error("Supabase Error:", error);
-        return;
-    }
+    if (error) return console.error("Error load:", error);
 
     container.innerHTML = ''; 
 
     zines.forEach(zine => {
         const zineHTML = `
-        <div class="glass zine-item zine-card reveal show">
+        <div class="glass zine-item zine-card reveal show" id="card-${zine.id}">
             <div class="zine">
-                <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}')" draggable="false">
+                <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id})" draggable="false">
                 <p class="zine-title">${zine.title}</p>
                 <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
                 <div class="zine-buttons">
                     <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
-                    <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}')">READ</button>
+                    <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}', ${zine.id})">READ</button>
                     <a href="${zine.pdf_url}" download class="download-btn">⬇︎</a>
                 </div>
             </div>
         </div>`;
         container.insertAdjacentHTML('beforeend', zineHTML);
     });
+    revealZines(); // Jalankan animasi muncul
 }
 
-// Jalankan load zines saat halaman siap
-document.addEventListener('DOMContentLoaded', loadZines);
+// 2. FUNGSI BUKA FLIPBOOK & UPDATE VIEWS
+async function openFlipbook(pdfUrl, zineId) {
+    if (!pdfUrl) return;
+
+    // UPDATE VIEWS KE SUPABASE
+    if (zineId) {
+        try {
+            await _supabase.rpc('increment_views', { row_id: zineId });
+            const viewSpan = document.getElementById(`view-${zineId}`);
+            if (viewSpan) {
+                viewSpan.innerText = parseInt(viewSpan.innerText) + 1;
+            }
+        } catch (e) { console.error("Gagal update views", e); }
+    }
+
+    // LOCK SCROLL
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    const session = ++currentSession;
+    document.getElementById("zine-loading").style.display = "flex";
+    document.getElementById("flipbook-container").style.display = "block";
+
+    // RE-CREATE FLIPBOOK ELEMENT
+    const oldFlip = document.getElementById("flipbook");
+    if($(oldFlip).data("turn")) $(oldFlip).turn("destroy");
+    const newFlip = document.createElement("div");
+    newFlip.id = "flipbook";
+    oldFlip.parentNode.replaceChild(newFlip, oldFlip);
+
+    // MUSIC LOGIC
+    const music = document.getElementById("bg-music");
+    music.pause();
+    music.src = "music.mp3"; 
+    music.currentTime = 0;
+    music.play().catch(()=>{});
+
+    try {
+        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        for(let i = 1; i <= pdf.numPages; i++){
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 2 });
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+            const div = document.createElement("div");
+            div.className = "page";
+            div.appendChild(canvas);
+            newFlip.appendChild(div);
+        }
+
+        let isMobile = window.innerWidth <= 768;
+        $(newFlip).turn({
+            width: isMobile ? window.innerWidth * 0.9 : 1000,
+            height: isMobile ? (window.innerWidth * 0.9) * 1.41 : 700,
+            autoCenter: true,
+            display: isMobile ? "single" : "double",
+            duration: 1200
+        });
+
+        document.getElementById("nextBtn").onclick = () => $(newFlip).turn("next");
+        document.getElementById("prevBtn").onclick = () => $(newFlip).turn("previous");
+        document.getElementById("zine-loading").style.display = "none";
+
+    } catch(err) { console.error(err); }
+}
+
+function closeFlipbook(){
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.getElementById("flipbook-container").style.display="none";
+    document.getElementById("bg-music").pause();
+}
+
+// 3. ANIMASI & UI LOGIC (Pindahkan ke sini semua)
+function revealZines(){
+    const items = document.querySelectorAll(".zine-card");
+    items.forEach((item,i)=>{
+        const rect = item.getBoundingClientRect();
+        if(rect.top < window.innerHeight - 50){
+            setTimeout(()=> item.classList.add("show"), i * 150);
+        }
+    });
+}
+
+window.addEventListener("scroll", revealZines);
+
+// INTRO LOGIC
+window.addEventListener("load", ()=>{
+    const intro = document.getElementById("intro");
+    setTimeout(()=> {
+        document.getElementById("introText").style.opacity = "1";
+        document.getElementById("introText").style.filter = "blur(0px)";
+    }, 500);
+    setTimeout(()=> intro.style.opacity = "0", 3000);
+    setTimeout(()=> {
+        intro.style.display = "none";
+        document.querySelector("nav").classList.add("nav-show");
+        loadZines(); // Panggil data setelah intro
+    }, 4200);
+});
+
+// KIRIM KRITIK
+function kirimKritik(){
+    const pesan = document.getElementById("kritikPesan").value;
+    if(!pesan) return alert("Kosong!");
+    window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
+}
+
 
 
 
