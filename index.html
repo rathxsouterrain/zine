@@ -952,6 +952,22 @@ window.addEventListener("scroll", () => {
         }
     });
 });
+function scrollToSection(id) {
+    const element = document.getElementById(id);
+    if (element) {
+        // Offset 80px agar judul tidak tertutup navbar yang melayang
+        const offset = 80;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = element.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+        });
+    }
+}
 
 /* --- 3. FIX KLIK NAVBAR (AGAR SMOOTH SCROLL) --- */
 document.querySelectorAll(".nav-bubble").forEach(link => {
