@@ -1,103 +1,689 @@
 <!DOCTYPE html>
 <html lang="id" translate="no">
 <head>
+    
 <link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8">
 <title>zinexflipbook</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
 
 <style>
-/* [SEMUA CSS LAMA TETAP SAMA - TIDAK DIUBAH] */
 html{ scroll-behavior:smooth; }
-body{margin:0;background:#000;color:white;font-family:Arial, sans-serif;-webkit-user-select: none;-ms-user-select: none;user-select: none;}
-nav{position:fixed;top:10px;left:0;width:100%;z-index:1000;display:flex;justify-content:center;}
-.nav-container{width:92%;max-width:450px;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:rgba(255,255,255,0.1);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.15);border-radius:50px;}
-nav{transition:transform 0.45s ease;}
-nav.nav-hidden{transform:translateY(-120%);}
-nav.nav-show{transform:translateY(0);}
-.brand{display:flex;align-items:center;}
-.brand img{height:28px;width:auto;display:block;}
-.menu{display:flex;gap:6px;margin:0;padding:0;}
-.nav-bubble{font-family:'Stack Sans Text',sans-serif;font-weight:500;font-size:10px;padding:4px 8px;border-radius:30px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);color:white;text-decoration:none;white-space:nowrap;transition:0.2s;}
-.menu a{margin-left:0!important;opacity:1!important;}
-.nav-bubble:hover{background:rgba(255,255,255,0.2);}
-.nav-bubble.active{background:white;color:black;}
-.hero{padding-top:110px;text-align:center;}
-.hero h1{font-size:28px;letter-spacing:4px;font-weight:600;}
-.profile-photo{display:flex;justify-content:center;margin-bottom:20px;}
-.profile-photo img{width:300px;height:auto;display:block;background:none;border:none;box-shadow:none;border-radius:0;}
-.glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:32px;margin:40px auto;width:65%;max-width:500px;animation:fadeUp 0.8s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
-.zine{text-align:center;}
-.zine img{width:200px;aspect-ratio:auto;object-fit:cover;margin-bottom:15px;border-radius:12px;cursor:pointer;transition:0.4s;}
-.zine img:hover{transform:scale(1.05);}
-.zine p{font-size:13px;margin-top:15px;letter-spacing:2px;opacity:0.7;will-change:transform;transition:transform 0.6s cubic-bezier(0.23,1,0.32,1);}
-#flipbook-container{display:none;position:fixed;inset:0;background:#000;z-index:2000;}
-#flipbook{margin:auto;}
-#flipbook .page{background:#111;display:flex;align-items:center;justify-content:center;}
-#flipbook canvas{max-width:100%;max-height:100%;pointer-events:none;}
-.glass-ui{background:rgba(255,255,255,0.08);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:10px 16px;}
-.close-btn{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:2px;cursor:pointer;z-index:9999;}
-.swipe-hint{position:fixed;top:20px;left:20px;font-size:11px;opacity:0.7;z-index:9999;}
-.nav-arrows{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:50px;z-index:9999;}
-.arrow{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.1);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.18);font-size:22px;cursor:pointer;user-select:none;transition:0.25s;}
-.arrow:active{transform:scale(0.9);}
-footer{text-align:center;padding:50px 0;font-size:11px;opacity:0.4;}
-.read-btn{padding:8px 18px;background:white;color:black;border:none;border-radius:20px;font-size:11px;letter-spacing:2px;cursor:pointer;transition:0.3s;}
-.no-scroll{overflow:hidden!important;position:fixed;width:100%;height:100%;touch-action:none;}
-.read-btn:hover{transform:scale(1.05);}
-.zine-buttons{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px;}
-.download-btn{background:white;color:black;border:1px solid black;border-radius:50px;padding:8px 12px;font-size:12px;letter-spacing:1px;cursor:pointer;transition:0.05s;}
-.download-btn:active{background:black;color:white;transform:translateY(2px);}
-#intro{position:fixed;inset:0;background:black;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:1.2s ease;}
-#introText{font-size:18px;letter-spacing:8px;opacity:0;filter:blur(10px);transition:1.2s ease;}
-#introSub{margin-top:20px;font-size:11px;letter-spacing:4px;opacity:0;filter:blur(10px);transition:1.5s ease;opacity:0.5;}
-#zine-loading{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;color:#fff;display:none;justify-content:center;align-items:center;z-index:999999;font-size:14px;letter-spacing:4px;}
-#pagination{text-align:center;margin-top:40px;}
-#pagination button{margin:5px;padding:8px 16px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:20px;cursor:pointer;}
-#pagination button.active{background:white;color:black;}
-.profile-photo img{pointer-events:none;user-select:none;-webkit-user-drag:none;touch-action:none;}
-img{-webkit-touch-callout:none;-webkit-user-drag:none;user-select:none;}
-.loader-text{color:white;font-size:14px;letter-spacing:4px;animation:pulse 1.5s infinite;}
-@keyframes pulse{0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
-.reveal{opacity:0;transform:translateY(40px);transition:0.8s ease;}
-.reveal.show{opacity:1;transform:translateY(0);}
-.profile-photo img{opacity:0;transform:translateY(40px);}
-@keyframes profileSlide{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
-#about{text-align:center;}
-.glass.archive-text,.glass-text,.glass p:not(.zine p):not(.music-text){font-family:'Poppins',monospace!important;font-size:13px!important;line-height:1.6!important;color:rgba(255,255,255,0.60);}
-.zine-title{font-family:'Poppins',serif!important;font-weight:700;font-size:11px!important;letter-spacing:1.6px;color:white!important;display:inline-block;padding:2px 8px;background:rgba(255,255,255,0.05);backdrop-filter:blur(8px);border-radius:9px;border:1px solid rgba(255,255,255,0.01);}
-#zineSearch{font-family:Arial,sans-serif!important;}
-.gif-bg{position:fixed;top:0;left:0;width:100vw;height:100dvh;background-image:url("back1.jpg");background-size:cover;background-position:center;background-repeat:no-repeat;z-index:-1;}
-.gif-bg::after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.60);}
-.menu{display:flex;gap:3px;}
-.nav-bubble{font-family:'Stack Sans Text',sans-serif;font-weight:700;letter-spacing:1px;font-size:10px;padding:10px 15px;border-radius:40px;background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);color:white;text-decoration:none;transition:0.25s ease;}
-.nav-bubble:hover{background:rgba(255,255,255,0.18);transform:translateY(-1px);}
-.nav-bubble.active{background:white;color:black;border:none;transform:scale(0.95);}
+
+body{
+margin:0;
+background:#000;
+color:white;
+font-family:Arial, sans-serif;
+    -webkit-user-select: none;  /* Safari */
+    -ms-user-select: none;      /* IE 10 dan Edge */
+    user-select: none;          /* Standard (Chrome, Firefox, Opera) */
+}
+
+
+/* NAVBAR */
+nav{
+position:fixed;
+top:10px;
+left:0;
+width:100%;
+z-index:1000;
+
+display:flex;
+justify-content:center;
+}
+.nav-container {
+    width: 92%; 
+    max-width: 450px; /* Membatasi lebar agar tidak terlalu panjang */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px; /* Super tipis */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50px;
+}
+
+nav{
+transition: transform 0.45s ease;
+}
+
+nav.nav-hidden{
+transform: translateY(-120%);
+}
+
+nav.nav-show{
+transform: translateY(0);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+}
+
+.brand img {
+    height: 28px; /* Logo kecil dan rapi */
+    width: auto;
+    display: block;
+}
+
+/* Mengatur area Tombol Menu */
+
+.menu {
+    display: flex;
+    gap: 6px; /* KUNCI: Jarak antar tombol sangat rapat */
+    margin: 0;
+    padding: 0;
+}
+
+.nav-bubble {
+    font-family: 'Stack Sans Text', sans-serif;
+    font-weight: 500;
+    font-size: 10px; /* Teks kecil agar muat banyak */
+    padding: 4px 8px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+/* HAPUS SEMUA .menu a { margin-left: 20px } YANG LAMA */
+.menu a {
+    margin-left: 0 !important; /* Memaksa reset margin lama */
+    opacity: 1 !important;
+}
+
+.nav-bubble:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-bubble.active {
+    background: white;
+    color: black;
+}
+
+/* HERO */
+.hero{
+padding-top:110px;
+text-align:center;
+}
+.hero h1{
+font-size:28px;
+letter-spacing:4px;
+font-weight:600;
+}
+
+/* ===== PROFILE PHOTO ===== */
+.profile-photo{
+display:flex;
+justify-content:center;
+margin-bottom:20px;
+}
+
+.profile-photo img{
+width:300px;   /* atur ukuran sesuai kebutuhan */
+height:auto;
+display:block;
+background:none;
+border:none;
+box-shadow:none;
+border-radius:0;
+}
+
+/* GLASS CARD */
+.glass{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:28px;
+padding:32px;
+margin:40px auto;
+width:65%;
+max-width:500px;
+animation:fadeUp 0.8s ease;
+}
+
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(30px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* ZINE */
+.zine{ text-align:center; }
+.zine img{
+width:200px;
+aspect-ratio:auto;
+object-fit:cover;
+margin-buttom:15px;
+border-radius:12px;
+cursor:pointer;
+transition:0.4s;
+}
+.zine img:hover{ transform:scale(1.05); }
+.zine p{
+font-size:13px;
+margin-top:15px;
+letter-spacing:2px;
+opacity:0.7;
+will-change: transform;
+transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+
+/* FLIPBOOK */
+#flipbook-container{
+display:none;
+position:fixed;
+inset:0;
+background:#000;
+z-index:2000;
+}
+
+#flipbook{ margin:auto; }
+
+#flipbook .page{
+background:#111;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+#flipbook canvas{
+  max-width:100%;
+  max-height:100%;
+  pointer-events: none;
+}
+
+/* ===== READER UI ===== */
+.glass-ui{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,0.15);
+border-radius:14px;
+padding:10px 16px;
+}
+
+/* CLOSE */
+.close-btn{
+position:fixed;
+
+/* POSISI BARU: DI ATAS TOMBOL PANAH */
+bottom:95px;
+left:50%;
+transform:translateX(-50%);
+
+font-size:11px;
+letter-spacing:2px;
+cursor:pointer;
+z-index:9999;
+}
+
+/* SWIPE HINT */
+.swipe-hint{
+position:fixed;
+top:20px;
+left:20px;
+font-size:11px;
+opacity:0.7;
+z-index:9999;
+}
+
+/* NAV ARROWS */
+.nav-arrows{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:50px;
+z-index:9999;
+}
+
+.arrow{
+width:48px;
+height:48px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(14px);
+border:1px solid rgba(255,255,255,0.18);
+font-size:22px;
+cursor:pointer;
+user-select:none;
+transition:0.25s;
+}
+
+.arrow:active{ transform:scale(0.9); }
+
+footer{
+text-align:center;
+padding:50px 0;
+font-size:11px;
+opacity:0.4;
+}
+.read-btn{
+padding:8px 18px;
+background:white;
+color:black;
+border:none;
+border-radius:20px;
+font-size:11px;
+letter-spacing:2px;
+cursor:pointer;
+transition:0.3s;
+}
+/* Class untuk mematikan scroll */
+.no-scroll {
+    overflow: hidden !important;
+    position: fixed; /* Mengunci posisi body agar tidak bisa ditarik */
+    width: 100%;
+    height: 100%;
+    touch-action: none; /* Mematikan interaksi scroll sentuh */
+}
+
+
+
+.read-btn:hover{
+transform:scale(1.05);
+}
+.zine-buttons{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+margin-top:12px;
+}
+
+.download-btn{
+background:white;
+color:black;
+
+border:1px solid black;
+border-radius:50px;
+
+padding:8px 12px;
+font-size:12px;
+letter-spacing:1px;
+
+cursor:pointer;
+
+transition:0.05s;
+}
+
+/* efek saat ditekan */
+.download-btn:active{
+background:black;
+color:white;
+transform:translateY(2px);
+}
+#intro{
+position:fixed;
+inset:0;
+background:black;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+z-index:9999;
+transition:1.2s ease;
+}
+
+#introText{
+font-size:18px;
+letter-spacing:8px;
+opacity:0;
+filter:blur(10px);
+transition:1.2s ease;
+}
+
+#introSub{
+margin-top:20px;
+font-size:11px;
+letter-spacing:4px;
+opacity:0;
+filter:blur(10px);
+transition:1.5s ease;
+opacity:0.5;
+}
+#zine-loading{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000;
+color:#fff;
+display:none;
+justify-content:center;
+align-items:center;
+z-index:999999; /* harus lebih tinggi dari flipbook */
+font-size:14px;
+letter-spacing:4px;
+}
+#pagination{
+text-align:center;
+margin-top:40px;
+}
+
+#pagination button{
+margin:5px;
+padding:8px 16px;
+background:rgba(255,255,255,0.1);
+color:white;
+border:1px solid rgba(255,255,255,0.2);
+border-radius:20px;
+cursor:pointer;
+}
+
+#pagination button.active{
+background:white;
+color:black;
+}
+.profile-photo img {
+    /* ... kode yang sudah ada ... */
+    pointer-events: none;       /* Gambar tidak bisa di-klik/sentuh */
+    user-select: none;          /* Gambar tidak bisa di-select */
+    -webkit-user-drag: none;    /* Mencegah gambar ditarik (drag) */
+    touch-action: none;         /* Mematikan interaksi sentuh di mobile */
+}
+img {
+    -webkit-touch-callout: none; /* Mematikan menu save/copy di iOS/Android */
+    -webkit-user-drag: none;      /* Mencegah gambar diseret */
+    user-select: none;            /* Mencegah seleksi gambar */
+}
+
+.loader-text{
+color:white;
+font-size:14px;
+letter-spacing:4px;
+animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:0.3;}
+50%{opacity:1;}
+100%{opacity:0.3;}
+}
+/* ===== SKELETON LOADING - OVERRIDE MAXIMUM ===== */
+
+/* Selector super spesifik untuk menangkal font color */
+body.loading .glass h1,
+body.loading .glass h2,
+body.loading .glass h3,
+body.loading .glass p,
+body.loading .glass .glass-text,
+body.loading .glass .archive-text,
+body.loading section .glass p,
+body.loading #about .glass p {
+  color: transparent !important;
+  background: rgba(255,255,255,0.08) !important;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer effect */
+body.loading .glass h1::after,
+body.loading .glass h2::after,
+body.loading .glass h3::after,
+body.loading .glass p::after,
+body.loading .glass .glass-text::after,
+body.loading .glass .archive-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.15),
+    transparent
+  );
+  animation: skeletonMove 1.2s infinite;
+  z-index: 9999;
+}
+
+@keyframes skeletonMove {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* === EXCEPTION - ZINE CARD === */
+body.loading .glass.zine-card h1,
+body.loading .glass.zine-card h2,
+body.loading .glass.zine-card h3,
+body.loading .glass.zine-card p,
+body.loading .glass.zine-card .glass-text {
+  color: inherit !important;
+  background: transparent !important;
+}
+body.loading .glass.zine-card h1::after,
+body.loading .glass.zine-card h2::after,
+body.loading .glass.zine-card h3::after,
+body.loading .glass.zine-card p::after,
+body.loading .glass.zine-card .glass-text::after {
+  display: none !important;
+}
+
+/* === EXCEPTION - BUTTON & INPUT === */
+body.loading .glass button,
+body.loading .glass a,
+body.loading .glass input,
+body.loading .glass textarea {
+  color: inherit !important;
+  background: inherit !important;
+}
+body.loading .glass button::after,
+body.loading .glass a::after,
+body.loading .glass input::after,
+body.loading .glass textarea::after {
+  display: none !important;
+}
+
+/* === EXCEPTION - MUSIC TEXT === */
+body.loading .glass .music-text {
+  color: inherit !important;
+}
+body.loading .glass .music-text::after {
+  display: none !important;
+}
+
+.reveal{
+opacity:0;
+transform:translateY(40px);
+transition:0.8s ease;
+}
+
+.reveal.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.brand{
+display:60px;
+align-items:center;
+}
+
+.profile-photo img{
+  width:300px;
+  height:auto;
+  display:block;
+  opacity:0;
+  transform: translateY(40px);
+}
+
+@keyframes profileSlide{
+  from{
+    opacity:0;
+    transform: translateY(40px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0);
+  }
+}
+#about{
+  text-align:center;
+}
+
+/* FONT ARCHIVE TEXT ONLY */
+/* CSS FONT - versi tanpa !important di color */
+.glass.archive-text,
+.glass-text,
+.glass p:not(.zine p):not(.music-text) {
+    font-family: 'Poppins', monospace !important;
+    font-size:13px !important;
+    line-height:1.6 !important;
+    color: rgba(255, 255, 255, 0.60); /* ← HAPUS !important */
+}
+/* JUDUL ZINE TETAP NORMAL */
+.zine-title {
+    font-family: 'Poppins', serif !important;
+    font-weight: 700;           /* ← ini menebalkan teks */
+    font-size: 11px !important;
+    letter-spacing: 1.6px;
+    color: white !important;
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border-radius: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.01);
+}
+/* SEARCH INPUT TIDAK IKUT FONT ARCHIVE */
+#zineSearch{
+    font-family: Arial, sans-serif !important;
+}
+/* Semua teks dalam card glass lebih lembut */
+.gif-bg{
+position:fixed;
+top:0;
+left:0;
+
+width:100vw;
+height:100dvh;
+
+background-image:url("back1.jpg");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+
+z-index:-1;
+}
+
+#bgimg{
+position:fixed;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+object-position:center;
+
+z-index:-1;
+pointer-events:none;
+}
+.gif-bg::after{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.60);
+}
+/* MENU CONTAINER */
+.menu{
+display:flex;
+gap:3px;
+}
+
+/* GLASS BUBBLE */
+.nav-bubble{
+
+font-family:'Stack Sans Text', sans-serif; /* sama seperti brand */
+
+font-weight:700;
+
+letter-spacing:1px;
+
+font-size:10px;
+
+padding:10px 15px;
+
+border-radius:40px;
+
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+
+border:1px solid rgba(255,255,255,0.15);
+
+color:white;
+text-decoration:none;
+
+transition:0.25s ease;
+
+}
+
+/* HOVER EFFECT */
+.nav-bubble:hover{
+
+background:rgba(255,255,255,0.18);
+
+transform:translateY(-1px);
+
+}
+
+/* CLICK EFFECT */
+.nav-bubble.active{
+
+background:white;
+color:black;
+
+border:none;
+
+transform:scale(0.95);
+
+}
+
+
 </style>
 </head>
 <body>
 <div class="gif-bg"></div>
 <script>
-var images=["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
-var bg=images[Math.floor(Math.random()*images.length)];
-document.querySelector(".gif-bg").style.backgroundImage="url('"+bg+"')";
+var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
+var bg = images[Math.floor(Math.random()*images.length)];
+document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </script>
 <body oncontextmenu="return false;">
 <div id="intro">
-  <div id="introText">ZINE FLIPBOOK</div>
-  <div id="introSub">digital underground archive</div>
+  <h id="introText">ZINE FLIPBOOK</h>
+  <p id="introSub">digital underground archive</p>
 </div>
 <nav class="nav-hidden">
 <audio id="bg-music" loop>
@@ -105,13 +691,19 @@ document.querySelector(".gif-bg").style.backgroundImage="url('"+bg+"')";
 </audio>
 <div class="nav-container">
 <div class="brand">
-<a href="#"><img src="logo.png" alt="logo"></a>
+<a href="#">
+<img src="logo.png" alt="logo">
+</a>
 </div>
-<div class="menu">
-<a href="#zine" class="nav-bubble">ZINE</a>
-<a href="j-card.html" class="nav-bubble">J-CARD</a>
-<a href="#about" class="nav-bubble">ABOUT</a>
+        <div class="menu">
+            <a href="#zine" class="nav-bubble">ZINE</a>
+            <a href="j-card.html" class="nav-bubble">J-CARD</a>
+            <a href="#about" class="nav-bubble">ABOUT</a>
+        </div>
+    </div>
 </div>
+
+
 </div>
 </nav>
 <audio id="bg-music" loop>
@@ -128,42 +720,267 @@ document.querySelector(".gif-bg").style.backgroundImage="url('"+bg+"')";
 <div class="glass">
   <h3 style="letter-spacing:2px;">CHARITY FOR GAZA</h3>
   <p class="glass-text">Satu kebaikan bisa jadi selimut, roti, dan obat bagi mereka.</p>
-  <button onclick="window.location.href='https://kasihpalestina.com/'" style="margin-top:15px;padding:10px 25px;background:white;color:black;border:none;border-radius:20px;cursor:pointer;font-size:12px;letter-spacing:1px;">DONASI SEKARANG</button>
+  <button onclick="window.location.href='https://kasihpalestina.com/'"
+    style="margin-top:15px;
+        padding:10px 25px;
+        background:white;
+        color:black;
+        border:none;
+        border-radius:20px;
+        cursor:pointer;
+        font-size:12px;
+        letter-spacing:1px;">
+        DONASI SEKARANG
+  </button>
 </div>
+</section>
 
-<!-- ZINE SECTION - DYNAMIC -->
+<!-- ===== ZINE LIST (3 ITEM) ===== -->
 <section id="zine">
 <div class="glass" style="text-align:center;">
-  <input type="text" id="zineSearch" placeholder="Search zine..." onkeyup="searchZine()" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:20px;color:white;outline:none;font-size:13px;letter-spacing:1px;">
+  <input 
+    type="text" 
+    id="zineSearch" 
+    placeholder="Search zine..."
+    onkeyup="searchZine()"
+    style="
+      width:100%;
+      padding:12px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:20px;
+      color:white;
+      outline:none;
+      font-size:13px;
+      letter-spacing:1px;
+    ">
 </div>
+<div class="glass zine-item zine-card reveal">
+      <div class="zine">
+    
+        <img 
+    src="cover6.jpg" 
+    onclick="openFlipbook('zine6.pdf'); addView('zine6')" 
+    oncontextmenu="return false;" 
+    draggable="false"
+>
 
-<!-- ZINE CONTAINER - DARI DATABASE -->
-<div id="zine-container">
-  <!-- Skeleton loading -->
-  <div class="glass zine-item reveal" style="text-align:center;padding:40px;">
-    <div style="width:200px;height:280px;background:rgba(255,255,255,0.1);border-radius:12px;margin:0 auto 15px;animation:pulse 1.5s infinite;"></div>
-    <div style="height:14px;background:rgba(255,255,255,0.1);border-radius:4px;margin:10px auto;width:60%;animation:pulse 1.5s infinite;"></div>
-  </div>
-</div>
+    
+        <p class="zine-title">LYCHNOBITE THEORY</p>
+    
+        <p style="opacity:0.4; font-size:10px;">
+          ♫ music : TITLE FIGHT - Head in the Ceiling Fan
+        </p>
+    
+        <div class="zine-buttons">
+<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
 
+  <span id="view-zine6">0</span> views
+</p>
+          <button class="read-btn" onclick="openFlipbook('zine6.pdf'); addView('zine6')">
+            READ
+          </button>
+    
+                <a href="zine6.pdf" download class="download-btn">
+                            ⬇︎
+                          </a>
+                          </div>
+    
+      </div>
+    </div>
+<div class="glass zine-item zine-card reveal">
+      <div class="zine">
+    
+        <img 
+    src="cover5.jpg" 
+    onclick="openFlipbook('zine5.pdf'); addView('zine5')" 
+    oncontextmenu="return false;" 
+    draggable="false"
+>
+
+    
+        <p class="zine-title">WHO DO YOU CALL<br>WHEN POLICE MURDER?</p>
+    
+        <p style="opacity:0.4; font-size:10px;">
+          ♫ music : HOMICIDE - Rima Ababil
+        </p>
+    
+        <div class="zine-buttons">
+<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+
+  <span id="view-zine5">0</span> views
+</p>
+          <button class="read-btn" onclick="openFlipbook('zine5.pdf'); addView('zine5')">
+            READ
+          </button>
+    
+                <a href="zine5.pdf" download class="download-btn">
+                            ⬇︎
+                          </a>
+                          </div>
+    
+        </div>
+    </div>
+    </div>
+<div class="glass zine-item zine-card reveal">
+      <div class="zine">
+    
+        <img 
+    src="cover1.jpg" 
+    onclick="openFlipbook('zine1.pdf'); addView('zine1')" 
+    oncontextmenu="return false;" 
+    draggable="false"
+>
+
+    
+        <p class="zine-title"> DREAM TURNED INTO<br>STRAIGHT BULLSHIT</p>
+    
+        <div class="zine-buttons">
+<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+
+  <span id="view-zine1">0</span> views
+</p>
+          <button class="read-btn" onclick="openFlipbook('zine1.pdf'); addView('zine1')">
+            READ
+          </button>
+    
+                <a href="zine1.pdf" download class="download-btn">
+                            ⬇︎
+                          </a>
+                          </div>
+    
+        </div>
+
+    </div>
+    </div>
+<div class="glass zine-item zine-card reveal">
+        <div class="zine">
+      
+          <img 
+    src="cover2.jpg" 
+    onclick="openFlipbook('zine2.pdf'); addView('zine2')" 
+    oncontextmenu="return false;" 
+    draggable="false"
+>
+
+      
+          <p class="zine-title"> AKU, KAMU, & PALESTINE 🍉</p>
+      
+          <div class="zine-buttons">
+<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+
+  <span id="view-zine2">0</span> views
+</p>
+            <button class="read-btn" onclick="openFlipbook('zine2.pdf'); addView('zine2')">
+              READ
+            </button>
+      
+                  <a href="zine2.pdf" download class="download-btn">
+                              ⬇︎
+                            </a>
+                            </div>
+      
+          </div>
+  
+      </div>
+      </div>
+<div class="glass zine-item zine-card reveal">
+      <div class="zine">
+    
+        <img 
+    src="cover4.jpg" 
+    onclick="openFlipbook('zine4.pdf'); addView('zine4')" 
+    oncontextmenu="return false;" 
+    draggable="false"
+>
+
+    
+        <p class="zine-title"> MEMERAS JAM SAMPAI<br>KELUAR DETIK TERAKHIR</p>
+    
+        <div class="zine-buttons">
+<p style="font-size:12px; opacity:0.6; display:flex; align-items:center; gap:6px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+
+  <span id="view-zine4">0</span> views
+</p>
+          <button class="read-btn" onclick="openFlipbook('zine4.pdf'); addView('zine4')">
+            READ
+          </button>
+    
+                <a href="zine4.pdf" download class="download-btn">
+                            ⬇︎
+                          </a>
+                          </div>
+    
+        </div>
+
+    </div>
+    </div>
 <div id="pagination"></div>
-
-<div class="glass zine-item">
-  <div class="zine">
-    <img src="cover.gif">
+  <div class="glass zine-item">
+    <div class="zine">
+      <img src="cover.gif">
     <h4 style="letter-spacing:2px;">COMING SOON</h4>
+    </div>
   </div>
-</div>
-</section>
 
+</section>
 <section id="kritik">
   <div class="glass">
-    <h3 style="letter-spacing:2px;">Feedback</h3>
-    <textarea id="kritikPesan" placeholder="Tulis kritik & saran kamu di sini..." style="width:100%;height:80px;margin-top:5px;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:white;resize:none;outline:none;font-size:13px;"></textarea>
-    <button onclick="kirimKritik()" style="margin-top:15px;padding:10px 25px;background:white;color:black;border:none;border-radius:20px;cursor:pointer;font-size:12px;letter-spacing:1px;">KIRIM</button>
+    <h3 style="letter-spacing:2px;">Fedback</h3>
+
+    <textarea id="kritikPesan"
+      placeholder="Tulis kritik & saran kamu di sini..."
+      style="
+        width:100%;
+        height:30px;
+        margin-top:5px;
+        padding:5px;
+        background:rgba(255,255,255,0.05);
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:10px;
+        color:white;
+        resize:none;
+        outline:none;
+        font-size:15px;
+      ">
+    </textarea>
+
+    <button onclick="kirimKritik()"
+      style="
+        margin-top:15px;
+        padding:10px 25px;
+        background:white;
+        color:black;
+        border:none;
+        border-radius:20px;
+        cursor:pointer;
+        font-size:12px;
+        letter-spacing:1px;
+      ">
+      KIRIM
+    </button>
   </div>
 </section>
-
 <section id="about">
 <div class="glass zine-item">
 <h3 style="letter-spacing:2px;">ABOUT ARCHIVE</h3>
@@ -171,27 +988,35 @@ document.querySelector(".gif-bg").style.backgroundImage="url('"+bg+"')";
 Website ini adalah arsip digital zine independen.
 Eksplorasi visual dan teks dalam format flipbook digital.
 Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik secara perlahan. Beberapa zine mungkin terasa kasar, tidak rapi, atau penuh kesalahan. Halaman-halaman yang kotor, kalimat yang patah, dan ide yang tidak selalu selesai, website ini hanyalah sebuah arsip kecil di internet. Tempat menyimpan halaman-halaman yang mungkin tidak pernah diminta oleh siapa pun untuk ada. Zine-zine ini tetap dibiarkan hidup di sini untuk dibaca, dibagikan, atau sekadar dilihat oleh siapa saja.
+<p class="music-text" style="opacity:0.4; font-size:11px;">
+    ♫ background music : hasohkah (shcool rooftop)
 </p>
-<p class="music-text" style="opacity:0.4;font-size:11px;">♫ background music : hasohkah (shcool rooftop)</p>
+
+</p>
 </div>
 </section>
 
 <footer>ZINE FLIPBOOK Copyright © Rath x Souterrain</footer>
-
-<div id="zine-loading">membuka zine...</div>
+<!-- ===== FLIPBOOK VIEW ===== -->
+<div id="zine-loading">
+  membuka zine...
+</div>
 <div id="flipbook-container">
+
   <div class="close-btn glass-ui" onclick="closeFlipbook()">CLOSE</div>
   <div id="flipbook"></div>
+
   <div class="nav-arrows">
     <div class="arrow" id="prevBtn">←</div>
     <div class="arrow" id="nextBtn">→</div>
   </div>
+
+</div>
 </div>
 
+
 <script>
-// ==========================================
-// FIREBASE INIT
-// ==========================================
+
 const firebaseConfig = {
   apiKey: "AIzaSyAw66sRfrCj_3oyu2vPKKaxnwsqX_QuYV0",
   authDomain: "zine-flipbook.firebaseapp.com",
@@ -204,207 +1029,25 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+async function addView(zineId){
 
-let currentSession = 0;
-let allZines = [];
-const itemsPerPage = 3;
+const ref = db.collection("zineViews").doc(zineId);
 
-// ==========================================
-// LOAD ZINES FROM DATABASE
-// ==========================================
-async function loadZinesFromDB() {
-  const container = document.getElementById("zine-container");
-  
-  try {
-    const snapshot = await db.collection("zines").orderBy("createdAt", "desc").get();
-    
-    if (snapshot.empty) {
-      container.innerHTML = '<div class="glass" style="text-align:center;padding:40px;"><p style="opacity:0.5;">Belum ada zine</p></div>';
-      return;
-    }
+await ref.set({
+views: firebase.firestore.FieldValue.increment(1)
+},{merge:true});
 
-    allZines = [];
-    snapshot.forEach(doc => {
-      allZines.push({ id: doc.id, ...doc.data() });
-    });
+const doc = await ref.get();
 
-    renderZinePage(0);
-    setupPagination(allZines.length);
-
-  } catch (err) {
-    console.error("Error:", err);
-    container.innerHTML = '<div class="glass" style="text-align:center;padding:40px;color:#ff6666;"><p>Error loading zines</p></div>';
-  }
+if(doc.exists){
+document.getElementById("view-"+zineId).innerText = doc.data().views;
 }
 
-// ==========================================
-// RENDER ZINE - FIXED: Data sekarang diisi!
-// ==========================================
-function renderZinePage(pageNum) {
-  const container = document.getElementById("zine-container");
-  const start = pageNum * itemsPerPage;
-  const end = start + itemsPerPage;
-  const zinesToShow = allZines.slice(start, end);
-
-  container.innerHTML = "";
-
-  zinesToShow.forEach((zine, index) => {
-    const card = document.createElement("div");
-    card.className = "glass zine-item zine-card reveal";
-    
-    // ✅ FIXED: Isi data dari database
-    const musicHtml = zine.music ? `<p style="opacity:0.4;font-size:10px;">♫ music : ${escapeHtml(zine.music)}</p>` : '';
-    
-    card.innerHTML = `
-      <div class="zine">
-        <img src="${escapeHtml(zine.coverUrl)}" 
-             onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')" 
-             oncontextmenu="return false;" 
-             draggable="false"
-             alt="${escapeHtml(zine.title)}">
-        
-        <p class="zine-title">${escapeHtml(zine.title)}</p>
-        ${musicHtml}
-        
-        <div class="zine-buttons">
-          <p style="font-size:12px;opacity:0.6;display:flex;align-items:center;gap:6px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-            <span id="view-${zine.id}">${zine.views || 0}</span> views
-          </p>
-          <button class="read-btn" onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')">READ</button>
-          <a href="${escapeHtml(zine.pdfUrl)}" download class="download-btn">⬇︎</a>
-        </div>
-      </div>
-    `;
-    
-    container.appendChild(card);
-  });
-
-  setTimeout(() => {
-    container.querySelectorAll('.reveal').forEach(el => el.classList.add('show'));
-  }, 100);
 }
 
-// ==========================================
-// PAGINATION
-// ==========================================
-function setupPagination(totalItems) {
-  const pagination = document.getElementById("pagination");
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
-  pagination.innerHTML = "";
-  if (totalPages <= 1) return;
-
-  for (let i = 0; i < totalPages; i++) {
-    const btn = document.createElement("button");
-    btn.innerText = i + 1;
-    btn.className = i === 0 ? "active" : "";
-    
-    btn.onclick = function() {
-      document.querySelectorAll("#pagination button").forEach(b => b.classList.remove("active"));
-      this.classList.add("active");
-      renderZinePage(i);
-      document.getElementById("zine").scrollIntoView({ behavior: "smooth" });
-    };
-    
-    pagination.appendChild(btn);
-  }
-}
-
-// ==========================================
-// SEARCH - FIXED
-// ==========================================
-function searchZine() {
-  const input = document.getElementById("zineSearch").value.toLowerCase().trim();
-  const container = document.getElementById("zine-container");
-  const pagination = document.getElementById("pagination");
-
-  if (!input) {
-    renderZinePage(0);
-    setupPagination(allZines.length);
-    pagination.style.display = "block";
-    return;
-  }
-
-  pagination.style.display = "none";
-  const filtered = allZines.filter(z => 
-    z.title.toLowerCase().includes(input) || 
-    (z.music && z.music.toLowerCase().includes(input))
-  );
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<div class="glass" style="text-align:center;padding:40px;"><p style="opacity:0.5;">Zine tidak ditemukan</p></div>';
-    return;
-  }
-
-  container.innerHTML = "";
-  filtered.forEach(zine => {
-    const card = document.createElement("div");
-    card.className = "glass zine-item zine-card reveal show";
-    
-    const musicHtml = zine.music ? `<p style="opacity:0.4;font-size:10px;">♫ music : ${escapeHtml(zine.music)}</p>` : '';
-    
-    // ✅ FIXED: Isi data juga di search
-    card.innerHTML = `
-      <div class="zine">
-        <img src="${escapeHtml(zine.coverUrl)}" 
-             onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')" 
-             oncontextmenu="return false;" 
-             draggable="false"
-             alt="${escapeHtml(zine.title)}">
-        
-        <p class="zine-title">${escapeHtml(zine.title)}</p>
-        ${musicHtml}
-        
-        <div class="zine-buttons">
-          <p style="font-size:12px;opacity:0.6;display:flex;align-items:center;gap:6px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            <span id="view-${zine.id}">${zine.views || 0}</span> views
-          </p>
-          <button class="read-btn" onclick="openFlipbook('${escapeHtml(zine.pdfUrl)}'); addView('${zine.id}')">READ</button>
-          <a href="${escapeHtml(zine.pdfUrl)}" download class="download-btn">⬇︎</a>
-        </div>
-      </div>
-    `;
-    container.appendChild(card);
-  });
-}
-
-// ==========================================
-// VIEW COUNTER - FIXED
-// ==========================================
-async function addView(zineId) {
-  try {
-    const ref = db.collection("zines").doc(zineId);
-    await ref.update({ views: firebase.firestore.FieldValue.increment(1) });
-    
-    const doc = await ref.get();
-    if (doc.exists) {
-      const el = document.getElementById("view-" + zineId);
-      if (el) el.innerText = doc.data().views;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// ==========================================
-// UTILITY
-// ==========================================
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// ==========================================
-// FLIPBOOK - TETAP SAMA
-// ==========================================
-async function openFlipbook(pdfUrl) {
+  let currentSession = 0;
+async function openFlipbook(pdfUrl){
+  // KUNCI SCROLL: Cara paling aman di semua browser
   document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
   document.body.style.position = 'fixed';
@@ -418,7 +1061,7 @@ async function openFlipbook(pdfUrl) {
   container.style.display = "block";
 
   const oldFlipbook = document.getElementById("flipbook");
-  if ($(oldFlipbook).data("turn")) {
+  if($(oldFlipbook).data("turn")){
     $(oldFlipbook).turn("destroy");
   }
 
@@ -426,32 +1069,28 @@ async function openFlipbook(pdfUrl) {
   newFlipbook.id = "flipbook";
   oldFlipbook.parentNode.replaceChild(newFlipbook, oldFlipbook);
 
+  // Bagian Audio
   const music = document.getElementById("bg-music");
   music.pause();
-  
-  // Cek music spesifik
-  if (pdfUrl.includes("zine5")) music.src = "music-zine5.mp3";
-  else if (pdfUrl.includes("zine6")) music.src = "music-zine6.mp3";
-  else music.src = "music.mp3";
-  
+  if(pdfUrl === "zine5.pdf"){ music.src = "music-zine5.mp3"; }
+  else if(pdfUrl === "zine6.pdf"){ music.src = "music-zine6.mp3"; }
+  else { music.src = "music.mp3"; }
   music.volume = 0.5;
   music.currentTime = 0;
-  music.play().catch(() => {});
+  music.play().catch(()=>{});
 
   try {
     const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-    if (session !== currentSession) return;
+    if(session !== currentSession) return;
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      if (session !== currentSession) return;
-      
+    for(let i = 1; i <= pdf.numPages; i++){
+      if(session !== currentSession) return;
       const page = await pdf.getPage(i);
       const viewport = page.getViewport({ scale: 2 });
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      
       await page.render({ canvasContext: context, viewport: viewport }).promise;
 
       const div = document.createElement("div");
@@ -473,144 +1112,330 @@ async function openFlipbook(pdfUrl) {
       duration: 1200
     });
 
-    document.getElementById("nextBtn").onclick = () => $(newFlipbook).turn("next");
-    document.getElementById("prevBtn").onclick = () => $(newFlipbook).turn("previous");
+    document.getElementById("nextBtn").onclick = () => { $(newFlipbook).turn("next"); };
+    document.getElementById("prevBtn").onclick = () => { $(newFlipbook).turn("previous"); };
 
-  } catch (err) {
-    console.error(err);
-  }
+  } catch(err) { console.error(err); }
 
-  if (session === currentSession) {
-    loading.style.display = "none";
-  }
+  if(session === currentSession){ loading.style.display = "none"; }
 }
 
-function closeFlipbook() {
+
+function closeFlipbook(){
+  // BUKA KUNCI SCROLL: Kembalikan semua ke normal
   document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
   document.body.style.position = '';
   document.body.style.width = '';
 
-  currentSession++;
+  currentSession++; 
 
   const music = document.getElementById("bg-music");
   music.pause();
   music.currentTime = 0;
 
   const flip = document.getElementById("flipbook");
-  if ($(flip).data("turn")) {
+  if($(flip).data("turn")){
     $(flip).turn("destroy");
   }
 
-  document.getElementById("flipbook-container").style.display = "none";
-  document.getElementById("zine-loading").style.display = "none";
+  document.getElementById("flipbook-container").style.display="none";
+  document.getElementById("zine-loading").style.display="none";
 }
 
-// ==========================================
-// FUNGSI LAMA TETAP
-// ==========================================
-function kirimKritik() {
+function searchZine(){
+  const input = document.getElementById("zineSearch").value.toLowerCase();
+  const items = document.querySelectorAll(".zine-item");
+
+  items.forEach(item => {
+    const text = item.innerText.toLowerCase();
+    if(text.includes(input)){
+      item.style.display = "block";
+    } else {
+      item.style.display = "none";
+    }
+  });
+}
+function kirimKritik(){
   const pesan = document.getElementById("kritikPesan").value.trim();
-  if (pesan === "") {
+
+  if(pesan === ""){
     alert("Pesan tidak boleh kosong.");
     return;
   }
+
   const email = "ulinnha1140@gmail.com";
   const subject = "Kritik & Saran Website";
-  const link = "mailto:" + email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(pesan);
+
+  const link = "mailto:" + email +
+    "?subject=" + encodeURIComponent(subject) +
+    "&body=" + encodeURIComponent(pesan);
+
   window.location.href = link;
+
   document.getElementById("kritikPesan").value = "";
 }
+// aktifkan skeleton setelah intro selesai
+setTimeout(()=>{
 
-// INTRO ANIMATION
-window.addEventListener("load", () => {
+  document.body.classList.add("loading");
+
+},3000);
+
+
+// hilangkan skeleton setelah sebentar
+setTimeout(()=>{
+
+  document.body.classList.remove("loading");
+
+},5500);
+
+  window.addEventListener("load", ()=>{
   const intro = document.getElementById("intro");
   const text = document.getElementById("introText");
   const sub = document.getElementById("introSub");
   const profile = document.querySelector(".profile-photo img");
 
-  setTimeout(() => {
+  // munculkan teks utama
+  setTimeout(()=>{
     text.style.opacity = "1";
     text.style.filter = "blur(0px)";
   }, 500);
 
-  setTimeout(() => {
+  // munculkan sub text
+  setTimeout(()=>{
     sub.style.opacity = "0.6";
     sub.style.filter = "blur(0px)";
   }, 1200);
 
-  setTimeout(() => {
+  // fade out intro
+  setTimeout(()=>{
     intro.style.opacity = "0";
   }, 3000);
 
-  setTimeout(() => {
+  // hapus dari layar & jalankan animasi profil
+  setTimeout(()=>{
     intro.style.display = "none";
     profile.style.animation = "profileSlide 1s ease forwards";
-    
-    // LOAD ZINES SETELAH INTRO SELESAI
-    loadZinesFromDB();
   }, 4200);
 });
+function revealZines(){
 
-// ==========================================
-// NAVBAR
-// ==========================================
+const items = document.querySelectorAll("#zine .zine-card");
+
+items.forEach((item,i)=>{
+
+if(item.style.display === "none") return;
+
+const rect = item.getBoundingClientRect();
+
+if(rect.top < window.innerHeight - 100){
+
+setTimeout(()=>{
+item.classList.add("show");
+}, i * 150);
+
+}
+
+});
+
+}
+
+window.addEventListener("scroll", revealZines);
+window.addEventListener("load", revealZines);
+const itemsPerPage = 3;
+const zines = document.querySelectorAll("#zine .zine-card");
+const pagination = document.getElementById("pagination");
+
+function showPage(page, scroll=true){
+
+let start = page * itemsPerPage;
+let end = start + itemsPerPage;
+
+zines.forEach((item,index)=>{
+item.style.display = (index >= start && index < end) ? "block" : "none";
+
+if(index >= start && index < end){
+item.classList.remove("show");
+}
+
+});
+
+const buttons = document.querySelectorAll("#pagination button");
+
+buttons.forEach((btn,i)=>{
+btn.classList.toggle("active", i === page);
+});
+
+setTimeout(revealZines,100);
+
+// scroll hanya jika klik pagination
+if(scroll){
+document.getElementById("zine").scrollIntoView({
+behavior:"smooth"
+});
+}
+
+}
+
+function createPagination(){
+
+let totalPages = Math.ceil(zines.length / itemsPerPage);
+
+for(let i=0;i<totalPages;i++){
+
+let btn = document.createElement("button");
+btn.innerText = i + 1;
+
+btn.onclick = () => showPage(i, true);
+
+pagination.appendChild(btn);
+
+}
+
+}
+
+createPagination();
+showPage(0, false);
+async function loadViews(){
+
+const zines = ["zine1","zine2","zine4","zine5","zine6"];
+
+for(let id of zines){
+
+const ref = db.collection("zineViews").doc(id);
+const doc = await ref.get();
+
+if(doc.exists){
+document.getElementById("view-"+id).innerText = doc.data().views;
+}
+
+}
+
+}
+
+window.addEventListener("load", loadViews);
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
+window.addEventListener('load', () => {
+  window.scrollTo(0, 0);
+});
+
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll(".nav-bubble");
+
+window.addEventListener("scroll", () => {
+
+let current = "";
+
+sections.forEach(section => {
+
+const sectionTop = section.offsetTop - 120;
+
+if (scrollY >= sectionTop) {
+current = section.getAttribute("id");
+}
+
+});
+
+navLinks.forEach(link => {
+
+link.classList.remove("active");
+
+if(link.getAttribute("href") === "#" + current){
+link.classList.add("active");
+}
+
+});
+
+});
 window.addEventListener("load", () => {
   const nav = document.querySelector("nav");
-  let lastScroll = 0;
-  let isNavVisible = false;
+  let lastScroll = window.pageYOffset;
 
+  // navbar muncul setelah intro
   setTimeout(() => {
-    nav.classList.remove("nav-hidden");
     nav.classList.add("nav-show");
-    isNavVisible = true;
     lastScroll = window.pageYOffset;
   }, 4200);
 
+  // animasi scroll
   window.addEventListener("scroll", () => {
     const currentScroll = window.pageYOffset;
-    
-    if (currentScroll > lastScroll && currentScroll > 120 && isNavVisible) {
+
+    if (currentScroll > lastScroll && currentScroll > 120) {
+      // scroll ke bawah → sembunyikan navbar
       nav.classList.remove("nav-show");
       nav.classList.add("nav-hidden");
-      isNavVisible = false;
-    } else if (currentScroll < lastScroll && !isNavVisible) {
+    } 
+    // scroll ke atas → tampilkan navbar hanya jika sebelumnya hidden
+    else if (currentScroll < lastScroll && nav.classList.contains("nav-hidden")) {
       nav.classList.remove("nav-hidden");
       nav.classList.add("nav-show");
-      isNavVisible = true;
     }
-    
+
     lastScroll = currentScroll;
   });
 
+  // klik menu navbar
   document.querySelectorAll(".nav-bubble").forEach(link => {
     link.addEventListener("click", () => {
+      // langsung tampilkan navbar
       nav.classList.remove("nav-hidden");
       nav.classList.add("nav-show");
-      isNavVisible = true;
+
+      // kunci navbar agar tidak hilang walau scroll ke atas
+      let unlockScrollDown = false;
+
+      const scrollHandler = () => {
+        const scroll = window.pageYOffset;
+        if (scroll > lastScroll) {
+          // scroll ke bawah → bisa sembunyikan navbar
+          nav.classList.remove("nav-show");
+          nav.classList.add("nav-hidden");
+          lastScroll = scroll;
+          unlockScrollDown = true;
+        } else if (!unlockScrollDown) {
+          // scroll ke atas → abaikan, jangan hilangkan navbar
+          lastScroll = scroll;
+        }
+      };
+
+      window.addEventListener("scroll", scrollHandler, { once: true });
+
+      // reset lastScroll sekarang
       lastScroll = window.pageYOffset;
     });
   });
 });
 
-// ACTIVE NAV LINK
-const sections = document.querySelectorAll("section");
-const navLinks = document.querySelectorAll(".nav-bubble");
-window.addEventListener("scroll", () => {
-  let current = "";
-  sections.forEach(section => {
-    const sectionTop = section.offsetTop - 120;
-    if (scrollY >= sectionTop) current = section.getAttribute("id");
-  });
-  navLinks.forEach(link => {
-    link.classList.remove("active");
-    if (link.getAttribute("href") === "#" + current) link.classList.add("active");
-  });
-});
 
-// SCROLL RESTORATION
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-window.addEventListener('load', () => window.scrollTo(0, 0));
+document.addEventListener("DOMContentLoaded", function(){
+
+const backgrounds = [
+"back1.jpg",
+"back2.jpg",
+"back3.jpg",
+"back4.jpg",
+"back5.jpg"
+];
+
+const randomBg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
+
+document.getElementById("bgimg").src = randomBg;
+
+});
+// Taruh ini di bagian paling bawah file JS kamu
+function kunciScrollZine(e) {
+  // Hanya kunci scroll jika flipbook sedang tampil
+  if (document.getElementById("flipbook-container").style.display === "block") {
+    e.preventDefault();
+  }
+}
+
+
 </script>
 </body>
 </html>
