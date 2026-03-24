@@ -848,7 +848,7 @@ async function loadZines() {
             <div class="zine">
                 <img src="${zine.cover_url}" onclick="openFlipbook('${zine.pdf_url}', ${zine.id})" draggable="false">
                 <p class="zine-title">${zine.title}</p>
-                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Silent'}</p>
+                <p style="opacity:0.4; font-size:10px; margin-top: -5px;">♫ ${zine.music_title || 'Default'}</p>
                 <div class="zine-buttons">
                     <p style="font-size:12px; opacity:0.6;"><span id="view-${zine.id}">${zine.views || 0}</span> views</p>
                     <button class="read-btn" onclick="openFlipbook('${zine.pdf_url}', ${zine.id})">READ</button>
