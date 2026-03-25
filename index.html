@@ -191,12 +191,31 @@ transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 
 
 /* FLIPBOOK */
-#flipbook-container{
-display:none;
-position:fixed;
-inset:0;
-background:#000;
-z-index:2000;
+/* FLIPBOOK CONTAINER - PAKAI BACKGROUND KHUSUS & STATIS */
+#flipbook-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    
+    /* GANTI INI dengan nama file gambar tunggal untuk mode baca */
+    background-image: url("bg-baca-zine.jpg"); 
+    
+    /* Properti agar gambar penuh dan rapi */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    z-index: 2000;
+}
+
+/* Overlay gelap agar zine & tombol navigasi tetap kontras */
+#flipbook-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Lapisan hitam transparan 60% */
+    background: rgba(0, 0, 0, 0.6); 
+    z-index: -1;
 }
 
 #flipbook{ margin:auto; }
