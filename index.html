@@ -267,30 +267,27 @@ gap: 10px; /* Jarak antara CLOSE dan Arrows */
 }
 
 /* CLOSE (UPDATED) */
-.close-btn{
-/* POSISI BARU: Di dalam flex container .reader-nav-panel */
-position: relative;
-top: auto;
-left: auto;
-transform: none;
-bottom: auto;
-
-/* Styling Tombol */
-font-family: 'Stack Sans Text', sans-serif;
-font-weight: 500;
-font-size: 10px; /* Kecil seperti nav-bubble */
-letter-spacing: 2px;
-padding: 8px 16px;
-border-radius: 30px;
-cursor: pointer;
-background: rgba(255, 255, 255, 0.15); /* Sedikit kontras */
-color: white;
-text-decoration: none;
-white-space: nowrap;
-transition: 0.2s;
-z-index: 2;
+.close-btn {
+    position: relative;
+    font-family: 'Stack Sans Text', sans-serif;
+    font-weight: 700; /* Dibuat lebih tebal agar merahnya tegas */
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    
+    /* WARNA DI SINI */
+    background: rgba(255, 255, 255, 0.1); 
+    color: #ff4d4d; /* Merah terang agar kontras di latar gelap */
+    
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.2s;
 }
-.close-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+.close-btn:hover {
+    background: rgba(255, 0, 0, 0.1); /* Sedikit merah saat di-hover */
+}
 
 /* SWIPE HINT (UPDATED) */
 .swipe-hint{
@@ -315,24 +312,29 @@ gap: 50px; /* Jarak antar panah */
 z-index: 2;
 }
 
-.arrow{
-width: 48px;
-height: 48px;
-display: flex;
-align-items: center;
-justify-content: center;
-border-radius: 50%;
-/* Hapus efek kaca individual, gunakan panel utama */
-background: rgba(255, 255, 255, 0.05); 
-border: 1px solid rgba(255, 255, 255, 0.1);
-font-size: 22px;
-cursor: pointer;
-user-select: none;
-transition: 0.25s;
-color: white;
+.arrow {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    
+    /* WARNA DI SINI */
+    background: white; /* Background putih solid */
+    color: black;      /* Teks/Panah warna hitam */
+    
+    font-size: 22px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.25s;
+    border: none; /* Hilangkan border karena sudah solid putih */
 }
 
-.arrow:active{ transform: scale(0.9); background: rgba(255, 255, 255, 0.1); }
+.arrow:active {
+    transform: scale(0.9);
+    background: #e0e0e0; /* Berubah abu-abu sedikit saat ditekan */
+}
 
 footer {
     text-align: center;
