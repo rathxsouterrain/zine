@@ -233,68 +233,106 @@ justify-content:center;
   pointer-events: none;
 }
 
-/* ===== READER UI ===== */
+/* ===== READER UI (UPDATED WITH BOTTOM BLUR PANEL) ===== */
 .glass-ui{
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(18px);
-border:1px solid rgba(255,255,255,0.15);
-border-radius:14px;
-padding:10px 16px;
+/* Menghapus background & border individual agar panel utamanya menonjol */
+background: transparent;
+backdrop-filter: none;
+-webkit-backdrop-filter: none;
+border: none;
 }
 
-/* CLOSE */
+/* --- BARU: CONTAINER UNTUK PANEL KACA BAWAH --- */
+.reader-nav-panel {
+position: fixed;
+bottom: 10px; /* Jarak dari bawah layar, sama seperti top navbar */
+left: 50%;
+transform: translateX(-50%);
+width: 92%; 
+max-width: 450px; /* Samakan dengan top navbar */
+padding: 15px 12px; /* Padding vertikal sedikit lebih besar untuk muat CLOSE + Arrows */
+z-index: 9999;
+
+/* EFEK KACA/BLUR (Samakan dengan .nav-container) */
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(15px);
+-webkit-backdrop-filter: blur(15px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+border-radius: 40px; /* Border radius besar */
+
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 10px; /* Jarak antara CLOSE dan Arrows */
+}
+
+/* CLOSE (UPDATED) */
 .close-btn{
-position:fixed;
+/* POSISI BARU: Di dalam flex container .reader-nav-panel */
+position: relative;
+top: auto;
+left: auto;
+transform: none;
+bottom: auto;
 
-/* POSISI BARU: DI ATAS TOMBOL PANAH */
-bottom:95px;
-left:50%;
-transform:translateX(-50%);
-
-font-size:11px;
-letter-spacing:2px;
-cursor:pointer;
-z-index:9999;
+/* Styling Tombol */
+font-family: 'Stack Sans Text', sans-serif;
+font-weight: 500;
+font-size: 10px; /* Kecil seperti nav-bubble */
+letter-spacing: 2px;
+padding: 8px 16px;
+border-radius: 30px;
+cursor: pointer;
+background: rgba(255, 255, 255, 0.15); /* Sedikit kontras */
+color: white;
+text-decoration: none;
+white-space: nowrap;
+transition: 0.2s;
+z-index: 2;
 }
+.close-btn:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* SWIPE HINT */
+/* SWIPE HINT (UPDATED) */
 .swipe-hint{
-position:fixed;
-top:20px;
-left:20px;
-font-size:11px;
-opacity:0.7;
-z-index:9999;
+position: fixed;
+top: 20px;
+left: 20px;
+font-size: 11px;
+opacity: 0.7;
+z-index: 9999;
 }
 
-/* NAV ARROWS */
+/* NAV ARROWS (UPDATED) */
 .nav-arrows{
-position:fixed;
-bottom:30px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:50px;
-z-index:9999;
+/* POSISI BARU: Di dalam flex container .reader-nav-panel */
+position: relative;
+bottom: auto;
+left: auto;
+transform: none;
+
+display: flex;
+gap: 50px; /* Jarak antar panah */
+z-index: 2;
 }
 
 .arrow{
-width:48px;
-height:48px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:50%;
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(14px);
-border:1px solid rgba(255,255,255,0.18);
-font-size:22px;
-cursor:pointer;
-user-select:none;
-transition:0.25s;
+width: 48px;
+height: 48px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 50%;
+/* Hapus efek kaca individual, gunakan panel utama */
+background: rgba(255, 255, 255, 0.05); 
+border: 1px solid rgba(255, 255, 255, 0.1);
+font-size: 22px;
+cursor: pointer;
+user-select: none;
+transition: 0.25s;
+color: white;
 }
 
-.arrow:active{ transform:scale(0.9); }
+.arrow:active{ transform: scale(0.9); background: rgba(255, 255, 255, 0.1); }
 
 footer {
     text-align: center;
@@ -722,14 +760,14 @@ transform:scale(0.95);
 
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 <div class="gif-bg"></div>
 <script>
 var images = ["back1.jpg","back2.jpg","back3.jpg","back4.jpg","back5.jpg"];
 var bg = images[Math.floor(Math.random()*images.length)];
 document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </script>
-<body oncontextmenu="return false;">
+
 <div id="intro">
   <h id="introText">TURMOILDISTRACTED</h>
   <p id="introSub">digital underground archive</p>
@@ -755,9 +793,6 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 
 </div>
 </nav>
-<audio id="bg-music" loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
 
 <div class="hero">
   <div class="profile-photo">
@@ -784,7 +819,6 @@ document.querySelector(".gif-bg").style.backgroundImage = "url('"+bg+"')";
 </div>
 </section>
 
-<!-- ===== ZINE LIST (3 ITEM) ===== -->
 <section id="zine">
     <div class="glass" style="text-align:center; padding: 25px;">
       <input 
@@ -873,21 +907,23 @@ Setiap zine dapat dibaca seperti membuka buku fisik halaman demi halaman dibalik
     </div>
 </footer>
 
-<!-- ===== FLIPBOOK VIEW ===== -->
 <div id="zine-loading">
   membuka zine...
 </div>
 <div id="flipbook-container">
 
-  <div class="close-btn glass-ui" onclick="closeFlipbook()">CLOSE</div>
   <div id="flipbook"></div>
 
-  <div class="nav-arrows">
-    <div class="arrow" id="prevBtn">←</div>
-    <div class="arrow" id="nextBtn">→</div>
+  <div class="reader-nav-panel">
+      <div class="close-btn glass-ui" onclick="closeFlipbook()">CLOSE</div>
+      
+      <div class="nav-arrows">
+        <div class="arrow" id="prevBtn">←</div>
+        <div class="arrow" id="nextBtn">→</div>
+      </div>
   </div>
+  <div class="swipe-hint">geser halaman »</div>
 
-</div>
 </div>
 
 
