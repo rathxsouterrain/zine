@@ -26,82 +26,86 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 html{ scroll-behavior:smooth; }
 
 /* 1. DASAR BACKGROUND */
+/* 1. Reset Body & Background Dasar */
 body {
     margin: 0;
     padding: 0;
-    background: #000205; /* Hitam pekat agar cahaya biru menonjol */
+    background-color: #00050a; /* Hitam kebiruan sangat gelap */
     color: white;
     font-family: Arial, sans-serif;
-    min-height: 100vh;
     overflow-x: hidden;
+    min-height: 100vh;
     position: relative;
+    /* Memastikan konten tetap di atas background */
     z-index: 1;
 }
 
-/* 2. SILUET ATAS (Lengkungan Putih Kebiruan) */
+/* 2. Layer Siluet Bergerak (Persis Gambar) */
+body::before, body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Di bawah konten */
+    pointer-events: none;
+}
+
+/* Siluet Lengkungan Biru Utama */
 body::before {
-    content: "";
-    position: fixed;
-    top: -250px; /* Posisi di atas layar */
-    left: -20%;
-    width: 140%;
-    height: 600px;
-    background: radial-gradient(ellipse at center, 
-        rgba(255, 255, 255, 0.7) 0%, 
-        rgba(100, 180, 255, 0.3) 30%, 
-        transparent 70%);
-    border-radius: 50%; /* Membuat efek busur tajam */
-    filter: blur(50px);
-    z-index: -1;
-    animation: siluetAtas 12s ease-in-out infinite alternate;
+    background: radial-gradient(circle at 100% 0%, 
+        rgba(135, 206, 250, 0.4) 0%, 
+        rgba(30, 144, 255, 0.2) 25%, 
+        transparent 50%);
+    filter: blur(60px);
+    animation: aurora 10s ease-in-out infinite alternate;
 }
 
-/* 3. SILUET BAWAH (Pantulan Biru Deep) */
+/* Siluet Cahaya Putih/Cyan (Garis Lengkung) */
 body::after {
-    content: "";
-    position: fixed;
-    bottom: -300px;
-    right: -10%;
-    width: 120%;
-    height: 700px;
-    background: radial-gradient(ellipse at center, 
-        rgba(25, 70, 150, 0.6) 0%, 
-        rgba(10, 30, 80, 0.2) 40%, 
-        transparent 80%);
-    border-radius: 50%;
+    background: radial-gradient(ellipse at 0% 100%, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        rgba(100, 200, 255, 0.15) 30%, 
+        transparent 60%);
     filter: blur(80px);
-    z-index: -2;
-    animation: siluetBawah 15s ease-in-out infinite alternate;
+    animation: aurora-reverse 12s ease-in-out infinite alternate;
 }
 
-/* 4. ANIMASI PERGERAKAN (Bernapas & Mengalir) */
-@keyframes siluetAtas {
-    0% {
-        transform: translate(0, 0) rotate(-5deg) scale(1);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translate(-50px, 40px) rotate(2deg) scale(1.05);
-        opacity: 1;
-    }
-}
-
-@keyframes siluetBawah {
+/* 3. Animasi Pergerakan Siluet */
+@keyframes aurora {
     0% {
         transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(-10%, 15%) scale(1.2);
+        opacity: 0.9;
     }
     100% {
-        transform: translate(30px, -60px) scale(1.1);
+        transform: translate(5%, -5%) scale(1.1);
+        opacity: 0.7;
     }
 }
 
-/* 5. PENYESUAIAN KARTU KACA */
+@keyframes aurora-reverse {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+        transform: translate(15%, -10%) rotate(5deg);
+    }
+    100% {
+        transform: translate(-5%, 5%) rotate(-5deg);
+    }
+}
+
+/* 4. Optimasi Glass Card agar terlihat menyatu */
 .glass {
-    background: rgba(255, 255, 255, 0.02) !important;
-    backdrop-filter: blur(30px) !important;
-    -webkit-backdrop-filter: blur(30px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 
