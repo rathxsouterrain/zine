@@ -25,80 +25,71 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 <style>
 html{ scroll-behavior:smooth; }
 
-/* 1. DASAR BACKGROUND */
-/* 1. Reset Body & Background Dasar */
+/* 1. DASAR BACKGROUND HITAM PEKAT */
 body {
     margin: 0;
     padding: 0;
-    background-color: #00050a; /* Hitam kebiruan sangat gelap */
-    color: white;
-    font-family: Arial, sans-serif;
+    background: #000205; 
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
-    /* Memastikan konten tetap di atas background */
-    z-index: 1;
 }
 
-/* 2. Layer Siluet Bergerak (Persis Gambar) */
-body::before, body::after {
-    content: "";
+/* 2. KONTAINER UNTUK SILUET CAHAYA */
+.bg-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Di bawah konten */
-    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
 }
 
-/* Siluet Lengkungan Biru Utama */
-body::before {
-    background: radial-gradient(circle at 100% 0%, 
-        rgba(135, 206, 250, 0.4) 0%, 
-        rgba(30, 144, 255, 0.2) 25%, 
-        transparent 50%);
-    filter: blur(60px);
-    animation: aurora 10s ease-in-out infinite alternate;
+/* 3. LENGKUNGAN UTAMA (GARIS CAHAYA PUTIH-BIRU) */
+.light-curve {
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 150%;
+    height: 100%;
+    /* Ini yang bikin efek garis melengkung tajam di gambar */
+    border-bottom: 80px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    filter: blur(40px) drop-shadow(0 0 50px rgba(100, 200, 255, 0.8));
+    animation: flowLine 12s ease-in-out infinite alternate;
 }
 
-/* Siluet Cahaya Putih/Cyan (Garis Lengkung) */
-body::after {
-    background: radial-gradient(ellipse at 0% 100%, 
-        rgba(255, 255, 255, 0.3) 0%, 
-        rgba(100, 200, 255, 0.15) 30%, 
-        transparent 60%);
-    filter: blur(80px);
-    animation: aurora-reverse 12s ease-in-out infinite alternate;
+/* 4. BIASAN BIRU DI BAWAH LENGKUNGAN */
+.blue-glow {
+    position: absolute;
+    top: 10%;
+    right: -20%;
+    width: 100%;
+    height: 120%;
+    background: radial-gradient(circle at center, 
+        rgba(30, 80, 180, 0.5) 0%, 
+        rgba(10, 30, 60, 0.2) 40%, 
+        transparent 70%);
+    filter: blur(100px);
+    animation: pulseGlow 15s ease-in-out infinite alternate;
 }
 
-/* 3. Animasi Pergerakan Siluet */
-@keyframes aurora {
+/* 5. ANIMASI BIAR GERAK HIDUP */
+@keyframes flowLine {
     0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.6;
-    }
-    50% {
-        transform: translate(-10%, 15%) scale(1.2);
-        opacity: 0.9;
+        transform: rotate(-5deg) translate(0, 0) scale(1);
     }
     100% {
-        transform: translate(5%, -5%) scale(1.1);
-        opacity: 0.7;
+        transform: rotate(2deg) translate(-30px, 50px) scale(1.05);
     }
 }
 
-@keyframes aurora-reverse {
-    0% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-    50% {
-        transform: translate(15%, -10%) rotate(5deg);
-    }
-    100% {
-        transform: translate(-5%, 5%) rotate(-5deg);
-    }
+@keyframes pulseGlow {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0.9; transform: scale(1.2); }
 }
+
 
 /* 4. Optimasi Glass Card agar terlihat menyatu */
 .glass {
@@ -793,6 +784,11 @@ transform:scale(0.95);
 
 </style>
 </head>
+<div class="bg-container">
+    <div class="light-curve"></div>
+    <div class="blue-glow"></div>
+</div>
+
 <body oncontextmenu="return false;">
 
 <div id="intro">
