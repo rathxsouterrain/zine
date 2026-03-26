@@ -25,70 +25,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 <style>
 html{ scroll-behavior:smooth; }
 
-/* 1. DASAR BACKGROUND HITAM PEKAT */
-body {
-    margin: 0;
-    padding: 0;
-    background: #000205; 
-    overflow-x: hidden;
-    min-height: 100vh;
-    position: relative;
-}
+<div class="bg-container">
+    <div class="light-curve"></div>
+    <div class="blue-glow"></div>
+</div>
 
-/* 2. KONTAINER UNTUK SILUET CAHAYA */
-.bg-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-}
-
-/* 3. LENGKUNGAN UTAMA (GARIS CAHAYA PUTIH-BIRU) */
-.light-curve {
-    position: absolute;
-    top: -20%;
-    left: -10%;
-    width: 150%;
-    height: 100%;
-    /* Ini yang bikin efek garis melengkung tajam di gambar */
-    border-bottom: 80px solid rgba(255, 255, 255, 0.4);
-    border-radius: 50%;
-    filter: blur(40px) drop-shadow(0 0 50px rgba(100, 200, 255, 0.8));
-    animation: flowLine 12s ease-in-out infinite alternate;
-}
-
-/* 4. BIASAN BIRU DI BAWAH LENGKUNGAN */
-.blue-glow {
-    position: absolute;
-    top: 10%;
-    right: -20%;
-    width: 100%;
-    height: 120%;
-    background: radial-gradient(circle at center, 
-        rgba(30, 80, 180, 0.5) 0%, 
-        rgba(10, 30, 60, 0.2) 40%, 
-        transparent 70%);
-    filter: blur(100px);
-    animation: pulseGlow 15s ease-in-out infinite alternate;
-}
-
-/* 5. ANIMASI BIAR GERAK HIDUP */
-@keyframes flowLine {
-    0% {
-        transform: rotate(-5deg) translate(0, 0) scale(1);
-    }
-    100% {
-        transform: rotate(2deg) translate(-30px, 50px) scale(1.05);
-    }
-}
-
-@keyframes pulseGlow {
-    0% { opacity: 0.5; transform: scale(1); }
-    100% { opacity: 0.9; transform: scale(1.2); }
-}
 
 
 /* 4. Optimasi Glass Card agar terlihat menyatu */
@@ -784,11 +725,6 @@ transform:scale(0.95);
 
 </style>
 </head>
-<div class="bg-container">
-    <div class="light-curve"></div>
-    <div class="blue-glow"></div>
-</div>
-
 <body oncontextmenu="return false;">
 
 <div id="intro">
