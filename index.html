@@ -25,18 +25,34 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 <style>
 html{ scroll-behavior:smooth; }
 
+/* Cari bagian body di dalam <style> dan ganti menjadi seperti ini */
 body {
     margin: 0;
-    background: #000;
+    /* Gradasi linear menyesuaikan warna dan posisi dari gambar */
+    background: linear-gradient(
+        165deg, 
+        #2c3e50 0%,    /* Biru tua gelap */
+        #4a5c6d 30%,   /* Biru keabu-abuan */
+        #a4b0be 60%,   /* Abu-abu transisi */
+        #f5e6d3 100%   /* Krem hangat sesuai bagian bawah gambar */
+    );
+    background-attachment: fixed; /* Agar background tetap saat di-scroll */
+    background-size: cover;
+    
     color: white;
     font-family: Arial, sans-serif;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    
-    /* KUNCI PERBAIKAN: Mematikan efek tarik-tarikan/mantul browser */
     overscroll-behavior-y: none; 
 }
+
+/* Tambahan agar gradasi menutupi seluruh layar meski konten sedikit */
+html {
+    height: 100%;
+    background: #f5e6d3; /* Fallback warna krem bawah */
+}
+
 
 /* Tambahan agar elemen fixed tidak ikut bergeser saat scrolling */
 html {
