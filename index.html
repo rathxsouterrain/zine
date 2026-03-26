@@ -1084,10 +1084,34 @@ window.addEventListener("load", () => {
 });
 
 // FIX NAVBAR SCROLL (KEMBALI KE ASLI)
+// FIX NAVBAR SCROLL (ANTI KEDUT / OVERSCROLL PROTECTION)
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
     const currentScroll = window.pageYOffset;
+    const bodyHeight = document.body.offsetHeight;
+    const windowHeight = window.innerHeight;
+
+    // 1. Jika di posisi paling atas, selalu tampilkan navbar
+    if (currentScroll <= 0) {
+        nav.classList.remove("nav-hidden");
+        nav.classList.add("nav-show");
+        lastScroll = currentScroll;
+        return;
+    }
+
+    // 2. Jika mentok paling bawah (dengan toleransi 10px untuk efek pantulan), abaikan perintah hide/show
+    if (currentScroll + windowHeight >= bodyHeight - 10) {
+        lastScroll = currentScroll;
+        return;
+    }
+
+    // 3. Tambahkan toleransi 5px agar tidak berkedut saat jari bergetar
+    if (Math.abs(currentScroll - lastScroll) < 5) {
+        return;
+    }
+
+    // 4. Logika normal sembunyikan/tampilkan navbar
     if (currentScroll > lastScroll && currentScroll > 120) {
         nav.classList.remove("nav-show");
         nav.classList.add("nav-hidden");
@@ -1095,8 +1119,10 @@ window.addEventListener("scroll", () => {
         nav.classList.remove("nav-hidden");
         nav.classList.add("nav-show");
     }
+    
     lastScroll = currentScroll;
 });
+
 /* --- FUNGSI SEARCH ZINE SPESIFIK & OPTIMASI --- */
 /* --- FUNGSI SEARCH GLOBAL & RESPONSIF (SUPABASE) --- */
 async function searchZine() {
