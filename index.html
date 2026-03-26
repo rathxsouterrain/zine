@@ -28,24 +28,60 @@ html{ scroll-behavior:smooth; }
 /* Cari bagian body di dalam <style> dan ganti menjadi seperti ini */
 body {
     margin: 0;
-    /* Gradasi linear menyesuaikan warna dan posisi dari gambar */
-    background: linear-gradient(
-        165deg, 
-        #2c3e50 0%,    /* Biru tua gelap */
-        #4a5c6d 30%,   /* Biru keabu-abuan */
-        #a4b0be 60%,   /* Abu-abu transisi */
-        #f5e6d3 100%   /* Krem hangat sesuai bagian bawah gambar */
-    );
-    background-attachment: fixed; /* Agar background tetap saat di-scroll */
-    background-size: cover;
-    
+    padding: 0;
+    background: #000b1a; /* Warna dasar biru sangat gelap */
     color: white;
     font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
     -webkit-user-select: none;
-    -ms-user-select: none;
     user-select: none;
-    overscroll-behavior-y: none; 
 }
+
+/* Efek Siluet Cahaya Bergerak */
+body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* Membuat gradasi lengkungan cahaya */
+    background: radial-gradient(circle at center, 
+        transparent 30%, 
+        rgba(100, 180, 255, 0.15) 45%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        rgba(100, 180, 255, 0.15) 55%, 
+        transparent 70%
+    );
+    z-index: -1;
+    filter: blur(40px);
+    animation: moveLight 15s linear infinite;
+    transform-origin: center;
+}
+
+/* Animasi Rotasi Siluet */
+@keyframes moveLight {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* Tambahan agar kartu kaca (glass) tetap terlihat kontras */
+.glass {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+}
+
 
 /* Tambahan agar gradasi menutupi seluruh layar meski konten sedikit */
 html {
