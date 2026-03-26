@@ -25,15 +25,25 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 <style>
 html{ scroll-behavior:smooth; }
 
-body{
-margin:0;
-background:#000;
-color:white;
-font-family:Arial, sans-serif;
-    -webkit-user-select: none;  /* Safari */
-    -ms-user-select: none;      /* IE 10 dan Edge */
-    user-select: none;          /* Standard (Chrome, Firefox, Opera) */
+body {
+    margin: 0;
+    background: #000;
+    color: white;
+    font-family: Arial, sans-serif;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    
+    /* KUNCI PERBAIKAN: Mematikan efek tarik-tarikan/mantul browser */
+    overscroll-behavior-y: none; 
 }
+
+/* Tambahan agar elemen fixed tidak ikut bergeser saat scrolling */
+html {
+    height: 100%;
+    overflow-x: hidden;
+}
+
 
 
 /* NAVBAR */
@@ -1084,7 +1094,6 @@ window.addEventListener("load", () => {
 });
 
 // FIX NAVBAR SCROLL (KEMBALI KE ASLI)
-// FIX NAVBAR SCROLL (ANTI KEDUT / OVERSCROLL PROTECTION)
 let lastScroll = 0;
 window.addEventListener("scroll", () => {
     const nav = document.querySelector("nav");
@@ -1092,36 +1101,24 @@ window.addEventListener("scroll", () => {
     const bodyHeight = document.body.offsetHeight;
     const windowHeight = window.innerHeight;
 
-    // 1. Jika di posisi paling atas, selalu tampilkan navbar
-    if (currentScroll <= 0) {
+    // Jika sedang di area paling bawah (toleransi 30px), jangan ubah status navbar
+    if (currentScroll + windowHeight >= bodyHeight - 30) {
+        return; 
+    }
+
+    // Jika scroll ke atas (dengan sedikit toleransi 5px)
+    if (currentScroll < lastScroll) {
         nav.classList.remove("nav-hidden");
         nav.classList.add("nav-show");
-        lastScroll = currentScroll;
-        return;
-    }
-
-    // 2. Jika mentok paling bawah (dengan toleransi 10px untuk efek pantulan), abaikan perintah hide/show
-    if (currentScroll + windowHeight >= bodyHeight - 10) {
-        lastScroll = currentScroll;
-        return;
-    }
-
-    // 3. Tambahkan toleransi 5px agar tidak berkedut saat jari bergetar
-    if (Math.abs(currentScroll - lastScroll) < 5) {
-        return;
-    }
-
-    // 4. Logika normal sembunyikan/tampilkan navbar
-    if (currentScroll > lastScroll && currentScroll > 120) {
+    } 
+    // Jika scroll ke bawah dan sudah melewati area hero
+    else if (currentScroll > lastScroll && currentScroll > 150) {
         nav.classList.remove("nav-show");
         nav.classList.add("nav-hidden");
-    } else if (currentScroll < lastScroll) {
-        nav.classList.remove("nav-hidden");
-        nav.classList.add("nav-show");
     }
-    
-    lastScroll = currentScroll;
-});
+
+    lastScroll = Math.max(0, currentScroll); // Cegah nilai negatif di iOS
+}, { passive: true });
 
 /* --- FUNGSI SEARCH ZINE SPESIFIK & OPTIMASI --- */
 /* --- FUNGSI SEARCH GLOBAL & RESPONSIF (SUPABASE) --- */
