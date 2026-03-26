@@ -25,21 +25,62 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 <style>
 html{ scroll-behavior:smooth; }
 
-<div class="bg-container">
-    <div class="light-curve"></div>
-    <div class="blue-glow"></div>
-</div>
-
-
-
-/* 4. Optimasi Glass Card agar terlihat menyatu */
-.glass {
-    background: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+/* Cari bagian body di dalam <style> dan ganti menjadi seperti ini */
+body {
+    margin: 0;
+    padding: 0;
+    background: #000b1a; /* Warna dasar biru sangat gelap */
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
+/* Efek Siluet Cahaya Bergerak */
+body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* Membuat gradasi lengkungan cahaya */
+    background: radial-gradient(circle at center, 
+        transparent 30%, 
+        rgba(100, 180, 255, 0.15) 45%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        rgba(100, 180, 255, 0.15) 55%, 
+        transparent 70%
+    );
+    z-index: -1;
+    filter: blur(40px);
+    animation: moveLight 15s linear infinite;
+    transform-origin: center;
+}
+
+/* Animasi Rotasi Siluet */
+@keyframes moveLight {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* Tambahan agar kartu kaca (glass) tetap terlihat kontras */
+.glass {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+}
 
 
 /* Tambahan agar gradasi menutupi seluruh layar meski konten sedikit */
