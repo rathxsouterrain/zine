@@ -26,61 +26,88 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 html{ scroll-behavior:smooth; }
 
 /* Cari bagian body di dalam <style> dan ganti menjadi seperti ini */
+/* 1. Reset Body & Background Dasar */
 body {
     margin: 0;
     padding: 0;
-    background: #000b1a; /* Warna dasar biru sangat gelap */
+    background-color: #00050a; /* Hitam kebiruan sangat gelap */
     color: white;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
-    -webkit-user-select: none;
-    user-select: none;
+    /* Memastikan konten tetap di atas background */
+    z-index: 1;
 }
 
-/* Efek Siluet Cahaya Bergerak */
-body::before {
+/* 2. Layer Siluet Bergerak (Persis Gambar) */
+body::before, body::after {
     content: "";
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    /* Membuat gradasi lengkungan cahaya */
-    background: radial-gradient(circle at center, 
-        transparent 30%, 
-        rgba(100, 180, 255, 0.15) 45%, 
-        rgba(255, 255, 255, 0.4) 50%, 
-        rgba(100, 180, 255, 0.15) 55%, 
-        transparent 70%
-    );
-    z-index: -1;
-    filter: blur(40px);
-    animation: moveLight 15s linear infinite;
-    transform-origin: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Di bawah konten */
+    pointer-events: none;
 }
 
-/* Animasi Rotasi Siluet */
-@keyframes moveLight {
+/* Siluet Lengkungan Biru Utama */
+body::before {
+    background: radial-gradient(circle at 100% 0%, 
+        rgba(135, 206, 250, 0.4) 0%, 
+        rgba(30, 144, 255, 0.2) 25%, 
+        transparent 50%);
+    filter: blur(60px);
+    animation: aurora 10s ease-in-out infinite alternate;
+}
+
+/* Siluet Cahaya Putih/Cyan (Garis Lengkung) */
+body::after {
+    background: radial-gradient(ellipse at 0% 100%, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        rgba(100, 200, 255, 0.15) 30%, 
+        transparent 60%);
+    filter: blur(80px);
+    animation: aurora-reverse 12s ease-in-out infinite alternate;
+}
+
+/* 3. Animasi Pergerakan Siluet */
+@keyframes aurora {
     0% {
-        transform: rotate(0deg) scale(1);
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
     }
     50% {
-        transform: rotate(180deg) scale(1.1);
+        transform: translate(-10%, 15%) scale(1.2);
+        opacity: 0.9;
     }
     100% {
-        transform: rotate(360deg) scale(1);
+        transform: translate(5%, -5%) scale(1.1);
+        opacity: 0.7;
     }
 }
 
-/* Tambahan agar kartu kaca (glass) tetap terlihat kontras */
-.glass {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+@keyframes aurora-reverse {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+        transform: translate(15%, -10%) rotate(5deg);
+    }
+    100% {
+        transform: translate(-5%, 5%) rotate(-5deg);
+    }
 }
+
+/* 4. Optimasi Glass Card agar terlihat menyatu */
+.glass {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
 
 
 /* Tambahan agar gradasi menutupi seluruh layar meski konten sedikit */
