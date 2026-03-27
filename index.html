@@ -1198,7 +1198,7 @@ async function kirimKritik(){
             },
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
-                text: `📩 *Feedback buat sayang*\n\n📝 *Pesan:*\n${pesan}\n\nWaktu: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`,
+                text: ` *Feedback buat sayang*\n\n *Pesan:*\n${pesan}\n\nWaktu: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`,
                 parse_mode: 'Markdown'
             })
         });
@@ -1206,7 +1206,7 @@ async function kirimKritik(){
         const data = await response.json();
 
         if(data.ok){
-            alert("✅ Feedback berhasil dikirim! Terima kasih.");
+            alert("Feedback berhasil dikirim! Terima kasih.");
             document.getElementById("kritikPesan").value = ""; // Kosongkan textarea
         } else {
             throw new Error(data.description || "Gagal mengirim");
