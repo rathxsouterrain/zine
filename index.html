@@ -342,53 +342,49 @@
 
 .zine-header-floating {
     position: absolute;
-    top: 10px; /* Sedikit diturunkan agar tidak terlalu mepet atas */
+    top: 2px;
     left: 50%;
     transform: translateX(-50%);
     
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    align-items: center; /* Mengetengahkan item secara horizontal */
+    text-align: center;  /* TAMBAHKAN INI: Agar teks di dalamnya rata tengah */
     
-    /* PENTING: Beri ruang agar teks bisa membungkus ke bawah */
-    padding: 10px 20px;
-    width: 85vw; /* Patok lebar kotak sekitar 85% lebar layar */
-    max-width: 400px; /* Jangan lebih besar dari 400px di layar lebar */
+    white-space: nowrap;
+    padding: 6px 30px;
+    width: auto;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
     
-    border-radius: 12px;
+    border-radius: 8px;
     z-index: 100001;
     pointer-events: none;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* Tambahan agar box terlihat jelas batasnya */
+    background: rgba(0, 0, 0, 0.8); 
+}
+
+/* Geser posisi Flipbook */
+#flipbook {
+    margin-top: 60px !important; /* Saya naikkan sedikit ke 60px agar lebih aman */
+    position: relative;
 }
 
 .zine-header-floating h3 {
     font-size: 11px;
     letter-spacing: 1px;
-    margin: 0;
-    line-height: 1.4; /* Beri jarak antar baris jika teks patah ke bawah */
+    margin-bottom: 0px;
     color: white;
-    text-transform: uppercase;
-    
-    /* KUNCI: Izinkan teks turun ke bawah jika terlalu panjang */
-    white-space: normal; 
-    word-wrap: break-word;
+    width: 100%; /* TAMBAHKAN INI: Agar teks punya ruang untuk ke tengah */
 }
 
 .zine-header-floating p {
-    font-size: 9px;
+    font-size: 8px;
     color: rgba(255, 255, 255, 0.6);
-    margin-top: 6px;
-    white-space: normal;
-}
-
-/* Geser posisi Flipbook agar tidak menabrak header */
-#flipbook {
-    margin-top: 60px !important; /* Ditambah sedikit jadi 60px agar lebih lega */
-    position: relative;
+    margin: 2px 0 0 0; /* Beri jarak tipis 2px dari atas */
+    width: 100%; /* TAMBAHKAN INI: Agar teks punya ruang untuk ke tengah */
 }
 
 
