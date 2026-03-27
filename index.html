@@ -1171,11 +1171,56 @@ bgMusic.play().catch(e => console.warn("Autoplay dicegah browser atau file tidak
 }
 
 
-    function kirimKritik(){
-        const pesan = document.getElementById("kritikPesan").value;
-        if(!pesan) return alert("Pesan kosong!");
-        window.location.href = `mailto:ulinnha1140@gmail.com?subject=Kritik&body=${encodeURIComponent(pesan)}`;
+    /* --- KONFIGURASI TELEGRAM BOT --- */
+const TELEGRAM_BOT_TOKEN = '8737457266:AAHxTZmMovbmGPOg-E5cqUjsA-jyMHb9Kk0';
+const TELEGRAM_CHAT_ID = '6469917203';
+
+/* --- FUNGSI KIRIM FEEDBACK KE TELEGRAM --- */
+async function kirimKritik(){
+    const pesan = document.getElementById("kritikPesan").value.trim();
+    
+    if(!pesan){
+        alert("Pesan tidak boleh kosong!");
+        return;
     }
+
+    // Tampilkan loading state
+    const btn = document.querySelector('.submit-btn');
+    const originalText = btn.innerText;
+    btn.innerText = "MENGIRIM...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: `📩 *Feedback Baru dari Zine Archive*\n\n📝 *Pesan:*\n${pesan}\n\n⏰ Waktu: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        const data = await response.json();
+
+        if(data.ok){
+            alert("✅ Feedback berhasil dikirim! Terima kasih.");
+            document.getElementById("kritikPesan").value = ""; // Kosongkan textarea
+        } else {
+            throw new Error(data.description || "Gagal mengirim");
+        }
+
+    } catch(error) {
+        console.error("Error:", error);
+        alert("❌ Gagal mengirim feedback. Silakan coba lagi.");
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+}
+
 
     /* --- UI INTERACTIONS --- */
     function setActive(element) {
