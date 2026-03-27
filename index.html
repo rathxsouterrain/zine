@@ -1081,10 +1081,16 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl, zineTitle, zineMusic
     if (headerCard) headerCard.style.display = 'block';
 
     // Play music
-const musicSource = customMusicUrl ? customMusicUrl : 'music.mp3';
+// --- KODE PEMUTAR MUSIK TERBARU ---
+const bgMusic = document.getElementById('bgMusic');
 
-bgMusic.src = musicSource;
-bgMusic.load(); // Memastikan file baru dimuat
+// Logika: Jika customMusicUrl ada, pakai itu. Jika kosong/null, pakai music.mp3
+const musicToPlay = (customMusicUrl && customMusicUrl !== '') ? customMusicUrl : 'music.mp3';
+
+bgMusic.src = musicToPlay;
+bgMusic.load(); // Paksa browser memuat file baru
+bgMusic.play().catch(e => console.warn("Autoplay dicegah browser atau file tidak ditemukan:", e));
+
 
     // Update Views
     if (zineId) {
