@@ -340,50 +340,58 @@
     margin-top: 15px;
 }
 
-/* Card Judul Melayang di Atas Canvas */
 .zine-header-floating {
     position: absolute;
     top: 2px;
     left: 50%;
     transform: translateX(-50%);
     
-    /* KUNCI AGAR MELEBAR BUKAN MEMBESAR */
-    display: inline-flex;
+    /* Layout ke tengah */
+    display: flex; /* Flex lebih stabil untuk centering daripada inline-flex */
     flex-direction: column;
-    align-items: center;
-    white-space: nowrap; /* Mencegah teks turun ke baris baru */
+    align-items: center; 
+    justify-content: center;
+    text-align: center; /* KUNCI: Membuat teks di dalam h3 dan p rata tengah */
     
-    padding: 6px 30px; /* Padding samping (30px) lebih besar dari atas-bawah (6px) */
+    white-space: nowrap; 
+    padding: 8px 30px; /* Sedikit ditambah padding atas agar lebih proporsional */
     width: auto;
-    max-width: 90vw; /* Maksimal lebar 90% layar agar tidak tumpah */
-    overflow: hidden; /* Potong jika benar-benar terlalu panjang */
-    text-overflow: ellipsis;
+    max-width: 90vw; 
+    overflow: hidden;
     
     border-radius: 8px;
     z-index: 100001;
     pointer-events: none;
+    
+    /* Tambahan opsional: background agar teks lebih terbaca jika PDF berwarna terang */
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(4px);
 }
 
+/* Judul Zine */
+.zine-header-floating h3 {
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin: 0; /* Reset margin */
+    color: white;
+    width: 100%;
+    text-transform: uppercase; /* Agar terlihat lebih tegas seperti di gambar */
+}
 
-/* Geser posisi Flipbook ke bawah sedikit agar tidak tertutup judul */
+/* Info Musik */
+.zine-header-floating p {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 2px 0 0 0; /* Beri jarak tipis 2px dari judul */
+    width: 100%;
+}
+
+/* Geser posisi Flipbook agar tidak menabrak header */
 #flipbook {
-    margin-top: 50px !important; /* Memberi ruang untuk judul di atasnya */
+    margin-top: 60px !important; /* Ditambah sedikit jadi 60px agar lebih lega */
     position: relative;
 }
 
-
-/* Perkecil juga ukuran teksnya agar kotak ikut mengecil */
-.zine-header-floating h3 {
-    font-size: 11px;      /* GANTI: Dari 14px ke 11px */
-    letter-spacing: 1px;
-    margin-bottom: 0px;   /* GANTI: Dari 2px ke 0px */
-    color: white;
-}
-
-.zine-header-floating p {
-    font-size: 8px;       /* GANTI: Dari 10px ke 8px */
-    color: rgba(255, 255, 255, 0.6);
-}
 
 
 
