@@ -342,27 +342,26 @@
 
 .zine-header-floating {
     position: absolute;
-    top: 2px;
+    top: 10px; /* Sedikit diturunkan agar tidak terlalu mepet atas */
     left: 50%;
     transform: translateX(-50%);
     
-    /* Layout Utama */
-    display: flex; /* Gunakan flex biasa agar centering lebih akurat */
+    display: flex;
     flex-direction: column;
-    align-items: center; /* Mengetengahkan item secara horizontal */
-    justify-content: center; /* Mengetengahkan item secara vertikal */
-    text-align: center; /* WAJIB: Mengetengahkan baris teks */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     
-    padding: 10px 30px; 
-    width: auto;
-    min-width: 250px; /* Opsional: Memberi lebar minimal agar kotak tidak terlalu sempit */
-    max-width: 90vw;
-    border-radius: 8px;
+    /* PENTING: Beri ruang agar teks bisa membungkus ke bawah */
+    padding: 10px 20px;
+    width: 85vw; /* Patok lebar kotak sekitar 85% lebar layar */
+    max-width: 400px; /* Jangan lebih besar dari 400px di layar lebar */
+    
+    border-radius: 12px;
     z-index: 100001;
     pointer-events: none;
-    
-    /* Tambahkan background agar terlihat batas kotaknya */
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -370,19 +369,20 @@
     font-size: 11px;
     letter-spacing: 1px;
     margin: 0;
-    padding: 0;
+    line-height: 1.4; /* Beri jarak antar baris jika teks patah ke bawah */
     color: white;
-    width: 100%; /* Pastikan h3 mengambil lebar penuh kotak */
-    display: block;
+    text-transform: uppercase;
+    
+    /* KUNCI: Izinkan teks turun ke bawah jika terlalu panjang */
+    white-space: normal; 
+    word-wrap: break-word;
 }
 
 .zine-header-floating p {
-    font-size: 8px;
+    font-size: 9px;
     color: rgba(255, 255, 255, 0.6);
-    margin: 4px 0 0 0; /* Beri jarak sedikit antara judul dan musik */
-    padding: 0;
-    width: 100%; /* Pastikan p mengambil lebar penuh kotak */
-    display: block;
+    margin-top: 6px;
+    white-space: normal;
 }
 
 /* Geser posisi Flipbook agar tidak menabrak header */
