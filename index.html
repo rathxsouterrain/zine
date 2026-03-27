@@ -1081,11 +1081,10 @@ async function openFlipbook(pdfUrl, zineId, customMusicUrl, zineTitle, zineMusic
     if (headerCard) headerCard.style.display = 'block';
 
     // Play music
-    const bgMusic = document.getElementById('bgMusic');
-    if (customMusicUrl) {
-        bgMusic.src = customMusicUrl;
-        bgMusic.play().catch(e => console.log('Audio play failed:', e));
-    }
+const musicSource = customMusicUrl ? customMusicUrl : 'music.mp3';
+
+bgMusic.src = musicSource;
+bgMusic.load(); // Memastikan file baru dimuat
 
     // Update Views
     if (zineId) {
