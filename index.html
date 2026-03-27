@@ -346,44 +346,43 @@
     left: 50%;
     transform: translateX(-50%);
     
-    /* Layout ke tengah */
-    display: flex; /* Flex lebih stabil untuk centering daripada inline-flex */
+    /* Layout Utama */
+    display: flex; /* Gunakan flex biasa agar centering lebih akurat */
     flex-direction: column;
-    align-items: center; 
-    justify-content: center;
-    text-align: center; /* KUNCI: Membuat teks di dalam h3 dan p rata tengah */
+    align-items: center; /* Mengetengahkan item secara horizontal */
+    justify-content: center; /* Mengetengahkan item secara vertikal */
+    text-align: center; /* WAJIB: Mengetengahkan baris teks */
     
-    white-space: nowrap; 
-    padding: 8px 30px; /* Sedikit ditambah padding atas agar lebih proporsional */
+    padding: 10px 30px; 
     width: auto;
-    max-width: 90vw; 
-    overflow: hidden;
-    
+    min-width: 250px; /* Opsional: Memberi lebar minimal agar kotak tidak terlalu sempit */
+    max-width: 90vw;
     border-radius: 8px;
     z-index: 100001;
     pointer-events: none;
     
-    /* Tambahan opsional: background agar teks lebih terbaca jika PDF berwarna terang */
-    background: rgba(0, 0, 0, 0.6); 
-    backdrop-filter: blur(4px);
+    /* Tambahkan background agar terlihat batas kotaknya */
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Judul Zine */
 .zine-header-floating h3 {
     font-size: 11px;
     letter-spacing: 1px;
-    margin: 0; /* Reset margin */
+    margin: 0;
+    padding: 0;
     color: white;
-    width: 100%;
-    text-transform: uppercase; /* Agar terlihat lebih tegas seperti di gambar */
+    width: 100%; /* Pastikan h3 mengambil lebar penuh kotak */
+    display: block;
 }
 
-/* Info Musik */
 .zine-header-floating p {
     font-size: 8px;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 2px 0 0 0; /* Beri jarak tipis 2px dari judul */
-    width: 100%;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 4px 0 0 0; /* Beri jarak sedikit antara judul dan musik */
+    padding: 0;
+    width: 100%; /* Pastikan p mengambil lebar penuh kotak */
+    display: block;
 }
 
 /* Geser posisi Flipbook agar tidak menabrak header */
